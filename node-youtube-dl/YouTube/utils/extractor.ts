@@ -36,7 +36,6 @@ function get_ytInitialData(data:string): JSON {
 
 export async function url_get (url : string) : Promise<string>{
     return new Promise(async(resolve, reject) => {
-        let time_start = Date.now()
         let response = await fetch(url)
 
         if(response.status === 200) {
