@@ -2,7 +2,7 @@
   "name": "killer",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/killer069/node-youtube-dl#readme",
   "dependencies": {
+    "got": "^11.8.2",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
