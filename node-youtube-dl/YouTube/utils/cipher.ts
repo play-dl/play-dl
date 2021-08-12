@@ -1,5 +1,5 @@
 import { URL } from 'node:url'
-import { url_get } from './extractor'
+import { url_get } from './request'
 import querystring from 'node:querystring'
 
 interface formatOptions {
@@ -102,7 +102,7 @@ export function js_tokens( body:string ) {
   return tokens
 }
 
-export function deciper_signature(tokens : string[], signature :string){
+function deciper_signature(tokens : string[], signature :string){
   let sig = signature.split('')
   let len = tokens.length
   for(let i = 0; i < len; i++ ){
@@ -137,7 +137,7 @@ function swappositions(array : string[], position : number){
   return array
 }
 
-export function download_url(format: formatOptions, sig : string){
+function download_url(format: formatOptions, sig : string){
   let decoded_url;
   if(!format.url) return;
   decoded_url = format.url

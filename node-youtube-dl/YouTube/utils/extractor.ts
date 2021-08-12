@@ -1,14 +1,8 @@
-import fetch from 'node-fetch'
+import { url_get } from './request'
 import { format_decipher, js_tokens } from './cipher'
 
-export function valid_url(url : string): boolean{
-    let valid_url = /^https?:\/\/(youtu\.be\/|(www\.)?youtube\.com\/(embed|watch|v|shorts)(\/|\?))/
-    if(url.search(valid_url) !== -1) return true
-    else return false
-}
 
 export async function yt_initial_data(url : string){
-    if(valid_url(url)){
         let body = await url_get(url)
         let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split(";</script>")[0])
         let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
@@ -45,10 +39,6 @@ export async function yt_initial_data(url : string){
             video_details
         }
         return final
-    }
-    else {
-        throw 'Not a Valid YouTube URL'
-    }
 }
 
 export async function yt_deciphered_data(url : string) {
@@ -60,15 +50,4 @@ export async function yt_deciphered_data(url : string) {
     else {
         return data
     }
-}
-
-export async function url_get (url : string) : Promise<string>{
-    return new Promise(async(resolve, reject) => {
-        let response = await fetch(url)
-
-        if(response.status === 200) {
-            resolve(await response.text())
-        }
-        else reject(`Got ${response.status} from ${url}`)
-    })
 }
