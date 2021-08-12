@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/killer069/node-youtube-dl#readme",
   "dependencies": {
-    "got": "^11.8.2",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {

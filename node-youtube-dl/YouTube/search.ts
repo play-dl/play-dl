@@ -1,10 +1,13 @@
 import { url_get } from "./utils/request";
 import fs from 'fs'
+import { ParseSearchInterface, ParseSearchResult } from "./utils/parser";
+import { Video } from "./classes/Video";
+import { Channel } from "./classes/Channel";
+import { PlayList } from "./classes/Playlist";
 
 
-export async function search(url:string, options? : {limit : number}) {
+export async function search(url:string, options? : ParseSearchInterface): Promise<(Video | Channel | PlayList)[]> {
     let body = await url_get(url)
-    let json_convert = body.split("var ytInitialData = ")[1].split(";</script>")[0]
-    let result = JSON.parse(json_convert).contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents
-    console.log(result.length)
+    let data = ParseSearchResult(body)
+    return data
 }

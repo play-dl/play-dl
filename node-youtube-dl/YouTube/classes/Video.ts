@@ -1,3 +1,6 @@
+import { Channel } from "./Channel";
+import { Thumbnail } from "./Thumbnail";
+
 interface VideoOptions {
     id?: string;
     url? : string;
@@ -7,8 +10,17 @@ interface VideoOptions {
     duration: number;
     uploadedAt?: string;
     views: number;
-    thumbnail?: JSON;
-    channel?: JSON;
+    thumbnail?: {
+        id: string | undefined;
+        width: number;
+        height: number;
+        url: string | undefined;
+    };
+    channel?: {
+        name : string,
+        id : string,
+        icon : string
+    };
     videos?: Video[];
     type : string;
     ratings : {   
@@ -28,8 +40,8 @@ export class Video {
     duration: number;
     uploadedAt?: string;
     views: number;
-    thumbnail?: JSON;
-    channel?: JSON;
+    thumbnail?: Thumbnail;
+    channel?: Channel;
     videos?: Video[];
     likes: number;
     dislikes: number;
@@ -39,6 +51,7 @@ export class Video {
 
     constructor(data : any){
         if(!data) throw new Error(`Can not initiate ${this.constructor.name} without data`)
+        
         this.id = data.id || undefined;
         this.title = data.title || undefined;
         this.description = data.description || undefined;
@@ -77,8 +90,12 @@ export class Video {
             duration: this.duration,
             duration_formatted: this.durationFormatted,
             uploadedAt: this.uploadedAt,
-            thumbnail: this.thumbnail,
-            channel: this.channel,
+            thumbnail: this.thumbnail?.toJSON(),
+            channel: {
+                name: this.channel?.name as string,
+                id: this.channel?.id as string,
+                icon: this.channel?.iconURL() as string
+            },
             views: this.views,
             type: this.type,
             tags: this.tags,
