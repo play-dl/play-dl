@@ -70,7 +70,7 @@ console.log(playlist.videoCount) // This displays total no. of videos in a playl
 ```
 
 ## Search Command Usage :-
-### 1. search(url : `string`, options? : `SearchOptions`)
+### 1. search(url : `string`, options? : [SearchOptions](https://github.com/node-youtube-dl/node-youtube-dl/tree/Killer/node-youtube-dl/YouTube#searchoptions))
 *This enables all searching mechanism (video, channel, playlist)*
 ```js
 let result = await search('Rick Roll')
