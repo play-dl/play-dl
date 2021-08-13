@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/killer069/node-youtube-dl.git"
+    "url": "git+https://github.com/play-dl/play-dl"
   },
   "keywords": [
 		"node-youtube-dl",
@@ -25,9 +25,9 @@
   "author": "Killer069",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/killer069/node-youtube-dl/issues"
+    "url": "https://github.com/play-dl/play-dl/issues"
   },
-  "homepage": "https://github.com/killer069/node-youtube-dl#readme",
+  "homepage": "https://github.com/play-dl/play-dl#readme",
   "files": [
 		"dist/*"
 	],
