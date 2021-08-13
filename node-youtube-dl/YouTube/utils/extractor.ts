@@ -3,30 +3,25 @@ import { format_decipher, js_tokens } from './cipher'
 import { Video } from '../classes/Video'
 import { RequestInit } from 'node-fetch'
 import { PlayList } from '../classes/Playlist'
-import fs from 'fs'
 
 const DEFAULT_API_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
 const youtube_url = /https:\/\/www.youtube.com\//g
 const video_pattern = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 
-export interface PlaylistOptions {
-    limit?: number;
-    requestOptions?: RequestInit;
-}
-
 export async function video_basic_info(url : string){
         if(!url.match(youtube_url) || !url.match(video_pattern)) throw new Error('This is not a YouTube URL')
-        let body = await url_get(url)
+        let video_id = url.split('watch?v=')[1].split('&')[0]
+        let new_url = 'https://www.youtube.com/watch?v=' + video_id
+        let body = await url_get(new_url)
         let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split(";</script>")[0])
         if(player_response.playabilityStatus.status === 'ERROR') throw new Error(`While getting info from url \n  ${player_response.playabilityStatus.reason}`)
-        let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
         let html5player =  'https://www.youtube.com' + body.split('"jsUrl":"')[1].split('"')[0]
         let format = []
         format.push(player_response.streamingData.formats[0])
         format.push(...player_response.streamingData.adaptiveFormats)
         let vid = player_response.videoDetails
         let microformat = player_response.microformat.playerMicroformatRenderer
-        let video_details = new Video ({
+        let video_details = {
             id : vid.videoId,
             url : 'https://www.youtube.com/watch?v=' + vid.videoId,
             title : vid.title,
@@ -48,10 +43,8 @@ export async function video_basic_info(url : string){
             averageRating : vid.averageRating,
             live : vid.isLiveContent,
             private : vid.isPrivate
-        })
+        }
         return {
-            player_response,
-            response,
             html5player,
             format,
             video_details
@@ -69,9 +62,7 @@ export async function video_info(url : string) {
     }
 }
 
-export async function playlist_info(url : string , options? : PlaylistOptions) {
-    if (!options) options = { limit: 100, requestOptions: {} };
-    if(!options.limit) options.limit = 100
+export async function playlist_info(url : string) {
     if (!url || typeof url !== "string") throw new Error(`Expected playlist url, received ${typeof url}!`);
     if(url.search('(\\?|\\&)list\\=') === -1) throw new Error('This is not a PlayList URL')
 
@@ -87,7 +78,7 @@ export async function playlist_info(url : string , options? : PlaylistOptions) {
     let playlistDetails = JSON.parse(body.split('{"playlistSidebarRenderer":')[1].split("}};</script>")[0]).items;
 
     let API_KEY = body.split('INNERTUBE_API_KEY":"')[1]?.split('"')[0] ?? body.split('innertubeApiKey":"')[1]?.split('"')[0] ?? DEFAULT_API_KEY;
-    let videos = getPlaylistVideos(parsed, options.limit);
+    let videos = getPlaylistVideos(parsed, 100);
 
     let data = playlistDetails[0].playlistSidebarPrimaryInfoRenderer;
     if (!data.title.runs || !data.title.runs.length) return undefined;

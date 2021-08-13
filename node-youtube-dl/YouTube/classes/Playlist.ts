@@ -3,7 +3,6 @@ import { url_get } from "../utils/request";
 import { Thumbnail } from "./Thumbnail";
 import { Channel } from "./Channel";
 import { Video } from "./Video";
-import fs from 'fs'
 const BASE_API = "https://www.youtube.com/youtubei/v1/browse?key=";
 
 export class PlayList{
@@ -16,7 +15,7 @@ export class PlayList{
     link?: string;
     channel?: Channel;
     thumbnail?: Thumbnail;
-    videos?: [];
+    private videos?: [];
     private fetched_videos : Map<string, Video[]>
     private _continuation: { api?: string; token?: string; clientVersion?: string } = {};
     private __count : number

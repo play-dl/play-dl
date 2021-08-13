@@ -1,5 +1,4 @@
 import { url_get } from "./utils/request";
-import fs from 'fs'
 import { ParseSearchInterface, ParseSearchResult } from "./utils/parser";
 import { Video } from "./classes/Video";
 import { Channel } from "./classes/Channel";

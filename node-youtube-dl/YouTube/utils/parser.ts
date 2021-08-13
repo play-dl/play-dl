@@ -1,13 +1,10 @@
 import { Video } from "../classes/Video";
 import { PlayList } from "../classes/Playlist";
 import { Channel } from "../classes/Channel";
-import { RequestInit } from "node-fetch";
-import fs from 'fs'
 
 export interface ParseSearchInterface {
     type?: "video" | "playlist" | "channel" | "all";
     limit?: number;
-    requestOptions?: RequestInit;
 }
 
 export function ParseSearchResult(html :string, options? : ParseSearchInterface): (Video | PlayList | Channel)[] {

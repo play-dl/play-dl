@@ -153,10 +153,10 @@ function download_url(format: formatOptions, sig : string){
   format.url = parsed_url.toString();
 }
 
-export async function format_decipher(format: formatOptions[], html5player : string){
+export async function format_decipher(formats: formatOptions[], html5player : string){
   let body = await url_get(html5player)
   let tokens = js_tokens(body)
-  format.forEach((format) => {
+  formats.forEach((format) => {
     let cipher = format.signatureCipher || format.cipher;
     if(cipher){
       Object.assign(format, querystring.parse(cipher))
@@ -167,7 +167,9 @@ export async function format_decipher(format: formatOptions[], html5player : str
     if(tokens && format.s){
       sig = deciper_signature(tokens, format.s)
       download_url(format, sig)
+      delete format.s
+      delete format.sp
     }
   });
-  return format
+  return formats
 }
