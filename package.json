@@ -1,5 +1,5 @@
 {
-  "name": "@node/youtube-dl",
+  "name": "node-youtube-dl-v2",
   "version": "0.0.1",
   "description": "YouTube, SoundCloud, Spotify downloader",
   "main": "dist/index.js",
