@@ -20,8 +20,8 @@ let video = await video_info(url)
 ### 3. formats 
 *This shows all formats availiable of a video*
 ```js
-    let video = await video_info(url)
-    console.log(video.format)
+let video = await video_info(url)
+console.log(video.format)
 ```
 
 ## Playlist commands usage :-
