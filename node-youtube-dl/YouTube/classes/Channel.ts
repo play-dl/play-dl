@@ -6,10 +6,10 @@ export interface ChannelIconInterface {
 
 export class Channel {
     name?: string;
-    verified!: boolean;
+    verified?: boolean;
     id?: string;
     url?: string;
-    icon!: ChannelIconInterface;
+    icon?: ChannelIconInterface;
     subscribers?: string;
 
     constructor(data: any) {
@@ -36,7 +36,7 @@ export class Channel {
      */
     iconURL(options = { size: 0 }): string | undefined{
         if (typeof options.size !== "number" || options.size < 0) throw new Error("invalid icon size");
-        if (!this.icon.url) return undefined;
+        if (!this.icon?.url) return undefined;
         const def = this.icon.url.split("=s")[1].split("-c")[0];
         return this.icon.url.replace(`=s${def}-c`, `=s${options.size}-c`);
     }

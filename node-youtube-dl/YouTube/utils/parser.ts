@@ -2,6 +2,7 @@ import { Video } from "../classes/Video";
 import { PlayList } from "../classes/Playlist";
 import { Channel } from "../classes/Channel";
 import { RequestInit } from "node-fetch";
+import fs from 'fs'
 
 export interface ParseSearchInterface {
     type?: "video" | "playlist" | "channel" | "all";
@@ -31,7 +32,7 @@ export function ParseSearchResult(html :string, options? : ParseSearchInterface)
         details = JSON.parse(html.split('{"itemSectionRenderer":{"contents":')[html.split('{"itemSectionRenderer":{"contents":').length - 1].split(',"continuations":[{')[0]);
         fetched = true;
     } catch {
-        /* do nothing */
+        /* Do nothing*/
     }
 
     if (!fetched) {
@@ -76,40 +77,7 @@ export function ParseSearchResult(html :string, options? : ParseSearchInterface)
 return results as (Video | Channel | PlayList)[];
 }
 
-export function getPlaylistVideos(data:any, limit : number = Infinity) : Video[] {
-    const videos = [];
-
-    for (let i = 0; i < data.length; i++) {
-        if (limit === videos.length) break;
-        const info = data[i].playlistVideoRenderer;
-        if (!info || !info.shortBylineText) continue;
-
-        videos.push(
-            new Video({
-                id: info.videoId,
-                index: parseInt(info.index?.simpleText) || 0,
-                duration: parseDuration(info.lengthText?.simpleText) || 0,
-                duration_raw: info.lengthText?.simpleText ?? "0:00",
-                thumbnail: {
-                    id: info.videoId,
-                    url: info.thumbnail.thumbnails[info.thumbnail.thumbnails.length - 1].url,
-                    height: info.thumbnail.thumbnails[info.thumbnail.thumbnails.length - 1].height,
-                    width: info.thumbnail.thumbnails[info.thumbnail.thumbnails.length - 1].width
-                },
-                title: info.title.runs[0].text,
-                channel: {
-                    id: info.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId || undefined,
-                    name: info.shortBylineText.runs[0].text || undefined,
-                    url: `https://www.youtube.com${info.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl || info.shortBylineText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
-                    icon: undefined
-                }
-            })
-        );
-    }
-    return videos   
-}
-
-export function parseDuration(duration: string): number {
+function parseDuration(duration: string): number {
     duration ??= "0:00";
     const args = duration.split(":");
     let dur = 0;
@@ -128,11 +96,6 @@ export function parseDuration(duration: string): number {
     return dur;
 }
 
-export function getContinuationToken(data:any): string {
-    const continuationToken = data.find((x: any) => Object.keys(x)[0] === "continuationItemRenderer")?.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token;
-    return continuationToken;
-}
-
 export function parseChannel(data?: any): Channel | void {
     if (!data || !data.channelRenderer) return;
     const badge = data.channelRenderer.ownerBadges && data.channelRenderer.ownerBadges[0];
@@ -140,10 +103,14 @@ export function parseChannel(data?: any): Channel | void {
     let res = new Channel({
         id: data.channelRenderer.channelId,
         name: data.channelRenderer.title.simpleText,
-        icon: data.channelRenderer.thumbnail.thumbnails[data.channelRenderer.thumbnail.thumbnails.length - 1],
+        icon: {
+            url : data.channelRenderer.thumbnail.thumbnails[data.channelRenderer.thumbnail.thumbnails.length - 1].url.replace('//', 'https://'),
+            width : data.channelRenderer.thumbnail.thumbnails[data.channelRenderer.thumbnail.thumbnails.length - 1].width,
+            height: data.channelRenderer.thumbnail.thumbnails[data.channelRenderer.thumbnail.thumbnails.length - 1].height
+        },
         url: url,
         verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes("verified")),
-        subscribers: data.channelRenderer.subscriberCountText.simpleText
+        subscribers: (data.channelRenderer.subscriberCountText?.simpleText) ? data.channelRenderer.subscriberCountText.simpleText : '0 subscribers'
     });
 
     return res;

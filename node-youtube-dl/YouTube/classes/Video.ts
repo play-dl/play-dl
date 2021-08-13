@@ -12,8 +12,8 @@ interface VideoOptions {
     views: number;
     thumbnail?: {
         id: string | undefined;
-        width: number;
-        height: number;
+        width: number | undefined ;
+        height: number | undefined;
         url: string | undefined;
     };
     channel?: {
@@ -34,6 +34,7 @@ interface VideoOptions {
 
 export class Video {
     id?: string;
+    url? : string;
     title?: string;
     description?: string;
     durationFormatted: string;
@@ -53,6 +54,7 @@ export class Video {
         if(!data) throw new Error(`Can not initiate ${this.constructor.name} without data`)
         
         this.id = data.id || undefined;
+        this.url = `https://www.youtube.com/watch?v=${this.id}`
         this.title = data.title || undefined;
         this.description = data.description || undefined;
         this.durationFormatted = data.duration_raw || "0:00";
@@ -66,11 +68,6 @@ export class Video {
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
-    }
-
-    get url(){
-        if(!this.id) return undefined
-        else return `https://www.youtube.com/watch?v=${this.id}`;
     }
 
     get type(): "video" {

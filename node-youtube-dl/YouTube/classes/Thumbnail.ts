@@ -2,8 +2,8 @@ type ThumbnailType = "default" | "hqdefault" | "mqdefault" | "sddefault" | "maxr
 
 export class Thumbnail {
     id?: string;
-    width!: number;
-    height!: number;
+    width?: number;
+    height?: number;
     url?: string;
 
     constructor(data: any) {
