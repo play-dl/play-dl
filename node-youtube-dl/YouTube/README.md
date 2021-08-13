@@ -35,6 +35,7 @@ let playlist = await playlist_info(url) //This only fetches first 100 songs from
 *This fetches whole playlist.*
 ```js
 let playlist = await playlist_info(url) //This only fetches first 100 songs from a playlist
+
 await playlist.fetch() // This one fetches all songs from a playlist.
 ```
 #### 3. playlist.page(page_number : `number`)
@@ -44,21 +45,27 @@ await playlist.fetch() // This one fetches all songs from a playlist.
 
 ```js
 let playlist = await playlist_info(url) //This only fetches first 100 songs from a playlist
+
 await playlist.fetch() // This one fetches all songs from a playlist.
+
 console.log(playlist.page(1)) // This displays first 100 songs of a playlist
 ```
 #### 4. playlist.total_videos
 *This tells you total no of videos that have been fetched so far.*
 ```js
 let playlist = await playlist_info(url) //This only fetches first 100 songs from a playlist
+
 await playlist.fetch() // This one fetches all songs from a playlist.
+
 console.log(playlist.total_videos) // This displays total no. of videos fetched so far.
 ```
 #### 5. playlist.videoCount
 *This tells total no. of songs in a playlist.*
 ```js
 let playlist = await playlist_info(url) //This only fetches first 100 songs from a playlist
+
 await playlist.fetch() // This one fetches all songs from a playlist.
+
 console.log(playlist.videoCount) // This displays total no. of videos in a playlist
 ```
 
