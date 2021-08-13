@@ -1,22 +1,36 @@
 {
-  "name": "killer",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@node/youtube-dl",
+  "version": "0.0.1",
+  "description": "YouTube, SoundCloud, Spotify downloader",
   "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build" : "tsc",
+	  "build:check": "tsc --noEmit --incremental false"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/killer069/node-youtube-dl.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+		"node-youtube-dl",
+		"youtube-dl",
+		"yt-dl",
+		"ytdl",
+		"youtube",
+		"spotify-dl",
+		"spotify",
+		"soundcloud"
+		],
+  "author": "Killer069",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/killer069/node-youtube-dl/issues"
   },
   "homepage": "https://github.com/killer069/node-youtube-dl#readme",
+  "files": [
+		"dist/*"
+	],
   "dependencies": {
     "node-fetch": "^2.6.1"
   },
