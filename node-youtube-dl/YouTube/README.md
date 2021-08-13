@@ -40,7 +40,7 @@ await playlist.fetch() // This one fetches all songs from a playlist.
 #### 3. playlist.page(page_number : `number`)
 *This gives you no. of videos from a page*
 > Pages : every 100 songs have been divided into pages. 
-> So for example: There is 782 songs in a playlist, so there will be 8 pages.
+> So for example: There are 782 songs in a playlist, so there will be 8 pages.
 
 ```js
 let playlist = await playlist_info(url) //This only fetches first 100 songs from a playlist
