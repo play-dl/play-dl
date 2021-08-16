@@ -79,6 +79,9 @@ export async function stream(url : string, options? : StreamOptions): Promise<St
 
         if(final.length === 0) throw new Error("Video Format > 480p is not found")
     }
+    else{
+        final.push(info.format[info.format.length - 1])
+    }
 
     return yt_stream(final[0].url)
 }
