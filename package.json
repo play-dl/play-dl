@@ -33,8 +33,5 @@
   ],
   "dependencies": {
     "got": "^11.8.2"
-  },
-  "devDependencies": {
-    "@types/node-fetch": "^2.5.12"
   }
 }
