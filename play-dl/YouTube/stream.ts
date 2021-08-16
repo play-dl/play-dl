@@ -1,5 +1,5 @@
+import got from "got"
 import { video_info } from "."
-import { Stream, stream as yt_stream } from "../Stream/stream"
 
 
 interface FilterOptions {
@@ -44,7 +44,7 @@ function parseFormats(formats : any[]): { audio: any[], video:any[] } {
 function filter_songs(formats : any[], options : FilterOptions) {
 }
 
-export async function stream(url : string, options? : StreamOptions): Promise<Stream>{
+export async function stream(url : string, options? : StreamOptions){
     let info = await video_info(url)
     let final: any[] = [];
 
@@ -83,5 +83,5 @@ export async function stream(url : string, options? : StreamOptions): Promise<St
         final.push(info.format[info.format.length - 1])
     }
 
-    return yt_stream(final[0].url)
+    return got.stream(final[0].url)
 }

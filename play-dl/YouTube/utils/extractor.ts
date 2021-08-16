@@ -1,7 +1,6 @@
 import { url_get } from './request'
 import { format_decipher, js_tokens } from './cipher'
 import { Video } from '../classes/Video'
-import { RequestInit } from 'node-fetch'
 import { PlayList } from '../classes/Playlist'
 
 const DEFAULT_API_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
