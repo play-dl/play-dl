@@ -1,27 +1,27 @@
 {
   "name": "play-dl",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "YouTube, SoundCloud, Spotify downloader",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build" : "tsc",
-	  "build:check": "tsc --noEmit --incremental false"
+    "build": "tsc",
+    "build:check": "tsc --noEmit --incremental false"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/play-dl/play-dl"
   },
   "keywords": [
-		"node-youtube-dl",
-		"youtube-dl",
-		"yt-dl",
-		"ytdl",
-		"youtube",
-		"spotify-dl",
-		"spotify",
-		"soundcloud"
-		],
+    "node-youtube-dl",
+    "youtube-dl",
+    "yt-dl",
+    "ytdl",
+    "youtube",
+    "spotify-dl",
+    "spotify",
+    "soundcloud"
+  ],
   "author": "Killer069",
   "license": "MIT",
   "bugs": {
@@ -29,10 +29,10 @@
   },
   "homepage": "https://github.com/play-dl/play-dl#readme",
   "files": [
-		"dist/*"
-	],
+    "dist/*"
+  ],
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "got": "^11.8.2"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.12"
