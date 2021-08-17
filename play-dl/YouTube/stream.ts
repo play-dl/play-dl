@@ -1,6 +1,7 @@
 import got from "got"
 import { video_info } from "."
-import agent from 'agentkeepalive'
+import { PassThrough } from 'stream'
+import https from 'https'
 
 interface FilterOptions {
     averagebitrate? : number;
@@ -44,7 +45,7 @@ function parseFormats(formats : any[]): { audio: any[], video:any[] } {
 function filter_songs(formats : any[], options : FilterOptions) {
 }
 
-export async function stream(url : string, options? : StreamOptions){
+export async function stream(url : string, options? : StreamOptions): Promise<PassThrough>{
     let info = await video_info(url)
     let final: any[] = [];
 
@@ -83,7 +84,7 @@ export async function stream(url : string, options? : StreamOptions){
         final.push(info.format[info.format.length - 1])
     }
 
-    return got.stream(final[0].url, {
+    let stream = got.stream(final[0].url, {
         retry : 5,
         headers: {
             'Connection': 'keep-alive',
@@ -92,8 +93,12 @@ export async function stream(url : string, options? : StreamOptions){
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'
         },
         agent : {
-            https : new agent.HttpsAgent()
+            https : new https.Agent({ keepAlive : true })
         },
         http2 : true
     })
+    let playing_stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 })
+
+    stream.pipe(playing_stream)
+    return playing_stream
 }

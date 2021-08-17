@@ -1,6 +1,6 @@
 {
   "name": "play-dl",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "YouTube, SoundCloud, Spotify downloader",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -32,7 +32,6 @@
     "dist/*"
   ],
   "dependencies": {
-    "agentkeepalive": "^4.1.4",
     "got": "^11.8.2"
   }
 }
