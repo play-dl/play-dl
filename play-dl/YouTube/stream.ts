@@ -89,6 +89,7 @@ export async function stream(url : string, options? : StreamOptions){
             'Connection': 'keep-alive',
             'Accept-Encoding': '',
             'Accept-Language': 'en-US,en;q=0.8'
-        }
+        },
+        http2 : true
     })
 }
