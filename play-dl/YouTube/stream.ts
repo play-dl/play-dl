@@ -85,5 +85,10 @@ export async function stream(url : string, options? : StreamOptions){
 
     return got.stream(final[0].url, {
         retry : 5,
+        headers: {
+            'Connection': 'keep-alive',
+            'Accept-Encoding': '',
+            'Accept-Language': 'en-US,en;q=0.8'
+        }
     })
 }
