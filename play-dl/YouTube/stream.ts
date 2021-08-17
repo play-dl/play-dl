@@ -83,5 +83,7 @@ export async function stream(url : string, options? : StreamOptions){
         final.push(info.format[info.format.length - 1])
     }
 
-    return got.stream(final[0].url)
+    return got.stream(final[0].url, {
+        retry : 5,
+    })
 }
