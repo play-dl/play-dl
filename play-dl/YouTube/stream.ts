@@ -88,7 +88,8 @@ export async function stream(url : string, options? : StreamOptions){
         headers: {
             'Connection': 'keep-alive',
             'Accept-Encoding': '',
-            'Accept-Language': 'en-US,en;q=0.8'
+            'Accept-Language': 'en-US,en;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'
         },
         agent : {
             https : new agent.HttpsAgent()
