@@ -3,88 +3,75 @@ import { video_info } from "."
 import { PassThrough } from 'stream'
 import https from 'https'
 
-interface FilterOptions {
-    averagebitrate? : number;
-    videoQuality? : "144p" | "240p" | "360p" | "480p" | "720p" | "1080p";
-    audioQuality? : "AUDIO_QUALITY_LOW" | "AUDIO_QUALITY_MEDIUM";
-    audioSampleRate? : number;
-    audioChannels? : number;
-    audioCodec? : string;
-    audioContainer? : string;
-    hasAudio? : boolean;
-    hasVideo? : boolean;
-    isLive? : boolean;
-}
 
 interface StreamOptions {
-    filter : "bestaudio" | "bestvideo"
+    filter : "bestaudio" | "bestvideo" | "live"
 }
 
-function parseFormats(formats : any[]): { audio: any[], video:any[] } {
-    let audio: any[] = []
-    let video: any[] = []
+function parseAudioFormats(formats : any[]){
+    let result: any[] = []
     formats.forEach((format) => {
         let type = format.mimeType as string
         if(type.startsWith('audio')){
-            format.audioCodec = type.split('codecs="')[1].split('"')[0]
-            format.audioContainer = type.split('audio/')[1].split(';')[0]
-            format.hasAudio = true
-            format.hasVideo = false
-            audio.push(format)
-        }
-        else if(type.startsWith('video')){
-            format.videoQuality = format.qualityLabel
-            format.hasAudio = false
-            format.hasVideo = true
-            video.push(format)
+            format.codec = type.split('codecs="')[1].split('"')[0]
+            format.container = type.split('audio/')[1].split(';')[0]
+            result.push(format)
         }
     })
-    return { audio, video }
+    return result
 }
 
-function filter_songs(formats : any[], options : FilterOptions) {
+function parseVideoFormats(formats : any[]){
+    let result: any[] = []
+    formats.forEach((format) => {
+        let type = format.mimeType as string
+        if(type.startsWith('audio')){
+            format.codec = type.split('codecs="')[1].split('"')[0]
+            format.container = type.split('audio/')[1].split(';')[0]
+            result.push(format)
+        }
+    })
+    return result
 }
 
 export async function stream(url : string, options? : StreamOptions): Promise<PassThrough>{
     let info = await video_info(url)
     let final: any[] = [];
 
-    if(options?.filter === 'bestaudio'){
-        info.format.forEach((format) => {
-            let type = format.mimeType as string
-            if(type.startsWith('audio/webm')){
-                return final.push(format)
-            }
-            else return
-        })
+    if(info.video_details.live === true && options) {
+        options.filter = "live"
+    }
 
-        if(final.length === 0){
-            info.format.forEach((format) => {
-                let type = format.mimeType as string
-                if(type.startsWith('audio/')){
-                    return final.push(format)
+    if(options?.filter){
+        switch(options.filter){
+            case "bestaudio":
+                let audioFormat = parseAudioFormats(info.format)
+                if(audioFormat.length === 0) await stream(url, { filter : "bestvideo" })
+                let opusFormats = filterFormat(audioFormat, "opus")
+                if(opusFormats.length === 0){
+                    final.push(audioFormat[audioFormat.length - 1])
                 }
-                else return
-            })
+                else{
+                    final.push(opusFormats[opusFormats.length - 1])
+                }
+                break
+            case "bestvideo" :
+                let videoFormat = parseVideoFormats(info.format)
+                if(videoFormat.length === 0) throw new Error('Can\'t Find Video Formats ')
+                let qual_1080 = filterVideo(videoFormat, "1080p") 
+                if(qual_1080.length === 0) {
+                    let qual_720 = filterVideo(videoFormat, "720p")
+                    if(qual_720.length === 0) final.push(videoFormat[0])
+                    else final.push(qual_720)
+                    break
+                }
+                else final.push(qual_1080)
+                break
+                
         }
     }
-    else if(options?.filter === 'bestvideo'){
-        info.format.forEach((format) => {
-            let type = format.mimeType as string
-            if(type.startsWith('video/')){
-                if(parseInt(format.qualityLabel) > 480) final.push(format)
-                else return
-            }
-            else return
-        })
-
-        if(final.length === 0) throw new Error("Video Format > 480p is not found")
-    }
-    else{
-        final.push(info.format[info.format.length - 1])
-    }
-
-    let stream = got.stream(final[0].url, {
+    if(final.length === 0) final.push(info.format[info.format.length - 1])
+    let piping_stream = got.stream(final[0].url, {
         retry : 5,
         headers: {
             'Connection': 'keep-alive',
@@ -99,6 +86,22 @@ export async function stream(url : string, options? : StreamOptions): Promise<Pa
     })
     let playing_stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 })
 
-    stream.pipe(playing_stream)
+    piping_stream.pipe(playing_stream)
     return playing_stream
+}
+
+function filterFormat(formats : any[], codec : string){
+    let result: any[] = []
+    formats.forEach((format) => {
+        if(format.codec === codec) result.push(format)
+    })
+    return result
+}
+
+function filterVideo(formats : any[], quality : string) {
+    let result: any[] = []
+    formats.forEach((format) => {
+        if(format.qualityLabel === quality) result.push(format)
+    })
+    return result
 }

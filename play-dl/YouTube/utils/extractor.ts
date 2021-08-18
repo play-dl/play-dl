@@ -16,8 +16,6 @@ export async function video_basic_info(url : string){
         if(player_response.playabilityStatus.status === 'ERROR') throw new Error(`While getting info from url \n  ${player_response.playabilityStatus.reason}`)
         let html5player =  'https://www.youtube.com' + body.split('"jsUrl":"')[1].split('"')[0]
         let format = []
-        format.push(player_response.streamingData.formats[0])
-        format.push(...player_response.streamingData.adaptiveFormats)
         let vid = player_response.videoDetails
         let microformat = player_response.microformat.playerMicroformatRenderer
         let video_details = {
@@ -30,7 +28,7 @@ export async function video_basic_info(url : string){
             thumbnail : {
                 width : vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1].width,
                 height : vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1].height,
-                url : `https://i.ytimg.com/vi/${vid.videoId}/maxresdefault.jpg`
+                url : vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1].url,
             },
             channel : {
                 name : vid.author,
@@ -43,6 +41,8 @@ export async function video_basic_info(url : string){
             live : vid.isLiveContent,
             private : vid.isPrivate
         }
+        if(!video_details.live) format.push(player_response.streamingData.formats[0])
+        format.push(...player_response.streamingData.adaptiveFormats)
         return {
             html5player,
             format,
