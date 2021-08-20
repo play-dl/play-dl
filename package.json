@@ -1,6 +1,6 @@
 {
   "name": "play-dl",
-  "version": "0.1.7",
+  "version": "0.2.1",
   "description": "YouTube, SoundCloud, Spotify downloader",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
