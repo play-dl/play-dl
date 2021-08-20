@@ -1,6 +1,6 @@
-import { URL } from 'node:url'
+import { URL } from 'url'
 import { url_get } from './request'
-import querystring from 'node:querystring'
+import querystring from 'querystring'
 
 interface formatOptions {
   url? : string;
