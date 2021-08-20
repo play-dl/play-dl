@@ -1,30 +1,37 @@
 ---
 name: "\U0001F41E Bug report"
-about: Create a report to help us improve
+about: Something is not working as it should
 title: "[=BUG=]"
 labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+#### Describe the bug
 
-**Reproducing Code**
+ - Node.js version: 
+ - OS & version: 
+
+<!-- A clear and concise description of what the bug is. -->
+
+#### Actual behavior
+
+<!-- Actual behavior -->
+
+#### Expected behavior
+
+<!-- Expected behavior --> 
+
+#### Code to reproduce
+
 ```js
 
 ```
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+#### ScreenShots
+<!-- If possible, add screen shots of the problem here. -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+#### Checklist
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Node JS version : [e.g. 16]
- - Play - dl version : [e.g. 0.2.0]
-
-**Additional context**
-Add any other context about the problem here.
+- [ ] I have read the documentation.
+- [ ] I have tried my code with the latest version of Node.js and Got.
