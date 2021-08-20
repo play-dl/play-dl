@@ -1,0 +1,16 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GIT_TOKEN }}
+        issue-message: 'Thanks for using play-dl. Your problem will be solved by developers soon.'
+        pr-message: 'Thanks for using play-dl and for creating pull request. Our developers will soon see this pr.'
