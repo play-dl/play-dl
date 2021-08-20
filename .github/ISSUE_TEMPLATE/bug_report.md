@@ -1,5 +1,5 @@
 ---
-name: 🐞 Bug report
+name: "\U0001F41E Bug report"
 about: Create a report to help us improve
 title: "[=BUG=]"
 labels: bug
@@ -24,6 +24,7 @@ If applicable, add screenshots to help explain your problem.
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
  - Node JS version : [e.g. 16]
+ - Play - dl version : [e.g. 0.2.0]
 
 **Additional context**
 Add any other context about the problem here.
