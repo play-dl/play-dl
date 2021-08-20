@@ -12,8 +12,9 @@ export async function video_basic_info(url : string){
         let video_id = url.split('watch?v=')[1].split('&')[0]
         let new_url = 'https://www.youtube.com/watch?v=' + video_id
         let body = await url_get(new_url)
-        let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split(";</script>")[0])
+        let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split("}};")[0] + '}}')
         if(player_response.playabilityStatus.status === 'ERROR') throw new Error(`While getting info from url \n  ${player_response.playabilityStatus.reason}`)
+        if(player_response.playabilityStatus.status === 'LOGIN_REQUIRED') throw new Error(`While getting info from url \n  ${player_response.playabilityStatus.messages[0]}`)
         let html5player =  'https://www.youtube.com' + body.split('"jsUrl":"')[1].split('"')[0]
         let format = []
         let vid = player_response.videoDetails
@@ -43,7 +44,13 @@ export async function video_basic_info(url : string){
         }
         if(!video_details.live) format.push(player_response.streamingData.formats[0])
         format.push(...player_response.streamingData.adaptiveFormats)
+        let LiveStreamData = {
+            isLive : video_details.live,
+            dashManifestUrl : (player_response.streamingData?.dashManifestUrl) ? player_response.streamingData?.dashManifestUrl : null,
+            hlsManifestUrl : (player_response.streamingData?.hlsManifestUrl) ? player_response.streamingData?.hlsManifestUrl : null
+        }
         return {
+            LiveStreamData,
             html5player,
             format,
             video_details
@@ -56,9 +63,33 @@ export async function video_info(url : string) {
         data.format = await format_decipher(data.format, data.html5player)
         return data
     }
+    else if(data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null){
+        let m3u8 = await url_get(data.LiveStreamData.hlsManifestUrl)
+        data.format = await parseM3U8(m3u8, data.format)
+        return data
+    }
     else {
         return data
     }
+}
+
+async function parseM3U8(m3u8_data : string, formats : any[]): Promise<any[]>{
+    let lines = m3u8_data.split('\n')
+    formats.forEach((format) => {
+        if(!format.qualityLabel) return
+        let reso = format.width + 'x' + format.height
+        let index = -1;
+        let line_count = 0
+        lines.forEach((line) => {
+            index = line.search(reso)
+            if(index !== -1) {   
+                format.url = lines[line_count+1] 
+            }
+            line_count++
+            index = -1
+        })
+    })
+    return formats
 }
 
 export async function playlist_info(url : string) {
