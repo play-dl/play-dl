@@ -34,7 +34,10 @@ export class LiveStreaming{
     }
     
     private async live_loop(){
-        if(this.stream.destroyed) this.cleanup()
+        if(this.stream.destroyed) {
+            this.cleanup()
+            return
+        }
         await this.manifest_getter()
         this.segments_urls.splice(0, (this.segments_urls.length / 2))
         if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('index.m3u8/sq/')[1].split('/')[0])
@@ -61,7 +64,10 @@ export class LiveStreaming{
     }
 
     private async looping(){
-        if(this.stream.destroyed) this.cleanup()
+        if(this.stream.destroyed){
+            this.cleanup()
+            return
+        }
         await this.manifest_getter()
         for await (let url of this.segments_urls){
             await (async () => {
@@ -97,7 +103,10 @@ export class LiveStreaming{
     }
 
     private async start(){
-        if(this.stream.destroyed) this.cleanup()
+        if(this.stream.destroyed){
+            this.cleanup()
+            return
+        }
         await this.manifest_getter()
         if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('index.m3u8/sq/')[1].split('/')[0])
         for await (let url of this.segments_urls){
@@ -156,7 +165,10 @@ export class LiveEnded{
     }
 
     async start(){
-        if(this.stream.destroyed) this.cleanup()
+        if(this.stream.destroyed){
+            this.cleanup()
+            return
+        }
         await this.manifest_getter()
         if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('index.m3u8/sq/')[1].split('/')[0])
         for await (let url of this.segments_urls){
