@@ -58,15 +58,15 @@ export async function video_basic_info(url : string){
 
 export async function video_info(url : string) {
     let data = await video_basic_info(url)
-    if(data.format[0].signatureCipher || data.format[0].cipher){
-        data.format = await format_decipher(data.format, data.html5player)
-        return data
-    }
-    else if(data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null){
+    if(data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null){
         let m3u8 = await url_get(data.LiveStreamData.hlsManifestUrl)
         data.format = await parseM3U8(m3u8, data.format)
         return data
     }
+    else if(data.format[0].signatureCipher || data.format[0].cipher){
+        data.format = await format_decipher(data.format, data.html5player)
+        return data
+    } 
     else {
         return data
     }

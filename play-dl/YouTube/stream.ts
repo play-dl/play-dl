@@ -42,6 +42,8 @@ export async function stream(url : string, options : StreamOptions = { actual_li
     let info = await video_info(url)
     let final: any[] = [];
     let type : StreamType;
+    if(!options.actual_live) options.actual_live = false
+    if(!options.preferred_quality) options.preferred_quality = "144p"
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
         return await live_stream(info as InfoData, options)
     }
@@ -69,6 +71,8 @@ export async function stream(url : string, options : StreamOptions = { actual_li
 export async function stream_from_info(info : InfoData, options : StreamOptions = { actual_live : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
     let final: any[] = [];
     let type : StreamType;
+    if(!options.actual_live) options.actual_live = false
+    if(!options.preferred_quality) options.preferred_quality = "144p"
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
         return await live_stream(info as InfoData, options)
     }
@@ -113,10 +117,10 @@ async function live_stream(info : InfoData, options : StreamOptions): Promise<Li
     })
     let stream : LiveStreaming | LiveEnded
     if(info.video_details.duration === '0') {
-        stream = new LiveStreaming((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 1], options.actual_live)
+        stream = new LiveStreaming((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 2], options.actual_live)
     }
     else {
-        stream = new LiveEnded((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 1])
+        stream = new LiveEnded((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 2])
     }
     return stream
 }
