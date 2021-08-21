@@ -11,8 +11,8 @@ export interface FormatInterface{
 
 export class LiveStreaming{
     type : StreamType
-    actual_live : boolean;
     stream : PassThrough
+    private actual_live : boolean;
     private format : FormatInterface
     private interval : number
     private packet_count : number
@@ -54,7 +54,7 @@ export class LiveStreaming{
                 })
             })()
         }
-        this.interval = 1
+        this.interval = 1 * 1000
         this.timer = setTimeout(async () => {
             await this.looping()
         }, this.interval)
@@ -79,7 +79,7 @@ export class LiveStreaming{
                 })
             })()
         }
-        this.interval = 1
+        this.interval = 1 * 1000
         this.timer = setTimeout(async () => {
             await this.looping()
         }, this.interval)
@@ -91,7 +91,7 @@ export class LiveStreaming{
     }
 
     private cleanup(){
-        clearInterval(this.timer as NodeJS.Timer)
+        clearTimeout(this.timer as NodeJS.Timer)
         this.segments_urls = []
         this.packet_count = 0
     }
