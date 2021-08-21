@@ -1,6 +1,6 @@
 {
   "name": "play-dl",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "YouTube, SoundCloud, Spotify downloader",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/play-dl/play-dl"
+    "url": "git+https://github.com/play-dl/play-dl"
   },
   "keywords": [
     "node-youtube-dl",
