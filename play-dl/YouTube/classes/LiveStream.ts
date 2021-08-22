@@ -25,7 +25,7 @@ export class LiveStreaming{
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.segments_urls = []
         this.packet_count = 0
-        this.interval = 0
+        this.interval = (this.format.targetDurationSec / 2) * 1000 || 0
         this.timer = null
         this.stream.on('close', () => {
             this.cleanup()
@@ -57,7 +57,6 @@ export class LiveStreaming{
                 })
             })()
         }
-        this.interval = this.format.targetDurationSec
         this.timer = setTimeout(async () => {
             await this.looping()
         }, this.interval)
@@ -98,6 +97,7 @@ export class LiveStreaming{
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
+        this.timer = null
         this.segments_urls = []
         this.packet_count = 0
     }
@@ -125,7 +125,6 @@ export class LiveStreaming{
                 })
             })()
         }
-        this.interval = (this.segments_urls.length / 2) * 1000
         this.timer = setTimeout(async () => {
             await this.start()
         }, this.interval)
