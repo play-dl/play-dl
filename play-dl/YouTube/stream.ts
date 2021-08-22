@@ -10,7 +10,7 @@ export enum StreamType{
 }
 
 interface StreamOptions {
-    actual_live : boolean;
+    low_latency : boolean;
     preferred_quality : "144p" | "240p" | "360p" | "480p" | "720p" | "1080p" 
 }
 
@@ -38,11 +38,11 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string, options : StreamOptions = { actual_live : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream(url : string, options : StreamOptions = { low_latency : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
     let info = await video_info(url)
     let final: any[] = [];
     let type : StreamType;
-    if(!options.actual_live) options.actual_live = false
+    if(!options.low_latency) options.low_latency = false
     if(!options.preferred_quality) options.preferred_quality = "144p"
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
         return await live_stream(info as InfoData, options)
@@ -68,10 +68,10 @@ export async function stream(url : string, options : StreamOptions = { actual_li
     return new Stream(final[0].url, type) 
 }
 
-export async function stream_from_info(info : InfoData, options : StreamOptions = { actual_live : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream_from_info(info : InfoData, options : StreamOptions = { low_latency : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
     let final: any[] = [];
     let type : StreamType;
-    if(!options.actual_live) options.actual_live = false
+    if(!options.low_latency) options.low_latency = false
     if(!options.preferred_quality) options.preferred_quality = "144p"
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
         return await live_stream(info as InfoData, options)
@@ -117,7 +117,7 @@ async function live_stream(info : InfoData, options : StreamOptions): Promise<Li
     })
     let stream : LiveStreaming | LiveEnded
     if(info.video_details.duration === '0') {
-        stream = new LiveStreaming((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 2], options.actual_live)
+        stream = new LiveStreaming((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 2], options.low_latency)
     }
     else {
         stream = new LiveEnded((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 2])

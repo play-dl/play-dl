@@ -21,7 +21,7 @@ client.on('messageCreate', async message => {
         /*
         OR if you want to stream Live Video have less delay 
 
-        let stream = await youtube.stream(yt_info[0].url, { actual_live : true })
+        let stream = await youtube.stream(yt_info[0].url, { low_latency : true })
 
         OR if you want higher quality audio Live Stream
 
@@ -31,7 +31,7 @@ client.on('messageCreate', async message => {
 
         OR both
 
-        let stream = await youtube.stream(yt_info[0].url, { actual_live : true ,preferred_quality : "480p"})
+        let stream = await youtube.stream(yt_info[0].url, { low_latency : true ,preferred_quality : "480p"})
         */
 
         let resource = createAudioResource(stream.stream, {

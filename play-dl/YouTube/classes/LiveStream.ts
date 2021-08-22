@@ -12,15 +12,15 @@ export interface FormatInterface{
 export class LiveStreaming{
     type : StreamType
     stream : PassThrough
-    private actual_live : boolean;
+    private low_latency : boolean;
     private format : FormatInterface
     private interval : number
     private packet_count : number
     private timer : NodeJS.Timer | null
     private segments_urls : string[]
-    constructor(format : FormatInterface, actual_live : boolean){
+    constructor(format : FormatInterface, low_latency : boolean){
         this.type = StreamType.Arbitrary
-        this.actual_live = actual_live || false
+        this.low_latency = low_latency || false
         this.format = format
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.segments_urls = []
@@ -30,7 +30,7 @@ export class LiveStreaming{
         this.stream.on('close', () => {
             this.cleanup()
         });
-        (this.actual_live) ? this.live_loop() :this.start()
+        (this.low_latency) ? this.live_loop() :this.start()
     }
     
     private async live_loop(){
@@ -39,7 +39,7 @@ export class LiveStreaming{
             return
         }
         await this.manifest_getter()
-        this.segments_urls.splice(0, (this.segments_urls.length / 2))
+        this.segments_urls.splice(0, this.segments_urls.length - 2)
         if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('index.m3u8/sq/')[1].split('/')[0])
         for await (let url of this.segments_urls){
             await (async () => {
@@ -57,7 +57,7 @@ export class LiveStreaming{
                 })
             })()
         }
-        this.interval = 1 * 1000
+        this.interval = this.format.targetDurationSec
         this.timer = setTimeout(async () => {
             await this.looping()
         }, this.interval)
@@ -69,6 +69,7 @@ export class LiveStreaming{
             return
         }
         await this.manifest_getter()
+        this.segments_urls.splice(0, (this.segments_urls.length / 2))
         for await (let url of this.segments_urls){
             await (async () => {
                 return new Promise(async (resolve, reject) => {
@@ -85,7 +86,6 @@ export class LiveStreaming{
                 })
             })()
         }
-        this.interval = 1 * 1000
         this.timer = setTimeout(async () => {
             await this.looping()
         }, this.interval)
