@@ -8,7 +8,10 @@ const video_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|yout
 
 export async function video_basic_info(url : string){
         if(!url.match(video_pattern)) throw new Error('This is not a YouTube URL')
-        let video_id = url.split('watch?v=')[1].split('&')[0]
+        let video_id : string;
+        if(url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1]
+        else if(url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1]
+        else video_id = url.split('watch?v=')[1].split('&')[0];
         let new_url = 'https://www.youtube.com/watch?v=' + video_id
         let body = await url_get(new_url)
         let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split("}};")[0] + '}}')
@@ -113,7 +116,10 @@ export async function playlist_info(url : string) {
     
     let body = await url_get(new_url)
     let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
-    if(response.alerts && response.alerts[0].alertRenderer.type === 'ERROR') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertRenderer.text.runs[0].text}`)
+    if(response.alerts){ 
+        if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertRenderer.text.runs[0].text}`)
+        else throw new Error('While parsing playlist url\n Unknown Playlist Error')
+    }
 
     let rawJSON = `${body.split('{"playlistVideoListRenderer":{"contents":')[1].split('}],"playlistId"')[0]}}]`;
     let parsed = JSON.parse(rawJSON);
