@@ -6,8 +6,8 @@ interface VideoOptions {
     url? : string;
     title?: string;
     description?: string;
-    duration_formatted: string;
-    duration: number;
+    durationRaw: string;
+    durationInSec: number;
     uploadedAt?: string;
     views: number;
     thumbnail?: {
@@ -84,8 +84,8 @@ export class Video {
             url: this.url,
             title: this.title,
             description: this.description,
-            duration: this.duration,
-            duration_formatted: this.durationFormatted,
+            durationInSec: this.duration,
+            durationRaw: this.durationFormatted,
             uploadedAt: this.uploadedAt,
             thumbnail: this.thumbnail?.toJSON(),
             channel: {

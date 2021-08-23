@@ -23,7 +23,8 @@ export async function video_basic_info(url : string){
             url : 'https://www.youtube.com/watch?v=' + vid.videoId,
             title : vid.title,
             description : vid.shortDescription,
-            duration : vid.lengthSeconds,
+            durationInSec : vid.lengthSeconds,
+            durationRaw : parseSeconds(vid.lengthSeconds),
             uploadedDate : microformat.publishDate,
             thumbnail : {
                 width : vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1].width,
@@ -54,6 +55,18 @@ export async function video_basic_info(url : string){
             format,
             video_details
         }
+}
+
+function parseSeconds(seconds : number): string {
+    let d = Number(seconds);
+    var h = Math.floor(d / 3600);
+    var m = Math.floor(d % 3600 / 60);
+    var s = Math.floor(d % 3600 % 60);
+
+    var hDisplay = h > 0 ? (h < 10 ? `0${h}` : h) + ':' : "";
+    var mDisplay = m > 0 ? (m < 10 ? `0${m}` : m) + ':' : "00:";
+    var sDisplay = s > 0 ? (s < 10 ? `0${s}` : s)  : "00";
+    return hDisplay + mDisplay + sDisplay; 
 }
 
 export async function video_info(url : string) {
