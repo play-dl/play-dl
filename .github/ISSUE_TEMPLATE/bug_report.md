@@ -34,4 +34,4 @@ assignees: ''
 #### Checklist
 
 - [ ] I have read the documentation.
-- [ ] I have tried my code with the latest version of Node.js and Got.
+- [ ] I have tried my code with the latest version of Node.js and Play-dl.
