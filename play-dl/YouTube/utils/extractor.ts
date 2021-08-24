@@ -112,7 +112,7 @@ export async function playlist_info(url : string) {
     if(url.search('(\\?|\\&)list\\=') === -1) throw new Error('This is not a PlayList URL')
 
     let Playlist_id = url.split('list=')[1].split('&')[0]
-    if(Playlist_id.length !== 34) throw new Error('This is not a PlayList URL')
+    if(Playlist_id.length !== 34 || Playlist_id.startsWith('PL')) throw new Error('This is not a PlayList URL')
     let new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`
     
     let body = await url_get(new_url)
