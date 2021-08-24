@@ -9,8 +9,8 @@ const video_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|yout
 export async function video_basic_info(url : string){
         if(!url.match(video_pattern)) throw new Error('This is not a YouTube URL')
         let video_id : string;
-        if(url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1]
-        else if(url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1]
+        if(url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split('/')[0]
+        else if(url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1].split('/')[0]
         else video_id = url.split('watch?v=')[1].split('&')[0];
         let new_url = 'https://www.youtube.com/watch?v=' + video_id
         let body = await url_get(new_url)
