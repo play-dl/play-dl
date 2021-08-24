@@ -107,7 +107,7 @@ async function parseM3U8(m3u8_data : string, formats : any[]): Promise<any[]>{
     return formats
 }
 
-export async function playlist_info(url : string) {
+export async function playlist_info(url : string, parseIncomplete : boolean) {
     if (!url || typeof url !== "string") throw new Error(`Expected playlist url, received ${typeof url}!`);
     if(url.search('(\\?|\\&)list\\=') === -1) throw new Error('This is not a PlayList URL')
 
@@ -118,7 +118,10 @@ export async function playlist_info(url : string) {
     let body = await url_get(new_url)
     let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
     if(response.alerts){ 
-        if(response.alerts[0].alertWithButtonRenderer?.type === 'INFO') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
+        if(response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
+            if(parseIncomplete) console.log(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
+            else throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
+        }
         else if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertRenderer.text.runs[0].text}`)
         else throw new Error('While parsing playlist url\n Unknown Playlist Error')
     }
