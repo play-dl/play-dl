@@ -65,7 +65,7 @@ export async function stream(url : string, options : StreamOptions = { low_laten
         final.push(info.format[info.format.length - 1])
     }
     
-    return new Stream(final[0].url, type) 
+    return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
 export async function stream_from_info(info : InfoData, options : StreamOptions = { low_latency : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
@@ -94,7 +94,7 @@ export async function stream_from_info(info : InfoData, options : StreamOptions 
         final.push(info.format[info.format.length - 1])
     }
     
-    return new Stream(final[0].url, type) 
+    return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
 function filterFormat(formats : any[], codec : string){

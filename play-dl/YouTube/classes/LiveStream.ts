@@ -195,16 +195,96 @@ export class LiveEnded{
 
 export class Stream {
     type : StreamType
-    private piping_stream : Request
-    private playing_stream : PassThrough
-    constructor(url : string, type : StreamType){
+    stream : PassThrough
+    private url : string
+    private bytes_count : number;
+    private per_sec_bytes : number;
+    private duration : number;
+    private timer : NodeJS.Timer | null
+    constructor(url : string, type : StreamType, duration : number){
+        this.url = url
         this.type = type
-        this.piping_stream = got.stream(url)
-        this.playing_stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
-        this.piping_stream.pipe(this.playing_stream)
+        this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
+        this.bytes_count = 0
+        this.per_sec_bytes = 0
+        this.timer = null
+        this.duration = duration;
+        (duration > 300) ? this.loop_start() : this.normal_start()
     }
 
-    get stream(){
-        return this.playing_stream
+    private cleanup(){
+        clearTimeout(this.timer as NodeJS.Timer)
+        this.timer = null
+        this.url = ''
+        this.bytes_count = 0
+        this.per_sec_bytes = 0
+    }
+
+    private normal_start(){
+        if(this.stream.destroyed){
+            this.cleanup()
+            return
+        }
+        let stream = got.stream(this.url)
+        stream.pipe(this.stream)
+    }
+
+    private loop_start(){
+        if(this.stream.destroyed){
+            this.cleanup()
+            return
+        }
+        let stream = got.stream(this.url)
+        stream.once('data', () => {
+            this.per_sec_bytes = Math.ceil((stream.downloadProgress.total as number)/this.duration)
+        })
+
+        stream.on('data', (chunk) => {
+            this.bytes_count += chunk.length
+            this.stream.write(chunk)
+        })
+
+        stream.on('data', () => {
+            if(this.bytes_count > (this.per_sec_bytes * 300)){
+                stream.destroy()
+            }
+        })
+
+        this.timer = setTimeout(() => {
+            this.loop()
+        }, 270 * 1000)
+    }
+
+    private loop(){
+        if(this.stream.destroyed){
+            this.cleanup()
+            return
+        }
+        let absolute_bytes : number = 0
+        let stream = got.stream(this.url, {
+            headers : {
+                "range" : `bytes=${this.bytes_count}-`
+            }
+        })
+
+        stream.on('data', (chunk) => {
+            absolute_bytes += chunk.length
+            this.bytes_count += chunk.length
+            this.stream.write(chunk)
+        })
+
+        stream.on('data', () => {
+            if(absolute_bytes > (this.per_sec_bytes * 300)){
+                stream.destroy()
+            }
+        })
+
+        stream.on('end', () => {
+            this.cleanup()
+        })
+
+        this.timer = setTimeout(() => {
+            this.loop()
+        }, 270 * 1000)
     }
 }

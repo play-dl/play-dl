@@ -6,8 +6,8 @@ interface VideoOptions {
     url? : string;
     title?: string;
     description?: string;
-    duration_formatted: string;
-    duration: number;
+    durationRaw: string;
+    durationInSec: number;
     uploadedAt?: string;
     views: number;
     thumbnail?: {
@@ -37,8 +37,8 @@ export class Video {
     url? : string;
     title?: string;
     description?: string;
-    durationFormatted: string;
-    duration: number;
+    durationRaw: string;
+    durationInSec: number;
     uploadedAt?: string;
     views: number;
     thumbnail?: Thumbnail;
@@ -57,8 +57,8 @@ export class Video {
         this.url = `https://www.youtube.com/watch?v=${this.id}`
         this.title = data.title || undefined;
         this.description = data.description || undefined;
-        this.durationFormatted = data.duration_raw || "0:00";
-        this.duration = (data.duration < 0 ? 0 : data.duration) || 0;
+        this.durationRaw = data.duration_raw || "0:00";
+        this.durationInSec = (data.duration < 0 ? 0 : data.duration) || 0;
         this.uploadedAt = data.uploadedAt || undefined;
         this.views = parseInt(data.views) || 0;
         this.thumbnail = data.thumbnail || {};
@@ -84,8 +84,8 @@ export class Video {
             url: this.url,
             title: this.title,
             description: this.description,
-            duration: this.duration,
-            duration_formatted: this.durationFormatted,
+            durationInSec: this.durationInSec,
+            durationRaw: this.durationRaw,
             uploadedAt: this.uploadedAt,
             thumbnail: this.thumbnail?.toJSON(),
             channel: {
