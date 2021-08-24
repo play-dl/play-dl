@@ -107,7 +107,7 @@ async function parseM3U8(m3u8_data : string, formats : any[]): Promise<any[]>{
     return formats
 }
 
-export async function playlist_info(url : string, parseIncomplete : boolean) {
+export async function playlist_info(url : string, parseIncomplete : boolean = false) {
     if (!url || typeof url !== "string") throw new Error(`Expected playlist url, received ${typeof url}!`);
     if(url.search('(\\?|\\&)list\\=') === -1) throw new Error('This is not a PlayList URL')
 
