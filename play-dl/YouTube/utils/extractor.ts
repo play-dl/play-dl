@@ -119,8 +119,7 @@ export async function playlist_info(url : string, parseIncomplete : boolean) {
     let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
     if(response.alerts){ 
         if(response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
-            if(parseIncomplete) console.log(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
-            else throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
+            if(!parseIncomplete) throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
         }
         else if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertRenderer.text.runs[0].text}`)
         else throw new Error('While parsing playlist url\n Unknown Playlist Error')
