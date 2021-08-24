@@ -112,12 +112,14 @@ export async function playlist_info(url : string) {
     if(url.search('(\\?|\\&)list\\=') === -1) throw new Error('This is not a PlayList URL')
 
     let Playlist_id = url.split('list=')[1].split('&')[0]
+    if(Playlist_id.length !== 34) throw new Error('This is not a PlayList URL')
     let new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`
     
     let body = await url_get(new_url)
     let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
     if(response.alerts){ 
-        if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertRenderer.text.runs[0].text}`)
+        if(response.alerts[0].alertWithButtonRenderer?.type === 'INFO') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
+        else if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertRenderer.text.runs[0].text}`)
         else throw new Error('While parsing playlist url\n Unknown Playlist Error')
     }
 
