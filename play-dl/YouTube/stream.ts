@@ -1,5 +1,5 @@
 import { video_info } from "."
-import { FormatInterface, LiveEnded, LiveStreaming, Stream } from "./classes/LiveStream"
+import { LiveEnded, LiveStreaming, Stream } from "./classes/LiveStream"
 
 export enum StreamType{
     Arbitrary = 'arbitrary',
