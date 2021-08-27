@@ -98,11 +98,6 @@ function filterFormat(formats : any[], codec : string){
 }
 
 async function live_stream(info : InfoData): Promise<LiveStreaming | LiveEnded>{
-    let res_144 : FormatInterface = {
-        url : '',
-        targetDurationSec : 0,
-        maxDvrDurationSec : 0
-    }
     let stream : LiveStreaming | LiveEnded
     if(info.video_details.durationInSec === '0') {
         stream = new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec)
