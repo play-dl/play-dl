@@ -17,21 +17,6 @@ client.on('messageCreate', async message => {
 		
 		let args = message.content.split('play ')[1].split(' ')[0]
         let stream = await youtube.stream(args)
-        /*
-        OR if you want to stream Live Video have less delay 
-
-        let stream = await youtube.stream(args, { low_latency : true })
-
-        OR if you want higher quality audio Live Stream
-
-        let stream = await youtube.stream(args, { preferred_quality : "480p"}) // You can have resolution upto 1080p
-
-        Default : preferred_quality : "144p"
-
-        OR both
-
-        let stream = await youtube.stream(args, { low_latency : true ,preferred_quality : "480p"})
-        */
 
         let resource = createAudioResource(stream.stream, {
             inputType : stream.type

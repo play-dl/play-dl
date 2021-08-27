@@ -9,10 +9,6 @@ export enum StreamType{
 	Opus = 'opus',
 }
 
-interface StreamOptions {
-    low_latency : boolean;
-    preferred_quality : "144p" | "240p" | "360p" | "480p" | "720p" | "1080p" 
-}
 
 interface InfoData{
     LiveStreamData : {
@@ -38,14 +34,12 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string, options : StreamOptions = { low_latency : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream(url : string): Promise<Stream | LiveStreaming | LiveEnded>{
     let info = await video_info(url)
     let final: any[] = [];
     let type : StreamType;
-    if(!options.low_latency) options.low_latency = false
-    if(!options.preferred_quality) options.preferred_quality = "144p"
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
-        return await live_stream(info as InfoData, options)
+        return await live_stream(info as InfoData)
     }
 
     let audioFormat = parseAudioFormats(info.format)
@@ -68,13 +62,11 @@ export async function stream(url : string, options : StreamOptions = { low_laten
     return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
-export async function stream_from_info(info : InfoData, options : StreamOptions = { low_latency : false, preferred_quality : "144p" }): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming | LiveEnded>{
     let final: any[] = [];
     let type : StreamType;
-    if(!options.low_latency) options.low_latency = false
-    if(!options.preferred_quality) options.preferred_quality = "144p"
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
-        return await live_stream(info as InfoData, options)
+        return await live_stream(info as InfoData)
     }
 
     let audioFormat = parseAudioFormats(info.format)
@@ -105,22 +97,18 @@ function filterFormat(formats : any[], codec : string){
     return result
 }
 
-async function live_stream(info : InfoData, options : StreamOptions): Promise<LiveStreaming | LiveEnded>{
+async function live_stream(info : InfoData): Promise<LiveStreaming | LiveEnded>{
     let res_144 : FormatInterface = {
         url : '',
         targetDurationSec : 0,
         maxDvrDurationSec : 0
     }
-    info.format.forEach((format) => {
-        if(format.qualityLabel === options.preferred_quality) res_144 = format
-        else return
-    })
     let stream : LiveStreaming | LiveEnded
-    if(info.video_details.duration === '0') {
-        stream = new LiveStreaming((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 2], options.low_latency)
+    if(info.video_details.durationInSec === '0') {
+        stream = new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec)
     }
     else {
-        stream = new LiveEnded((res_144.url.length !== 0) ? res_144 : info.format[info.format.length - 2])
+        stream = new LiveEnded(info.format[info.format.length - 2])
     }
     return stream
 }
