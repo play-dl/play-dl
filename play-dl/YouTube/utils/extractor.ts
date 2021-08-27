@@ -75,8 +75,6 @@ function parseSeconds(seconds : number): string {
 export async function video_info(url : string) {
     let data = await video_basic_info(url)
     if(data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null){
-        let m3u8 = await url_get(data.LiveStreamData.hlsManifestUrl)
-        data.format = await parseM3U8(m3u8, data.format)
         return data
     }
     else if(data.format[0].signatureCipher || data.format[0].cipher){
@@ -86,25 +84,6 @@ export async function video_info(url : string) {
     else {
         return data
     }
-}
-
-async function parseM3U8(m3u8_data : string, formats : any[]): Promise<any[]>{
-    let lines = m3u8_data.split('\n')
-    formats.forEach((format) => {
-        if(!format.qualityLabel) return
-        let reso = format.width + 'x' + format.height
-        let index = -1;
-        let line_count = 0
-        lines.forEach((line) => {
-            index = line.search(reso)
-            if(index !== -1) {   
-                format.url = lines[line_count+1] 
-            }
-            line_count++
-            index = -1
-        })
-    })
-    return formats
 }
 
 export async function playlist_info(url : string, parseIncomplete : boolean = false) {

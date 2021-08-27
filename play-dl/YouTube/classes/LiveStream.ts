@@ -12,92 +12,108 @@ export interface FormatInterface{
 export class LiveStreaming{
     type : StreamType
     stream : PassThrough
-    private low_latency : boolean;
-    private format : FormatInterface
+    private base_url : string
+    private url : string
     private interval : number
     private packet_count : number
     private timer : NodeJS.Timer | null
     private segments_urls : string[]
-    constructor(format : FormatInterface, low_latency : boolean){
+    constructor(dash_url : string, target_interval : number){
         this.type = StreamType.Arbitrary
-        this.low_latency = low_latency || false
-        this.format = format
+        this.url = dash_url
+        this.base_url = ''
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.segments_urls = []
         this.packet_count = 0
-        this.interval = (this.format.targetDurationSec / 2) * 1000 || 0
         this.timer = null
+        this.interval = target_interval * 1000 || 0
         this.stream.on('close', () => {
             this.cleanup()
         });
-        (this.low_latency) ? this.live_loop() :this.start()
+        this.start()
     }
     
-    private async live_loop(){
-        if(this.stream.destroyed) {
-            this.cleanup()
-            return
-        }
-        await this.manifest_getter()
-        this.segments_urls.splice(0, this.segments_urls.length - 2)
-        if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('index.m3u8/sq/')[1].split('/')[0])
-        for await (let url of this.segments_urls){
-            await (async () => {
-                return new Promise(async (resolve, reject) => {
-                    if(Number(url.split('index.m3u8/sq/')[1].split('/')[0]) !== this.packet_count){
-                        resolve('')
-                        return
-                    }
-                    let stream = this.got_stream(url)
-                    stream.on('data', (chunk) => this.stream.write(chunk))
-                    stream.on('end', () => {
-                        this.packet_count++
-                        resolve('')
-                    })
-                })
-            })()
-        }
-        this.timer = setTimeout(async () => {
-            await this.looping()
-        }, this.interval)
-    }
-
-    private async looping(){
-        if(this.stream.destroyed){
-            this.cleanup()
-            return
-        }
-        await this.manifest_getter()
-        this.segments_urls.splice(0, (this.segments_urls.length / 2))
-        for await (let url of this.segments_urls){
-            await (async () => {
-                return new Promise(async (resolve, reject) => {
-                    if(Number(url.split('index.m3u8/sq/')[1].split('/')[0]) !== this.packet_count){
-                        resolve('')
-                        return
-                    }
-                    let stream = this.got_stream(url)
-                    stream.on('data', (chunk) => this.stream.write(chunk))
-                    stream.on('end', () => {
-                        this.packet_count++
-                        resolve('')
-                    })
-                })
-            })()
-        }
-        this.timer = setTimeout(async () => {
-            await this.looping()
-        }, this.interval)
-    }
-
-    private async manifest_getter(){
-        let response = await got(this.format.url)
-        this.segments_urls = response.body.split('\n').filter((x) => x.startsWith('https'))
+    private async dash_getter(){
+        let response = await got(this.url)
+        let audioFormat = response.body.split('<AdaptationSet id="0"')[1].split('</AdaptationSet>')[0].split('</Representation>')
+        if(audioFormat[audioFormat.length - 1] === '') audioFormat.pop()
+        this.base_url = audioFormat[audioFormat.length - 1].split('<BaseURL>')[1].split('</BaseURL>')[0]
+        let list = audioFormat[audioFormat.length - 1].split('<SegmentList>')[1].split('</SegmentList>')[0]
+        this.segments_urls = list.replace(new RegExp('<SegmentURL media="', 'g'), '').split('"/>')
+        if(this.segments_urls[this.segments_urls.length - 1] === '') this.segments_urls.pop()
     }
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
         this.timer = null
+        this.url = ''
+        this.base_url = ''
+        this.segments_urls = []
+        this.packet_count = 0
+        this.interval = 0
+    }
+
+    private async start(){
+        if(this.stream.destroyed){
+            this.cleanup()
+            return
+        }
+        await this.dash_getter()
+        if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('sq/')[1].split('/')[0])
+        for await (let segment of this.segments_urls){
+            if(Number(segment.split('sq/')[1].split('/')[0]) !== this.packet_count){
+                continue
+            }
+            await (async () => {
+                return new Promise(async (resolve, reject) => {
+                    let stream = got.stream(this.base_url + segment)
+                    stream.on('data', (chunk) => this.stream.write(chunk))
+                    stream.on('end', () => {
+                        this.packet_count++
+                        resolve('')
+                    })
+                })
+            })()
+        }
+        this.timer = setTimeout(() => {
+            this.start()
+        }, this.interval)
+    }
+}
+
+export class LiveEnded{
+    type : StreamType
+    stream : PassThrough
+    private url : string;
+    private base_url : string;
+    private packet_count : number
+    private segments_urls : string[]
+    constructor(dash_url : string){
+        this.type = StreamType.Arbitrary
+        this.url = dash_url
+        this.base_url = ''
+        this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
+        this.segments_urls = []
+        this.packet_count = 0
+        this.stream.on('close', () => {
+            this.cleanup()
+        })
+        this.start()
+    }
+
+    private async dash_getter(){
+        let response = await got(this.url)
+        let audioFormat = response.body.split('<AdaptationSet id="0"')[1].split('</AdaptationSet>')[0].split('</Representation>')
+        if(audioFormat[audioFormat.length - 1] === '') audioFormat.pop()
+        this.base_url = audioFormat[audioFormat.length - 1].split('<BaseURL>')[1].split('</BaseURL>')[0]
+        let list = audioFormat[audioFormat.length - 1].split('<SegmentList>')[1].split('</SegmentList>')[0]
+        this.segments_urls = list.replace(new RegExp('<SegmentURL media="', 'g'), '').split('"/>')
+        if(this.segments_urls[this.segments_urls.length - 1] === '') this.segments_urls.pop()
+    }
+
+    private cleanup(){
+        this.url = ''
+        this.base_url = ''
         this.segments_urls = []
         this.packet_count = 0
     }
@@ -107,16 +123,15 @@ export class LiveStreaming{
             this.cleanup()
             return
         }
-        await this.manifest_getter()
-        if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('index.m3u8/sq/')[1].split('/')[0])
-        for await (let url of this.segments_urls){
+        await this.dash_getter()
+        if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('sq/')[1].split('/')[0])
+        for await (let segment of this.segments_urls){
+            if(Number(segment.split('sq/')[1].split('/')[0]) !== this.packet_count){
+                continue
+            }
             await (async () => {
                 return new Promise(async (resolve, reject) => {
-                    if(Number(url.split('index.m3u8/sq/')[1].split('/')[0]) !== this.packet_count){
-                        resolve('')
-                        return
-                    }
-                    let stream = this.got_stream(url)
+                    let stream = got.stream(this.base_url + segment)
                     stream.on('data', (chunk) => this.stream.write(chunk))
                     stream.on('end', () => {
                         this.packet_count++
@@ -125,71 +140,6 @@ export class LiveStreaming{
                 })
             })()
         }
-        this.timer = setTimeout(async () => {
-            await this.start()
-        }, this.interval)
-    }
-
-    private got_stream(url: string){
-        return got.stream(url)
-    }
-}
-
-export class LiveEnded{
-    type : StreamType
-    stream : PassThrough
-    private format : FormatInterface
-    private packet_count : number
-    private segments_urls : string[]
-    constructor(format : FormatInterface){
-        this.type = StreamType.Arbitrary
-        this.format = format
-        this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
-        this.segments_urls = []
-        this.packet_count = 0
-        this.stream.on('close', () => {
-            this.cleanup()
-        })
-        this.start()
-    }
-    
-    async manifest_getter(){
-        let response = await got(this.format.url)
-        this.segments_urls = response.body.split('\n').filter((x) => x.startsWith('https'))
-    }
-
-    private cleanup(){
-        this.segments_urls = []
-        this.packet_count = 0
-    }
-
-    async start(){
-        if(this.stream.destroyed){
-            this.cleanup()
-            return
-        }
-        await this.manifest_getter()
-        if(this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('index.m3u8/sq/')[1].split('/')[0])
-        for await (let url of this.segments_urls){
-            await (async () => {
-                return new Promise(async (resolve, reject) => {
-                    if(Number(url.split('index.m3u8/sq/')[1].split('/')[0]) !== this.packet_count){
-                         resolve('')
-                         return
-                    }
-                    let stream = this.got_stream(url)
-                    stream.on('data', (chunk) => this.stream.write(chunk))
-                    stream.on('end', () => {
-                        this.packet_count++
-                        resolve('')
-                    })
-                })
-            })()
-        }
-    }
-
-    private got_stream(url: string){
-        return got.stream(url)
     }
 }
 
@@ -285,6 +235,6 @@ export class Stream {
 
         this.timer = setTimeout(() => {
             this.loop()
-        }, 290 * 1000)
+        }, 300 * 1000)
     }
 }
