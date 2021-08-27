@@ -1,8 +1,8 @@
 ---
 name: "❓ Question"
 about: Something is unclear or needs to be discussed
-title: ''
-labels: ''
+title: "[=ASK=]"
+labels: question
 assignees: ''
 
 ---
