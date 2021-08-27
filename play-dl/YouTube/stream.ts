@@ -103,7 +103,7 @@ async function live_stream(info : InfoData): Promise<LiveStreaming | LiveEnded>{
         stream = new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec)
     }
     else {
-        stream = new LiveEnded(info.format[info.format.length - 2])
+        stream = new LiveEnded(info.LiveStreamData.dashManifestUrl)
     }
     return stream
 }
