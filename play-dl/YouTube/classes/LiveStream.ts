@@ -202,7 +202,7 @@ export class Stream {
 
         this.timer = setTimeout(() => {
             this.loop()
-        }, 290 * 1000)
+        }, 280 * 1000)
     }
 
     private loop(){
