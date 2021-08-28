@@ -80,12 +80,16 @@ const video = await video_info(url)
 
 # Playlist
 
-### playlist_info(url : `string`)
+### playlist_info(url : `string`, parseIncomplete : `boolean`)
 *This fetches all details about a playlist.*
 
+**parseIncomplete** is optional parameter if you want to parse playlist with hidden videos in them.
 ```js
 const playlist = await playlist_info(url)
 //This only fetches first 100 videos from a playlist
+
+const playlist = await playlist_info(url, true)
+//This only fetches first 100 videos from a playlist and also parses playlist with hidden videos
 ```
 
 - #### fetch() `method`
