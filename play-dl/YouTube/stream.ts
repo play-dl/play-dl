@@ -39,7 +39,7 @@ export async function stream(url : string): Promise<Stream | LiveStreaming | Liv
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
-        return await live_stream(info as InfoData)
+        return live_stream(info as InfoData)
     }
 
     let audioFormat = parseAudioFormats(info.format)
@@ -62,11 +62,11 @@ export async function stream(url : string): Promise<Stream | LiveStreaming | Liv
     return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
-export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming | LiveEnded>{
+export function stream_from_info(info : InfoData): Stream | LiveStreaming | LiveEnded{
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
-        return await live_stream(info as InfoData)
+        return live_stream(info as InfoData)
     }
 
     let audioFormat = parseAudioFormats(info.format)
@@ -97,7 +97,7 @@ function filterFormat(formats : any[], codec : string){
     return result
 }
 
-async function live_stream(info : InfoData): Promise<LiveStreaming | LiveEnded>{
+function live_stream(info : InfoData): LiveStreaming | LiveEnded{
     let stream : LiveStreaming | LiveEnded
     if(info.video_details.durationInSec === '0') {
         stream = new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec)
