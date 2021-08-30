@@ -32,7 +32,31 @@ const options = {
 const results = await youtube.search('post malone sunflower', options);
 ```
 
+# Stream
+### stream(url : `string`, error_check? : `boolean`)
+*This is basic to create a youtube stream from a url.*
+```js
+ let source = await stream(<url>) // This will create a stream Class which contains type and stream to be played.
+ let resource = createAudioResource(source.stream, {
+            inputType : source.type
+        }) // This creates resource for playing
+        
+let source = await stream(<url>, true) //This will check for 404 error if any
+```
+![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) `Note : enabling error_check will take more time to start streaming`
 
+### stream_from_info(info : `infoData`, error_check? : `boolean`)
+*This is basic to create a youtube stream from a info [ from video_info function ].*
+```js
+let info = await video_info(<url>)
+ let source = await stream_from_info(info) // This will create a stream Class which contains type and stream to be played.
+ let resource = createAudioResource(source.stream, {
+            inputType : source.type
+        }) // This creates resource for playing
+        
+let source = await stream_from_info(info, true) //This will check for 404 error if any
+```
+![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) `Note : enabling error_check will take more time to start streaming`
 
 # Search
 
