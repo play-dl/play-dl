@@ -2,7 +2,6 @@ import { url_get } from './request'
 import { format_decipher, js_tokens } from './cipher'
 import { Video } from '../classes/Video'
 import { PlayList } from '../classes/Playlist'
-import { parseThumbnail } from './parser';
 
 const DEFAULT_API_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
 const video_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
@@ -30,7 +29,7 @@ export async function video_basic_info(url : string){
             durationInSec : vid.lengthSeconds,
             durationRaw : parseSeconds(vid.lengthSeconds),
             uploadedDate : microformat.publishDate,
-            thumbnail : parseThumbnail(vid.thumbnail.thumbnails),
+            thumbnail : vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1],
             channel : {
                 name : vid.author,
                 id : vid.channelId,

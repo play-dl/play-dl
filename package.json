@@ -28,8 +28,8 @@
     "url": "https://github.com/play-dl/play-dl/issues"
   },
   "engines": {
-		"node": ">=16.0.0"
-	},
+    "node": ">=16.0.0"
+  },
   "homepage": "https://github.com/play-dl/play-dl#readme",
   "files": [
     "dist/*"

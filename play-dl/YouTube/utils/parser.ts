@@ -130,7 +130,7 @@ export function parseVideo(data?: any): Video | void {
         description: data.videoRenderer.descriptionSnippet && data.videoRenderer.descriptionSnippet.runs[0] ? data.videoRenderer.descriptionSnippet.runs[0].text : "",
         duration: data.videoRenderer.lengthText ? parseDuration(data.videoRenderer.lengthText.simpleText) : 0,
         duration_raw: data.videoRenderer.lengthText ? data.videoRenderer.lengthText.simpleText : null,
-        thumbnail: parseThumbnail(data.videoRenderer.thumbnail.thumbnails),
+        thumbnail: data.videoRenderer.thumbnail.thumbnails[data.videoRenderer.thumbnail.thumbnails.length - 1],
         channel: {
             id: data.videoRenderer.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId || null,
             name: data.videoRenderer.ownerText.runs[0].text || null,
@@ -149,28 +149,6 @@ export function parseVideo(data?: any): Video | void {
     return res;
 }
 
-export function parseThumbnail(thumbnails :thumbnail[]) : thumbnail{
-    let parsed : thumbnail = {
-        width : '',
-        height : '',
-        url : ''
-    }
-    thumbnails.forEach((thumb) => {
-        if(thumb.url.indexOf('maxresdefault') !== -1){
-            parsed = {
-                width : thumb.width,
-                height : thumb.height,
-                url : thumb.url
-            }
-        }
-    })
-    if(parsed.url.length !== 0){
-        return parsed
-    }
-    else {
-        return thumbnails[thumbnails.length - 1]
-    }
-}
 
 export function parsePlaylist(data?: any): PlayList | void {
     if (!data.playlistRenderer) return;
