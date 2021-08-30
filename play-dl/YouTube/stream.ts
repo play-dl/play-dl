@@ -1,3 +1,4 @@
+import got from "got/dist/source"
 import { video_info } from "."
 import { LiveEnded, LiveStreaming, Stream } from "./classes/LiveStream"
 
@@ -34,12 +35,19 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream(url : string, error_check : boolean = false): Promise<Stream | LiveStreaming | LiveEnded>{
     let info = await video_info(url)
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
         return live_stream(info as InfoData)
+    }
+    
+    if(error_check){
+        let response = await got(info.video_details.url)
+        if(response.statusCode >= 400){
+            return await stream(info.video_details.url, true)
+        }
     }
 
     let audioFormat = parseAudioFormats(info.format)
@@ -62,11 +70,18 @@ export async function stream(url : string): Promise<Stream | LiveStreaming | Liv
     return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
-export function stream_from_info(info : InfoData): Stream | LiveStreaming | LiveEnded{
+export async function stream_from_info(info : InfoData, error_check : boolean = false): Promise<Stream | LiveStreaming | LiveEnded>{
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
         return live_stream(info as InfoData)
+    }
+
+    if(error_check){
+        let response = await got(info.video_details.url)
+        if(response.statusCode >= 400){
+            return await stream(info.video_details.url, true)
+        }
     }
 
     let audioFormat = parseAudioFormats(info.format)

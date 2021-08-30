@@ -1,7 +1,6 @@
 import { PassThrough } from 'stream'
 import got from 'got'
 import { StreamType } from '../stream';
-import { Socket } from 'net'
 
 export interface FormatInterface{
     url : string;
@@ -17,7 +16,6 @@ export class LiveStreaming{
     private interval : number
     private packet_count : number
     private timer : NodeJS.Timer | null
-    private socket : Socket | null
     private segments_urls : string[]
     constructor(dash_url : string, target_interval : number){
         this.type = StreamType.Arbitrary
@@ -27,7 +25,6 @@ export class LiveStreaming{
         this.segments_urls = []
         this.packet_count = 0
         this.timer = null
-        this.socket = null
         this.interval = target_interval * 1000 || 0
         this.stream.on('close', () => {
             this.cleanup()
@@ -47,8 +44,6 @@ export class LiveStreaming{
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
-        this.socket?.destroy()
-        this.socket = null
         this.timer = null
         this.url = ''
         this.base_url = ''
@@ -92,7 +87,6 @@ export class LiveEnded{
     private base_url : string;
     private packet_count : number
     private segments_urls : string[]
-    private socket : Socket | null
     constructor(dash_url : string){
         this.type = StreamType.Arbitrary
         this.url = dash_url
@@ -100,7 +94,6 @@ export class LiveEnded{
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.segments_urls = []
         this.packet_count = 0
-        this.socket = null
         this.stream.on('close', () => {
             this.cleanup()
         })
@@ -118,8 +111,6 @@ export class LiveEnded{
     }
 
     private cleanup(){
-        this.socket?.destroy()
-        this.socket = null
         this.url = ''
         this.base_url = ''
         this.segments_urls = []
@@ -163,7 +154,6 @@ export class Stream {
     private per_sec_bytes : number;
     private duration : number;
     private timer : NodeJS.Timer | null
-    private socket : Socket | null
     constructor(url : string, type : StreamType, duration : number){
         this.url = url
         this.type = type
@@ -171,14 +161,12 @@ export class Stream {
         this.bytes_count = 0
         this.per_sec_bytes = 0
         this.timer = null
-        this.duration = duration
-        this.socket = null;
+        this.duration = duration;
         (duration > 300) ? this.loop_start() : this.normal_start()
     }
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
-        this.socket?.destroy()
         this.timer = null
         this.url = ''
         this.bytes_count = 0
@@ -191,7 +179,6 @@ export class Stream {
             return
         }
         let stream = got.stream(this.url)
-        this.socket = stream.socket as Socket
         stream.pipe(this.stream)
     }
 
@@ -209,10 +196,8 @@ export class Stream {
             this.bytes_count += chunk.length
             this.stream.write(chunk)
         })
-        this.socket = stream.socket as Socket
         stream.on('data', () => {
             if(this.bytes_count > (this.per_sec_bytes * 300)){
-                this.socket?.destroy()
                 stream.destroy()
             }
         })
@@ -239,10 +224,8 @@ export class Stream {
             this.bytes_count += chunk.length
             this.stream.write(chunk)
         })
-        this.socket = stream.socket as Socket
         stream.on('data', () => {
             if(absolute_bytes > (this.per_sec_bytes * 300)){
-                this.socket?.destroy()
                 stream.destroy()
             }
         })
