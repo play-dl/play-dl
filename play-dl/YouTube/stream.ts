@@ -44,7 +44,7 @@ export async function stream(url : string, error_check : boolean = false): Promi
     }
     
     if(error_check){
-        let response = await got(info.video_details.url)
+        let response = await got(info.format[info.format.length - 1].url)
         if(response.statusCode >= 400){
             return await stream(info.video_details.url, true)
         }
@@ -78,7 +78,7 @@ export async function stream_from_info(info : InfoData, error_check : boolean = 
     }
 
     if(error_check){
-        let response = await got(info.video_details.url)
+        let response = await got(info.format[info.format.length - 1].url)
         if(response.statusCode >= 400){
             return await stream(info.video_details.url, true)
         }
