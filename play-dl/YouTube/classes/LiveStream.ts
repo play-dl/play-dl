@@ -183,10 +183,8 @@ export class Stream {
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
-        this.socket?.end()
-        this.socket?.on('close', () => {
-            console.log('Socket Closed')
-        })
+        this.socket?.destroy()
+        this.socket = null
         this.timer = null
         this.url = ''
         this.bytes_count = 0
