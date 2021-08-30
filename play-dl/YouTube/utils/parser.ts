@@ -7,6 +7,12 @@ export interface ParseSearchInterface {
     limit?: number;
 }
 
+export interface thumbnail{
+    width: string;
+    height : string;
+    url : string
+}
+
 export function ParseSearchResult(html :string, options? : ParseSearchInterface): (Video | PlayList | Channel)[] {
     if(!html) throw new Error('Can\'t parse Search result without data')
     if (!options) options = { type: "video", limit: 0 };
@@ -124,12 +130,7 @@ export function parseVideo(data?: any): Video | void {
         description: data.videoRenderer.descriptionSnippet && data.videoRenderer.descriptionSnippet.runs[0] ? data.videoRenderer.descriptionSnippet.runs[0].text : "",
         duration: data.videoRenderer.lengthText ? parseDuration(data.videoRenderer.lengthText.simpleText) : 0,
         duration_raw: data.videoRenderer.lengthText ? data.videoRenderer.lengthText.simpleText : null,
-        thumbnail: {
-            id: data.videoRenderer.videoId,
-            url: data.videoRenderer.thumbnail.thumbnails[data.videoRenderer.thumbnail.thumbnails.length - 1].url,
-            height: data.videoRenderer.thumbnail.thumbnails[data.videoRenderer.thumbnail.thumbnails.length - 1].height,
-            width: data.videoRenderer.thumbnail.thumbnails[data.videoRenderer.thumbnail.thumbnails.length - 1].width
-        },
+        thumbnail: parseThumbnail(data.videoRenderer.thumbnail.thumbnails),
         channel: {
             id: data.videoRenderer.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId || null,
             name: data.videoRenderer.ownerText.runs[0].text || null,
@@ -146,6 +147,29 @@ export function parseVideo(data?: any): Video | void {
     });
 
     return res;
+}
+
+export function parseThumbnail(thumbnails :thumbnail[]) : thumbnail{
+    let parsed : thumbnail = {
+        width : '',
+        height : '',
+        url : ''
+    }
+    thumbnails.forEach((thumb) => {
+        if(thumb.url.indexOf('maxresdefault') !== -1){
+            parsed = {
+                width : thumb.width,
+                height : thumb.height,
+                url : thumb.url
+            }
+        }
+    })
+    if(parsed.url.length !== 0){
+        return parsed
+    }
+    else {
+        return thumbnails[thumbnails.length - 1]
+    }
 }
 
 export function parsePlaylist(data?: any): PlayList | void {
