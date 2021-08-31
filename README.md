@@ -33,11 +33,23 @@ const results = await youtube.search('post malone sunflower', options);
 ```
 
 # Validate
+
 ### validate( url : `string` )
  *Much faster and easier way to validate url.*
 ```js
 if(validate(url)) // Will return true if url is a YouTube url 
 ```
+
+### validate_playlist( url : `string` )
+ *Much faster and easier way to validate url.*
+```js
+if(validate_playlist(url)) // Will return true if url is a YouTube Playlist url 
+```
+
+ > Want to Check both, use this
+ ```js
+if(validate(url) || validate_playlist(url)) // This will check both and if anyone is true, it will execute the below function
+ ```
 
 # Stream
 
