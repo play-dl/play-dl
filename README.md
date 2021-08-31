@@ -51,7 +51,7 @@ if(validate(url)) // Will return true if url is a YouTube url
 ```
 
 ### stream_from_info(info : `infoData`)
-*This is basic to create a youtube stream from a info [ from video_info function ].*
+*This is basic to create a youtube stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function ].*
 ```js
 let info = await video_info("url")
  let source = await stream_from_info(info) // This will create a stream Class which contains type and stream to be played.
