@@ -44,7 +44,7 @@ if(validate(url)) // Will return true if url is a YouTube url
 ### stream(url : `string`)
 *This is basic to create a youtube stream from a url.*
 ```js
- let source = await stream(<url>) // This will create a stream Class which contains type and stream to be played.
+ let source = await stream("url") // This will create a stream Class which contains type and stream to be played.
  let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
@@ -53,7 +53,7 @@ if(validate(url)) // Will return true if url is a YouTube url
 ### stream_from_info(info : `infoData`)
 *This is basic to create a youtube stream from a info [ from video_info function ].*
 ```js
-let info = await video_info(<url>)
+let info = await video_info("url")
  let source = await stream_from_info(info) // This will create a stream Class which contains type and stream to be played.
  let resource = createAudioResource(source.stream, {
             inputType : source.type
