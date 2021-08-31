@@ -143,7 +143,8 @@ export function parseVideo(data?: any): Video | void {
             verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes("verified"))
         },
         uploadedAt: data.videoRenderer.publishedTimeText?.simpleText ?? null,
-        views: data.videoRenderer.viewCountText?.simpleText?.replace(/[^0-9]/g, "") ?? 0
+        views: data.videoRenderer.viewCountText?.simpleText?.replace(/[^0-9]/g, "") ?? 0,
+        live : data.videoRenderer.lengthText ? false : true,
     });
 
     return res;
