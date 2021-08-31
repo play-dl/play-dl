@@ -1,6 +1,6 @@
 {
   "name": "play-dl",
-  "version": "0.6.4",
+  "version": "0.6.9",
   "description": "YouTube, SoundCloud, Spotify streaming for discord.js bots",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -28,8 +28,8 @@
     "url": "https://github.com/play-dl/play-dl/issues"
   },
   "engines": {
-		"node": ">=16.0.0"
-	},
+    "node": ">=16.0.0"
+  },
   "homepage": "https://github.com/play-dl/play-dl#readme",
   "files": [
     "dist/*"
