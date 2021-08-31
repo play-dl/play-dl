@@ -30,6 +30,8 @@ export async function video_basic_info(url : string){
         let new_url = 'https://www.youtube.com/watch?v=' + video_id
         let body = await url_get(new_url)
         let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split("}};")[0] + '}}')
+        let initial_response = JSON.parse(body.split("var ytInitialData = ")[1].split("}};")[0] + '}}')
+        let badge = initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges && initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges[0]
         if(player_response.playabilityStatus.status === 'ERROR') throw new Error(`While getting info from url \n  ${player_response.playabilityStatus.reason}`)
         if(player_response.playabilityStatus.status === 'LOGIN_REQUIRED') throw new Error(`While getting info from url \n  ${ player_response.playabilityStatus.reason || player_response.playabilityStatus.messages[0]}`)
         let html5player =  'https://www.youtube.com' + body.split('"jsUrl":"')[1].split('"')[0]
@@ -48,7 +50,8 @@ export async function video_basic_info(url : string){
             channel : {
                 name : vid.author,
                 id : vid.channelId,
-                url : `https://www.youtube.com/channel/${vid.channelId}`
+                url : `https://www.youtube.com/channel/${vid.channelId}`,
+                verified : Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified'))
             },
             views : vid.viewCount,
             tags : vid.keywords,
