@@ -1,7 +1,7 @@
 import { PassThrough } from 'stream'
 import got from 'got'
 import { StreamType } from '../stream';
-import { Socket } from 'net'
+import Request from 'got/dist/source/core';
 
 export interface FormatInterface{
     url : string;
@@ -18,7 +18,7 @@ export class LiveStreaming{
     private packet_count : number
     private timer : NodeJS.Timer | null
     private segments_urls : string[]
-    private socket : Socket | null
+    private request : Request | null
     constructor(dash_url : string, target_interval : number){
         this.type = StreamType.Arbitrary
         this.url = dash_url
@@ -26,8 +26,8 @@ export class LiveStreaming{
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.segments_urls = []
         this.packet_count = 0
+        this.request = null
         this.timer = null
-        this.socket = null
         this.interval = target_interval * 1000 || 0
         this.stream.on('close', () => {
             this.cleanup()
@@ -47,8 +47,8 @@ export class LiveStreaming{
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
-        this.socket?.destroy()
-        this.socket = null
+        this.request?.destroy()
+        this.request = null
         this.timer = null
         this.url = ''
         this.base_url = ''
@@ -71,8 +71,8 @@ export class LiveStreaming{
             await (async () => {
                 return new Promise(async (resolve, reject) => {
                     let stream = got.stream(this.base_url + segment)
+                    this.request = stream
                     stream.on('data', (chunk: any) => this.stream.write(chunk))
-                    stream.once('data', () => {this.socket = stream.socket as Socket})
                     stream.on('end', () => {
                         this.packet_count++
                         resolve('')
@@ -93,15 +93,15 @@ export class LiveEnded{
     private base_url : string;
     private packet_count : number
     private segments_urls : string[]
-    private socket : Socket | null
+    private request : Request | null
     constructor(dash_url : string){
         this.type = StreamType.Arbitrary
         this.url = dash_url
         this.base_url = ''
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.segments_urls = []
+        this.request = null
         this.packet_count = 0
-        this.socket = null
         this.stream.on('close', () => {
             this.cleanup()
         })
@@ -119,8 +119,8 @@ export class LiveEnded{
     }
 
     private cleanup(){
-        this.socket?.destroy()
-        this.socket = null
+        this.request?.destroy()
+        this.request = null
         this.url = ''
         this.base_url = ''
         this.segments_urls = []
@@ -145,8 +145,8 @@ export class LiveEnded{
             await (async () => {
                 return new Promise(async (resolve, reject) => {
                     let stream = got.stream(this.base_url + segment)
+                    this.request = stream
                     stream.on('data', (chunk: any) => this.stream.write(chunk))
-                    stream.once('data', () => {this.socket = stream.socket as Socket})
                     stream.on('end', () => {
                         this.packet_count++
                         resolve('')
@@ -165,7 +165,7 @@ export class Stream {
     private per_sec_bytes : number;
     private duration : number;
     private timer : NodeJS.Timer | null
-    private socket : Socket | null
+    private request : Request | null
     constructor(url : string, type : StreamType, duration : number){
         this.url = url
         this.type = type
@@ -173,7 +173,7 @@ export class Stream {
         this.bytes_count = 0
         this.per_sec_bytes = 0
         this.timer = null
-        this.socket = null
+        this.request = null
         this.stream.on('close', () => {
             this.cleanup()
         })
@@ -183,8 +183,8 @@ export class Stream {
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
-        this.socket?.destroy()
-        this.socket = null
+        this.request?.destroy()
+        this.request = null
         this.timer = null
         this.url = ''
         this.bytes_count = 0
@@ -197,8 +197,8 @@ export class Stream {
             return
         }
         let stream = got.stream(this.url)
+        this.request = stream
         stream.pipe(this.stream)
-        stream.once('data', () => {this.socket = stream.socket as Socket})
     }
 
     private loop_start(){
@@ -207,9 +207,9 @@ export class Stream {
             return
         }
         let stream = got.stream(this.url)
+        this.request = stream
         stream.once('data', () => {
             this.per_sec_bytes = Math.ceil((stream.downloadProgress.total as number)/this.duration)
-            this.socket = stream.socket as Socket
         })
 
         stream.on('data', (chunk: any) => {
@@ -238,13 +238,12 @@ export class Stream {
                 "range" : `bytes=${this.bytes_count}-`
             }
         })
-
+        this.request = stream
         stream.on('data', (chunk: any) => {
             absolute_bytes += chunk.length
             this.bytes_count += chunk.length
             this.stream.write(chunk)
         })
-        stream.once('data', () => {this.socket = stream.socket as Socket})
         stream.on('data', () => {
             if(absolute_bytes > (this.per_sec_bytes * 300)){
                 stream.destroy()
