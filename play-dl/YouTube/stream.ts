@@ -35,7 +35,7 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string, error_check : boolean = false): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream(url : string): Promise<Stream | LiveStreaming | LiveEnded>{
     let info = await video_info(url)
     let final: any[] = [];
     let type : StreamType;
@@ -43,15 +43,13 @@ export async function stream(url : string, error_check : boolean = false): Promi
         return live_stream(info as InfoData)
     }
     
-    if(error_check){
-        let response  = await got(info.format[info.format.length - 1].url, {
-            headers : {
-                "range" : `bytes=0-1`
-            }
-        })
-        if(response.statusCode >= 400){
-            return await stream(info.video_details.url, true)
+    let response  = await got(info.format[info.format.length - 1].url, {
+        headers : {
+            "range" : `bytes=0-1`
         }
+    })
+    if(response.statusCode >= 400){
+        return await stream(info.video_details.url)
     }
 
     let audioFormat = parseAudioFormats(info.format)
@@ -74,22 +72,20 @@ export async function stream(url : string, error_check : boolean = false): Promi
     return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
-export async function stream_from_info(info : InfoData, error_check : boolean = false): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming | LiveEnded>{
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
         return live_stream(info as InfoData)
     }
 
-    if(error_check){
-        let response = await got(info.format[info.format.length - 1].url, {
-            headers : {
-                "range" : `bytes=0-1`
-            }
-        })
-        if(response.statusCode >= 400){
-            return await stream(info.video_details.url, true)
+    let response = await got(info.format[info.format.length - 1].url, {
+        headers : {
+            "range" : `bytes=0-1`
         }
+    })
+    if(response.statusCode >= 400){
+        return await stream(info.video_details.url)
     }
 
     let audioFormat = parseAudioFormats(info.format)
