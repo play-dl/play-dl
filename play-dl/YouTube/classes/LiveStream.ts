@@ -77,6 +77,9 @@ export class LiveStreaming{
                         this.packet_count++
                         resolve('')
                     })
+                    stream.once('error', (err) => {
+                        this.stream.emit('error', err)
+                    })
                 })
             })()
         }
@@ -151,6 +154,9 @@ export class LiveEnded{
                         this.packet_count++
                         resolve('')
                     })
+                    stream.once('error', (err) => {
+                        this.stream.emit('error', err)
+                    })
                 })
             })()
         }
@@ -198,6 +204,11 @@ export class Stream {
         }
         let stream = got.stream(this.url)
         this.request = stream
+
+        stream.once('error', (err) => {
+            this.stream.emit('error', err)
+        })
+        
         stream.pipe(this.stream)
     }
 
@@ -210,6 +221,10 @@ export class Stream {
         this.request = stream
         stream.once('data', () => {
             this.per_sec_bytes = Math.ceil((stream.downloadProgress.total as number)/this.duration)
+        })
+
+        stream.once('error', (err) => {
+            this.stream.emit('error', err)
         })
 
         stream.on('data', (chunk: any) => {
@@ -244,6 +259,11 @@ export class Stream {
             this.bytes_count += chunk.length
             this.stream.write(chunk)
         })
+
+        stream.once('error', (err) => {
+            this.stream.emit('error', err)
+        })
+
         stream.on('data', () => {
             if(absolute_bytes > (this.per_sec_bytes * 300)){
                 stream.destroy()
