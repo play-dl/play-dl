@@ -37,6 +37,7 @@ export async function video_basic_info(url : string){
         let html5player =  'https://www.youtube.com' + body.split('"jsUrl":"')[1].split('"')[0]
         let format = []
         let vid = player_response.videoDetails
+        console.log(vid.thumbnail.thumbnails)
         let microformat = player_response.microformat.playerMicroformatRenderer
         let video_details = {
             id : vid.videoId,
