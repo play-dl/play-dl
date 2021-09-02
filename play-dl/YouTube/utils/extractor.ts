@@ -21,14 +21,16 @@ export function validate_playlist(url : string): boolean{
     return true
 }
 
-export async function video_basic_info(url : string){
+export async function video_basic_info(url : string, cookie? : string){
         if(!url.match(video_pattern)) throw new Error('This is not a YouTube URL')
         let video_id : string;
         if(url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split('/')[0]
         else if(url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1].split('/')[0]
         else video_id = url.split('watch?v=')[1].split('&')[0];
         let new_url = 'https://www.youtube.com/watch?v=' + video_id
-        let body = await url_get(new_url)
+        let body = await url_get(new_url, {
+            headers : (cookie) ? { 'cookie' : cookie } : {}
+        })
         let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split("}};")[0] + '}}')
         let initial_response = JSON.parse(body.split("var ytInitialData = ")[1].split("}};")[0] + '}}')
         let badge = initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges && initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges[0]
@@ -86,8 +88,8 @@ function parseSeconds(seconds : number): string {
     return hDisplay + mDisplay + sDisplay; 
 }
 
-export async function video_info(url : string) {
-    let data = await video_basic_info(url)
+export async function video_info(url : string, cookie? : string) {
+    let data = await video_basic_info(url, cookie)
     if(data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null){
         return data
     }
