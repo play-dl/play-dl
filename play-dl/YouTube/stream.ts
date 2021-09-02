@@ -35,8 +35,8 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string): Promise<Stream | LiveStreaming | LiveEnded>{
-    let info = await video_info(url)
+export async function stream(url : string, cookie? : string): Promise<Stream | LiveStreaming | LiveEnded>{
+    let info = await video_info(url, cookie)
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
