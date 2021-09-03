@@ -1,6 +1,6 @@
 import got from "got/dist/source"
 import { video_info } from "."
-import { LiveEnded, LiveStreaming, Stream } from "./classes/LiveStream"
+import { LiveStreaming, Stream } from "./classes/LiveStream"
 
 export enum StreamType{
     Arbitrary = 'arbitrary',
@@ -35,11 +35,11 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string, cookie? : string): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream(url : string, cookie? : string): Promise<Stream | LiveStreaming>{
     let info = await video_info(url, cookie)
     let final: any[] = [];
     let type : StreamType;
-    if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
+    if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
         return live_stream(info as InfoData)
     }
     
@@ -72,10 +72,10 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
     return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
-export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming | LiveEnded>{
+export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming>{
     let final: any[] = [];
     let type : StreamType;
-    if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null) {
+    if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
         return live_stream(info as InfoData)
     }
 
@@ -116,13 +116,7 @@ function filterFormat(formats : any[], codec : string){
     return result
 }
 
-function live_stream(info : InfoData): LiveStreaming | LiveEnded{
-    let stream : LiveStreaming | LiveEnded
-    if(info.video_details.durationInSec === '0') {
-        stream = new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec)
-    }
-    else {
-        stream = new LiveEnded(info.LiveStreamData.dashManifestUrl)
-    }
+function live_stream(info : InfoData): LiveStreaming{
+    let stream = new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     return stream
 }

@@ -55,8 +55,12 @@ if(validate(url) || validate_playlist(url)) // This will check both and if anyon
 
 ### stream(url : `string`, cookie? : `string`)
 *This is basic to create a youtube stream from a url.*
+<<<<<<< HEAD
+**Cookies are optional and are required for playing age restricted videos.**
+=======
 
 **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
+>>>>>>> 4487ef38a991af12fb1660bc7ffe3cf7418433ca
 ```js
  let source = await stream("url") // This will create a stream Class which contains type and stream to be played.
  let resource = createAudioResource(source.stream, {
@@ -98,6 +102,7 @@ console.log(results[0].url);
 
 ### video_basic_info(url : `string`, cookie? : `string`)
 *The basic video details `play-dl` fetches at first.*
+**Cookies are optional and are required for playing age restricted videos.**
 
 **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
@@ -106,6 +111,7 @@ const video = await video_basic_info(url)
 ```
 ### video_info(url : `string`, cookie? : `string`)
 *This contains everything with deciphered formats along with `video_details`.*
+**Cookies are optional and are required for playing age restricted videos.**
 
 **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
