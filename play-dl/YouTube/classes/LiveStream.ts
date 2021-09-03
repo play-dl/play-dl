@@ -135,7 +135,6 @@ export class Stream {
     }
 
     private cleanup(){
-        console.log('Ending Everything')
         clearTimeout(this.timer as NodeJS.Timer)
         this.request?.destroy()
         this.request = null
