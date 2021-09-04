@@ -89,20 +89,18 @@ export class LiveStreaming{
             if(Number(segment.split('sq/')[1].split('/')[0]) !== this.packet_count){
                 continue
             }
-            await (async () => {
-                return new Promise(async (resolve, reject) => {
-                    let stream = got.stream(this.base_url + segment)
-                    this.request = stream
-                    stream.on('data', (chunk: any) => this.stream.write(chunk))
-                    stream.on('end', () => {
-                        this.packet_count++
-                        resolve('')
-                    })
-                    stream.once('error', (err) => {
-                        this.stream.emit('error', err)
-                    })
+            await new Promise((resolve, reject) => {
+                let stream = got.stream(this.base_url + segment)
+                this.request = stream
+                stream.on('data', (chunk: any) => this.stream.write(chunk))
+                stream.on('end', () => {
+                    this.packet_count++
+                    resolve('')
                 })
-            })()
+                stream.once('error', (err) => {
+                    this.stream.emit('error', err)
+                })
+            })
         }
         this.timer = setTimeout(() => {
             this.start()
