@@ -5,5 +5,5 @@ export async function url_get (url : string, options? : OptionsOfTextResponseBod
     if(response.statusCode === 200) {
         return response.body
     }
-    else throw `Got ${response.statusCode} from ${url}`
+    else throw new Error(`Got ${response.statusCode} from ${url}`)
 }
