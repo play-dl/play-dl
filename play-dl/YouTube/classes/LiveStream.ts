@@ -89,7 +89,7 @@ export class LiveStreaming{
             if(Number(segment.split('sq/')[1].split('/')[0]) !== this.packet_count){
                 continue
             }
-            await new Promise(async (resolve, reject) => {
+            await new Promise((resolve, reject) => {
                 let stream = got.stream(this.base_url + segment)
                 this.request = stream
                 stream.on('data', (chunk: any) => this.stream.write(chunk))
