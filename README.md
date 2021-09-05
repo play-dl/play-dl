@@ -16,8 +16,8 @@ npm install play-dl@latest
 ```
 
 ### Examples
-
-For pre-made examples, head over to [/examples](https://github.com/play-dl/play-dl/tree/main/examples) folder.
+- [YouTube](https://github.com/play-dl/play-dl/tree/developer/examples/YouTube)
+- [Spotify](https://github.com/play-dl/play-dl/tree/developer/examples/Spotify)
 
 
 ### Docs
