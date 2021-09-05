@@ -22,6 +22,6 @@ For pre-made examples, head over to [/examples](https://github.com/play-dl/play-
 
 ### Docs
 
-- [Main]()
-- [YouTube]()
-- [Spotify]()
+- [Main](https://github.com/play-dl/play-dl/tree/developer/docs#play-dl-commands)
+- [YouTube](https://github.com/play-dl/play-dl/tree/developer/docs/YouTube#youtube)
+- [Spotify](https://github.com/play-dl/play-dl/tree/developer/docs/Spotify#spotify)
