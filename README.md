@@ -16,12 +16,12 @@ npm install play-dl@latest
 ```
 
 ### Examples
-- [YouTube](https://github.com/play-dl/play-dl/tree/developer/examples/YouTube)
-- [Spotify](https://github.com/play-dl/play-dl/tree/developer/examples/Spotify)
+- [YouTube](https://github.com/play-dl/play-dl/tree/main/examples/YouTube)
+- [Spotify](https://github.com/play-dl/play-dl/tree/main/examples/Spotify)
 
 
 ### Docs
 
-- [Main](https://github.com/play-dl/play-dl/tree/developer/docs#play-dl-commands)
-- [YouTube](https://github.com/play-dl/play-dl/tree/developer/docs/YouTube#youtube)
-- [Spotify](https://github.com/play-dl/play-dl/tree/developer/docs/Spotify#spotify)
+- [Main](https://github.com/play-dl/play-dl/tree/main/docs#play-dl-commands)
+- [YouTube](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#youtube)
+- [Spotify](https://github.com/play-dl/play-dl/tree/main/docs/Spotify#spotify)
