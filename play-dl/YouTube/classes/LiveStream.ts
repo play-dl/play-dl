@@ -92,7 +92,7 @@ export class LiveStreaming{
             await new Promise((resolve, reject) => {
                 let stream = got.stream(this.base_url + segment)
                 this.request = stream
-                stream.on('data', (chunk: any) => this.stream.write(chunk))
+                stream.pipe(this.stream, { end : false })
                 stream.on('end', () => {
                     this.packet_count++
                     resolve('')
@@ -154,6 +154,7 @@ export class Stream {
             }
         })
         this.request = stream
+        stream.pipe(this.stream, { end : false })
         stream.once('data', () => {
             if(this.per_sec_bytes === 0){
                 this.per_sec_bytes = Math.ceil((stream.downloadProgress.total as number)/this.duration)
@@ -167,7 +168,6 @@ export class Stream {
         stream.on('data', (chunk: any) => {
             absolute_bytes += chunk.length
             this.bytes_count += chunk.length
-            this.stream.write(chunk)
             if(absolute_bytes > (this.per_sec_bytes * 300) && this.per_sec_bytes !== 0){
                 stream.destroy()
             }

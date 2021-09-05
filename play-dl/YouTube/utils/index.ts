@@ -1,1 +1,1 @@
-export { video_basic_info, video_info, playlist_info, validate, validate_playlist } from './extractor'
+export { video_basic_info, video_info, playlist_info, yt_validate } from './extractor'
