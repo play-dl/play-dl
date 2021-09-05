@@ -1,8 +1,8 @@
 # Play-dl commands
 
 For source specific commands :-
-- [YouTube](https://github.com/play-dl/play-dl/tree/developer/docs/YouTube#youtube)
-- [Spotify](https://github.com/play-dl/play-dl/tree/developer/docs/Spotify#spotify)
+- [YouTube](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#youtube)
+- [Spotify](https://github.com/play-dl/play-dl/tree/main/docs/Spotify#spotify)
 
 ### Validate
 
