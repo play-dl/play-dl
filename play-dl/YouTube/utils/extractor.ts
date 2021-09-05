@@ -7,18 +7,19 @@ const DEFAULT_API_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
 const video_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)/
 
-export function validate(url : string): boolean{
-    if(!url.match(video_pattern)) return false
-    else return true
-}
-
-export function validate_playlist(url : string): boolean{
-    if(!url.match(playlist_pattern)) return false
-    let Playlist_id = url.split('list=')[1].split('&')[0]
-    if(Playlist_id.length !== 34 || !Playlist_id.startsWith('PL')){
-        return false
+export function yt_validate(url : string): "playlist" | "video" | boolean {
+    if(url.indexOf('list=') === -1){
+        if(!url.match(video_pattern)) return false
+        else return "video"
     }
-    return true
+    else {
+        if(!url.match(playlist_pattern)) return false
+        let Playlist_id = url.split('list=')[1].split('&')[0]
+        if(Playlist_id.length !== 34 || !Playlist_id.startsWith('PL')){
+            return false
+        }
+        return "playlist"
+    }
 }
 
 export async function video_basic_info(url : string, cookie? : string){

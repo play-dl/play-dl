@@ -1,9 +1,9 @@
 const discord = require('discord.js')
 const { Intents } = require('discord.js')
 const { createAudioPlayer, createAudioResource , StreamType, demuxProbe, joinVoiceChannel, NoSubscriberBehavior, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection } = require('@discordjs/voice')
-const youtube = require('play-dl')
+const play = require('play-dl')
 const client = new discord.Client({ intents : [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES] , partials : ['CHANNEL', 'MESSAGE']})
-const token = '< YOUR BOT TOKEN >'
+const token = '< Your Bot Token >'
 
 
 client.on('messageCreate', async message => {
@@ -15,9 +15,11 @@ client.on('messageCreate', async message => {
             adapterCreator: message.guild.voiceAdapterCreator
         })
 		
-		let args = message.content.split('play')[1]
-        let yt_info = await youtube.search(args, { limit : 1 })
-		let stream = await youtube.stream(yt_info[0].url)
+		let args = message.content.split('play ')[1].split(' ')[0]
+        let sp_data = await play.spotify(args) // This will get spotify data from the url [ I used track url, make sure to make a logic for playlist, album ]
+        let searched = await play.search(`${sp_data.name}`, { limit : 1 }) // This will search the found track on youtube.
+        let stream = await play.stream(searched[0].url) // This will create stream from the above search
+
         let resource = createAudioResource(stream.stream, {
             inputType : stream.type
         })

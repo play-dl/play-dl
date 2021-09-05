@@ -1,7 +1,7 @@
 const discord = require('discord.js')
 const { Intents } = require('discord.js')
 const { createAudioPlayer, createAudioResource , StreamType, demuxProbe, joinVoiceChannel, NoSubscriberBehavior, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection } = require('@discordjs/voice')
-const youtube = require('play-dl')
+const play = require('play-dl')
 const client = new discord.Client({ intents : [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES] , partials : ['CHANNEL', 'MESSAGE']})
 const token = '< YOUR BOT TOKEN >'
 const COOKIE = '< YOUR COOKIES >'
@@ -17,13 +17,13 @@ client.on('messageCreate', async message => {
         })
 		
 		let args = message.content.split('play ')[1].split(' ')[0]
-        let stream = await youtube.stream(args, COOKIE)
+        let stream = await play.stream(args, COOKIE)
         /*
         OR if you want to get info about youtube link and then stream it
 
-        let yt_info = await youtube.video_info(args, COOKIE)
+        let yt_info = await play.video_info(args, COOKIE)
         console.log(yt_info.video_details.title) 
-        let stream = await youtube.stream_from_info(yt_info)
+        let stream = await play.stream_from_info(yt_info)
         */
 
         let resource = createAudioResource(stream.stream, {
