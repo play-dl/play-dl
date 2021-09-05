@@ -1,9 +1,13 @@
 {
   "name": "play-dl",
-  "version": "0.7.9",
+  "version": "0.8.0",
   "description": "YouTube, SoundCloud, Spotify streaming for discord.js bots",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
   "scripts": {
     "build": "tsc",
     "build:check": "tsc --noEmit --incremental false"
