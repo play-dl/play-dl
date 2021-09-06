@@ -90,7 +90,6 @@ export class LiveStreaming{
                 continue
             }
             await new Promise((resolve, reject) => {
-                this.request?.unpipe(this.stream)
                 let stream = got.stream(this.base_url + segment)
                 this.request = stream
                 stream.pipe(this.stream, { end : false })
@@ -149,7 +148,6 @@ export class Stream {
             return
         }
         let absolute_bytes : number = 0
-        this.request?.unpipe(this.stream)
         let stream = got.stream(this.url, {
             headers : {
                 "range" : `bytes=${this.bytes_count}-`
@@ -172,6 +170,7 @@ export class Stream {
             this.bytes_count += chunk.length
             if(absolute_bytes > (this.per_sec_bytes * 300) && this.per_sec_bytes !== 0){
                 stream.destroy()
+                stream.unpipe(this.stream)
             }
         })
 
