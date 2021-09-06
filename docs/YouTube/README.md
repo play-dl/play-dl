@@ -27,10 +27,21 @@ if(check === "video") //URL is video url
 if(check === "playlist") //URL is a playlist url
 ```
 
+## Extract ID
+
+### extractID(url : `string`)
+*This will return videoID or playlistID from a url*
+
+**Note :** URL like [this](https://www.youtube.com/watch?v=E2gHczUOCGI&list=PLUt3leKZfbZqLzLwcQMYPBdbe7i7KRCOP&index=2) will return a playlist ID only.
+
+```js
+let id = extractID(url)
+```
+
 ## Stream
 
 ### stream(url : `string`, cookie? : `string`)
-*This is basic to create a youtube stream from a url.*
+*This is basic to create a youtube stream from a url or videoID.*
 
 **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
@@ -74,7 +85,7 @@ console.log(results[0].url);
 ## Video
 
 ### video_basic_info(url : `string`, cookie? : `string`)
-*The basic video details `play-dl` fetches at first.*
+*The basic video details `play-dl` fetches at first from url or videoID.*
 
 **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
@@ -82,7 +93,7 @@ console.log(results[0].url);
 const video = await video_basic_info(url)
 ```
 ### video_info(url : `string`, cookie? : `string`)
-*This contains everything with deciphered formats along with `video_details`.*
+*This contains everything with deciphered formats along with `video_details`. It can fetech data from url or videoID.*
 
 **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
@@ -102,7 +113,7 @@ const video = await video_info(url)
 ## Playlist
 
 ### playlist_info(url : `string`, parseIncomplete : `boolean`)
-*This fetches all details about a playlist.*
+*This fetches all details about a playlist from a url or playlistID.*
 
 **parseIncomplete** is optional parameter if you want to parse playlist with hidden videos.
 ```js
@@ -155,7 +166,7 @@ const playlist = await playlist_info(url, true)
   // This displays total no. of pages fetched so far.
 
   for(let i = 1; i <= playlist.total_pages; i++){
-      "Your queue".push(...playlist.page(i))
+      queue.push(...playlist.page(i))
   } // This will push every video in that playlist to your queue
   ```
 

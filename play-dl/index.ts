@@ -1,4 +1,4 @@
-export { playlist_info, video_basic_info, video_info, search, stream, stream_from_info, yt_validate } from "./YouTube";
+export { playlist_info, video_basic_info, video_info, search, stream, stream_from_info, yt_validate, extractID } from "./YouTube";
 
 export { spotify, sp_validate } from './Spotify'
 

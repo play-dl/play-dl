@@ -22,12 +22,29 @@ export function yt_validate(url : string): "playlist" | "video" | boolean {
     }
 }
 
+export function extractID(url : string): string{
+    if(url.startsWith('https')){
+        if(url.indexOf('list=') === -1){
+            let video_id : string;
+            if(url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split('/')[0]
+            else if(url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1].split('/')[0]
+            else video_id = url.split('watch?v=')[1].split('&')[0];
+            return video_id
+        }
+        else{
+            return url.split('list=')[1].split('&')[0]
+        }
+    }
+    else return url
+}
+
 export async function video_basic_info(url : string, cookie? : string){
-        if(!url.match(video_pattern)) throw new Error('This is not a YouTube URL')
         let video_id : string;
-        if(url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split('/')[0]
-        else if(url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1].split('/')[0]
-        else video_id = url.split('watch?v=')[1].split('&')[0];
+        if(url.startsWith('https')) {
+            if(yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL')
+            video_id = extractID(url)
+        }
+        else video_id = url
         let new_url = 'https://www.youtube.com/watch?v=' + video_id
         let body = await url_get(new_url, {
             headers : (cookie) ? { 'cookie' : cookie } : {}
@@ -105,10 +122,12 @@ export async function video_info(url : string, cookie? : string) {
 
 export async function playlist_info(url : string, parseIncomplete : boolean = false) {
     if (!url || typeof url !== "string") throw new Error(`Expected playlist url, received ${typeof url}!`);
-    if(url.search('(\\?|\\&)list\\=') === -1) throw new Error('This is not a PlayList URL')
-
-    let Playlist_id = url.split('list=')[1].split('&')[0]
-    if(Playlist_id.length !== 34 || !Playlist_id.startsWith('PL')) throw new Error('This is not a PlayList URL')
+    let Playlist_id : string
+    if(url.startsWith('https')){
+        if(yt_validate(url) !== 'playlist') throw new Error('This is not a Playlist URL')
+        Playlist_id = extractID(url)
+    }
+    else Playlist_id = url
     let new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`
     
     let body = await url_get(new_url)
