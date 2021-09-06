@@ -40,7 +40,7 @@ let id = extractID(url)
 
 ## Stream
 
-### stream(url : `string`, options : `StreamOptions`)
+### stream(url : `string`, options : [StreamOptions](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#streamoptions))
 *This is basic to create a youtube stream from a url or videoID.*
 
 
@@ -56,7 +56,7 @@ let id = extractID(url)
         }) // This creates resource for playing
 ```
 
-### stream_from_info(info : `infoData`, options : `StreamOptions`)
+### stream_from_info(info : `infoData`, options : [StreamOptions](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#streamoptions))
 *This is basic to create a youtube stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function ].*
 ```js
 let info = await video_info("url")
