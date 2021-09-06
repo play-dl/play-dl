@@ -17,7 +17,9 @@ client.on('messageCreate', async message => {
         })
 		
 		let args = message.content.split('play ')[1].split(' ')[0]
-        let stream = await play.stream(args, COOKIE)
+        let stream = await play.stream(args, {
+            cookie : COOKIE
+        })
         /*
         OR if you want to get info about youtube link and then stream it
 

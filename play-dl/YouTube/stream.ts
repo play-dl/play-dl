@@ -10,6 +10,10 @@ export enum StreamType{
 	Opus = 'opus',
 }
 
+interface StreamOptions{
+    cookie? : string;
+    retry? : boolean;
+}
 
 interface InfoData{
     LiveStreamData : {
@@ -35,22 +39,23 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string, cookie? : string): Promise<Stream | LiveStreaming>{
-    let info = await video_info(url, cookie)
+export async function stream(url : string, options : StreamOptions = { retry : false }): Promise<Stream | LiveStreaming>{
+    let info = await video_info(url, options.cookie)
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
         return new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     }
-    
-    await got(info.format[info.format.length - 1].url, {
-        headers : {
-            "range" : `bytes=0-1`
-        },
-        retry : 0
-    }).catch(async () => {
-        return await stream(info.video_details.url)
-    })
+    if(options.retry){
+        await got(info.format[info.format.length - 1].url, {
+            headers : {
+                "range" : `bytes=0-1`
+            },
+            retry : 0
+        }).catch(async () => {
+            return await stream(info.video_details.url)
+        })
+    }
 
     let audioFormat = parseAudioFormats(info.format)
     let opusFormats = filterFormat(audioFormat, "opus")
@@ -72,21 +77,23 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
     return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
-export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming>{
+export async function stream_from_info(info : InfoData, options : StreamOptions = { retry : false }): Promise<Stream | LiveStreaming>{
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
         return new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     }
 
-    await got(info.format[info.format.length - 1].url, {
-        headers : {
-            "range" : `bytes=0-1`
-        },
-        retry : 0
-    }).catch(async () => {
-        return await stream(info.video_details.url)
-    })
+    if(options.retry){
+        await got(info.format[info.format.length - 1].url, {
+            headers : {
+                "range" : `bytes=0-1`
+            },
+            retry : 0
+        }).catch(async () => {
+            return await stream(info.video_details.url)
+        })
+    }
 
     let audioFormat = parseAudioFormats(info.format)
     let opusFormats = filterFormat(audioFormat, "opus")
