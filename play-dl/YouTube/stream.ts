@@ -10,11 +10,6 @@ export enum StreamType{
 	Opus = 'opus',
 }
 
-interface StreamOptions{
-    cookie? : string;
-    retry? : boolean;
-}
-
 interface InfoData{
     LiveStreamData : {
         isLive : boolean
@@ -39,24 +34,28 @@ function parseAudioFormats(formats : any[]){
     return result
 }
 
-export async function stream(url : string, options : StreamOptions = { retry : false }): Promise<Stream | LiveStreaming>{
-    let info = await video_info(url, options.cookie)
+export async function stream(url : string, cookie? : string): Promise<Stream | LiveStreaming>{
+    let info = await video_info(url, cookie)
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
         return new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     }
-    if(options.retry){
-        await got(info.format[info.format.length - 1].url, {
-            headers : {
-                "range" : `bytes=0-1`
-            },
-            retry : 0
-        }).catch(async () => {
-            return await stream(info.video_details.url)
-        })
+    console.time('Time to Retry')
+    let resp = await got(info.format[info.format.length - 1].url, {
+        headers : {
+            "range" : `bytes=0-1`
+        },
+        retry : 0
+    }).catch(() => {
+        return 0
+    })
+    if(resp === 0){
+        return await stream(info.video_details.url)
     }
+    else if(typeof resp !== "number") resp.destroy()
 
+    console.timeEnd('Time to Retry')
     let audioFormat = parseAudioFormats(info.format)
     let opusFormats = filterFormat(audioFormat, "opus")
 
@@ -77,23 +76,25 @@ export async function stream(url : string, options : StreamOptions = { retry : f
     return new Stream(final[0].url, type, info.video_details.durationInSec) 
 }
 
-export async function stream_from_info(info : InfoData, options : StreamOptions = { retry : false }): Promise<Stream | LiveStreaming>{
+export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming>{
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
         return new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     }
 
-    if(options.retry){
-        await got(info.format[info.format.length - 1].url, {
-            headers : {
-                "range" : `bytes=0-1`
-            },
-            retry : 0
-        }).catch(async () => {
-            return await stream(info.video_details.url)
-        })
+    let resp = await got(info.format[info.format.length - 1].url, {
+        headers : {
+            "range" : `bytes=0-1`
+        },
+        retry : 0
+    }).catch(() => {
+        return 0
+    })
+    if(resp === 0){
+        return await stream(info.video_details.url)
     }
+    else if(typeof resp !== "number") resp.destroy()
 
     let audioFormat = parseAudioFormats(info.format)
     let opusFormats = filterFormat(audioFormat, "opus")
