@@ -26,15 +26,15 @@ function parse_json(url : string, data : string): SpotifyAlbum | SpotifyPlaylist
 }
 
 function embed_url(url : string): string{
-    if(url.indexOf('track') !== -1){
+    if(url.indexOf('track/') !== -1){
         let trackID = url.split('track/')[1].split('?')[0].split('/')[0].split('&')[0]
         return `https://open.spotify.com/embed/track/${trackID}`
     }
-    else if(url.indexOf('album') !== -1){
+    else if(url.indexOf('album/') !== -1){
         let albumID = url.split('album/')[1].split('?')[0].split('/')[0].split('&')[0]
         return `https://open.spotify.com/embed/album/${albumID}`
     }
-    else if(url.indexOf('playlist') !== -1){
+    else if(url.indexOf('playlist/') !== -1){
         let playlistID = url.split('playlist/')[1].split('?')[0].split('/')[0].split('&')[0]
         return `https://open.spotify.com/embed/playlist/${playlistID}`
     }
@@ -43,13 +43,13 @@ function embed_url(url : string): string{
 
 export function sp_validate(url : string): "track" | "playlist" | "album" | boolean{
     if(!url.match(pattern)) return false
-    if(url.indexOf('track') !== -1){
+    if(url.indexOf('track/') !== -1){
         return "track"
     }
-    else if(url.indexOf('album') !== -1){
+    else if(url.indexOf('album/') !== -1){
         return "album"
     }
-    else if(url.indexOf('playlist') !== -1){
+    else if(url.indexOf('playlist/') !== -1){
         return "playlist"
     }
     else return false
