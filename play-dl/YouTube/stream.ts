@@ -43,14 +43,14 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
         return new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     }
     
-    let response  = await got(info.format[info.format.length - 1].url, {
+    await got(info.format[info.format.length - 1].url, {
         headers : {
             "range" : `bytes=0-1`
-        }
-    })
-    if(response.statusCode >= 400){
+        },
+        retry : 0
+    }).catch(async () => {
         return await stream(info.video_details.url)
-    }
+    })
 
     let audioFormat = parseAudioFormats(info.format)
     let opusFormats = filterFormat(audioFormat, "opus")
@@ -79,14 +79,14 @@ export async function stream_from_info(info : InfoData): Promise<Stream | LiveSt
         return new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     }
 
-    let response = await got(info.format[info.format.length - 1].url, {
+    await got(info.format[info.format.length - 1].url, {
         headers : {
             "range" : `bytes=0-1`
-        }
-    })
-    if(response.statusCode >= 400){
+        },
+        retry : 0
+    }).catch(async () => {
         return await stream(info.video_details.url)
-    }
+    })
 
     let audioFormat = parseAudioFormats(info.format)
     let opusFormats = filterFormat(audioFormat, "opus")
