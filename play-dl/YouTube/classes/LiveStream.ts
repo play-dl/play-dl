@@ -65,6 +65,7 @@ export class LiveStreaming{
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
         clearTimeout(this.dash_timer as NodeJS.Timer)
+        this.request?.unpipe(this.stream)
         this.request?.destroy()
         this.dash_timer = null
         this.video_url = ''
@@ -134,6 +135,7 @@ export class Stream {
 
     private cleanup(){
         clearTimeout(this.timer as NodeJS.Timer)
+        this.request?.unpipe(this.stream)
         this.request?.destroy()
         this.request = null
         this.timer = null
@@ -178,6 +180,7 @@ export class Stream {
         })
 
         this.timer = setTimeout(() => {
+            this.request?.unpipe(this.stream)
             this.loop()
         }, 280 * 1000)
     }
