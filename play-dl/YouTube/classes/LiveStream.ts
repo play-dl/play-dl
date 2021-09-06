@@ -178,6 +178,7 @@ export class Stream {
         })
 
         this.timer = setTimeout(() => {
+            this.request?.unpipe(this.stream)
             this.loop()
         }, 280 * 1000)
     }
