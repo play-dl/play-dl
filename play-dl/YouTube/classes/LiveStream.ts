@@ -170,7 +170,6 @@ export class Stream {
             this.bytes_count += chunk.length
             if(absolute_bytes > (this.per_sec_bytes * 300) && this.per_sec_bytes !== 0){
                 stream.destroy()
-                stream.unpipe(this.stream)
             }
         })
 
