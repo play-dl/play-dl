@@ -28,7 +28,7 @@ interface SpotifyCopyright{
 
 export class SpotifyVideo{
     name : string;
-    type : "video" | "playlist" | "album"
+    type : "track" | "playlist" | "album"
     id : string;
     url : string;
     explicit : boolean;
@@ -40,7 +40,7 @@ export class SpotifyVideo{
     constructor(data : any){
         this.name = data.name
         this.id = data.id
-        this.type = "video"
+        this.type = "track"
         this.url = data.external_urls.spotify
         this.explicit = data.explicit
         this.durationInMs = data.duration_ms
@@ -83,7 +83,7 @@ export class SpotifyVideo{
 
 export class SpotifyPlaylist{
     name : string;
-    type : "video" | "playlist" | "album"
+    type : "track" | "playlist" | "album"
     collaborative : boolean;
     description : string;
     url : string;
@@ -128,7 +128,7 @@ export class SpotifyPlaylist{
 
 export class SpotifyAlbum{
     name : string
-    type : "video" | "playlist" | "album"
+    type : "track" | "playlist" | "album"
     url : string
     thumbnail : SpotifyThumbnail
     artists : SpotifyArtists[]
@@ -180,7 +180,7 @@ export class SpotifyAlbum{
 
 class SpotifyTracks{
     name : string;
-    type : "video" | "playlist" | "album"
+    type : "track" | "playlist" | "album"
     id : string;
     url : string;
     explicit : boolean;
@@ -190,7 +190,7 @@ class SpotifyTracks{
     constructor(data : any){
         this.name = data.name
         this.id = data.id
-        this.type = "video"
+        this.type = "track"
         this.url = data.external_urls.spotify
         this.explicit = data.explicit
         this.durationInMs = data.duration_ms
