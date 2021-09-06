@@ -41,7 +41,6 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
         return new LiveStreaming(info.LiveStreamData.dashManifestUrl, info.format[info.format.length - 1].targetDurationSec, info.video_details.url)
     }
-    console.time('Time to Retry')
     let resp = await got(info.format[info.format.length - 1].url, {
         headers : {
             "range" : `bytes=0-1`
@@ -55,7 +54,6 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
     }
     else if(typeof resp !== "number") resp.destroy()
 
-    console.timeEnd('Time to Retry')
     let audioFormat = parseAudioFormats(info.format)
     let opusFormats = filterFormat(audioFormat, "opus")
 
