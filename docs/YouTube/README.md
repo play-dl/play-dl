@@ -40,23 +40,19 @@ let id = extractID(url)
 
 ## Stream
 
-### stream(url : `string`, options : [StreamOptions](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#streamoptions))
+### stream(url : `string`, cookie? : `string`)
 *This is basic to create a youtube stream from a url or videoID.*
 
+**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
 ```js
  let source = await stream("url") // This will create a stream Class which contains type and stream to be played.
-
- let source = await stream("url", {
-   cookie : "Your Cookie",
-   retry : true
- }) //This will enable cookies and also prevent 403 Errors from happening.
  let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
 ```
 
-### stream_from_info(info : `infoData`, options : [StreamOptions](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#streamoptions))
+### stream_from_info(info : `infoData`)
 *This is basic to create a youtube stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function ].*
 ```js
 let info = await video_info("url")
@@ -65,14 +61,6 @@ let info = await video_info("url")
             inputType : source.type
         }) // This creates resource for playing
 ```
-
-#### StreamOptions
-  - **cookie** : `string`
-  - **retry** : `boolean`
-
-**NOTE :** Setting retry to true will cause performance decrease in stream starting.
-
-**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
 ## Search
 
