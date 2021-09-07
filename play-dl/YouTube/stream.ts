@@ -71,7 +71,7 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
         final.push(info.format[info.format.length - 1])
     }
     
-    return new Stream(final[0].url, type, info.video_details.durationInSec) 
+    return new Stream(final[0].url, type, info.video_details.durationInSec, Number(final[0].contentLength))
 }
 
 export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming>{
@@ -111,7 +111,7 @@ export async function stream_from_info(info : InfoData): Promise<Stream | LiveSt
         final.push(info.format[info.format.length - 1])
     }
     
-    return new Stream(final[0].url, type, info.video_details.durationInSec) 
+    return new Stream(final[0].url, type, info.video_details.durationInSec, Number(final[0].contentLength))
 }
 
 function filterFormat(formats : any[], codec : string){

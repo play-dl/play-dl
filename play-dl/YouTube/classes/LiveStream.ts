@@ -115,21 +115,19 @@ export class Stream {
     private url : string
     private bytes_count : number;
     private per_sec_bytes : number;
-    private duration : number;
     private timer : NodeJS.Timer | null
     private request : Request | null
-    constructor(url : string, type : StreamType, duration : number){
+    constructor(url : string, type : StreamType, duration : number, contentLength : number){
         this.url = url
         this.type = type
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.bytes_count = 0
-        this.per_sec_bytes = 0
+        this.per_sec_bytes = contentLength / duration
         this.timer = null
         this.request = null
         this.stream.on('close', () => {
             this.cleanup()
         })
-        this.duration = duration
         this.loop()
     }
 
@@ -141,7 +139,6 @@ export class Stream {
         this.timer = null
         this.url = ''
         this.bytes_count = 0
-        this.per_sec_bytes = 0
     }
 
     private loop(){
@@ -157,11 +154,6 @@ export class Stream {
         })
         this.request = stream
         stream.pipe(this.stream, { end : false })
-        stream.once('data', () => {
-            if(this.per_sec_bytes === 0){
-                this.per_sec_bytes = Math.ceil((stream.downloadProgress.total as number)/this.duration)
-            }
-        })
 
         stream.once('error', (err) => {
             this.stream.emit('error', err)
@@ -170,7 +162,7 @@ export class Stream {
         stream.on('data', (chunk: any) => {
             absolute_bytes += chunk.length
             this.bytes_count += chunk.length
-            if(absolute_bytes > (this.per_sec_bytes * 300) && this.per_sec_bytes !== 0){
+            if(absolute_bytes > (this.per_sec_bytes * 300)){
                 stream.destroy()
             }
         })
