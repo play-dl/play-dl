@@ -61,7 +61,9 @@ let id = extractID(url)
 ```js
 let info = await video_info("url")
  let source = await stream_from_info(info) // This will create a stream Class which contains type and stream to be played.
-  let source = await stream_from_info(info, cookie) // This will create a stream Class which contains type and stream to be played and also give cookies if retrying.
+ /* OR
+  let source = await stream_from_info(info, cookie) This will create a stream Class which contains type and stream to be played and also give cookies if retrying.
+ */
  let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
