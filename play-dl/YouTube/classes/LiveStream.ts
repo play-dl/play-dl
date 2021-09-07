@@ -122,7 +122,7 @@ export class Stream {
         this.type = type
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.bytes_count = 0
-        this.per_sec_bytes = contentLength / duration
+        this.per_sec_bytes = Math.ceil(contentLength / duration)
         this.timer = null
         this.request = null
         this.stream.on('close', () => {
