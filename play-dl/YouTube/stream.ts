@@ -50,7 +50,7 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
         return 0
     })
     if(resp === 0){
-        return await stream(info.video_details.url)
+        return await stream(info.video_details.url, cookie)
     }
     else if(typeof resp !== "number") resp.destroy()
 
@@ -71,10 +71,10 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
         final.push(info.format[info.format.length - 1])
     }
     
-    return new Stream(final[0].url, type, info.video_details.durationInSec) 
+    return new Stream(final[0].url, type, info.video_details.durationInSec, Number(final[0].contentLength))
 }
 
-export async function stream_from_info(info : InfoData): Promise<Stream | LiveStreaming>{
+export async function stream_from_info(info : InfoData, cookie? : string): Promise<Stream | LiveStreaming>{
     let final: any[] = [];
     let type : StreamType;
     if(info.LiveStreamData.isLive === true && info.LiveStreamData.hlsManifestUrl !== null && info.video_details.durationInSec === '0') {
@@ -90,7 +90,7 @@ export async function stream_from_info(info : InfoData): Promise<Stream | LiveSt
         return 0
     })
     if(resp === 0){
-        return await stream(info.video_details.url)
+        return await stream(info.video_details.url, cookie)
     }
     else if(typeof resp !== "number") resp.destroy()
 
@@ -111,7 +111,7 @@ export async function stream_from_info(info : InfoData): Promise<Stream | LiveSt
         final.push(info.format[info.format.length - 1])
     }
     
-    return new Stream(final[0].url, type, info.video_details.durationInSec) 
+    return new Stream(final[0].url, type, info.video_details.durationInSec, Number(final[0].contentLength))
 }
 
 function filterFormat(formats : any[], codec : string){
