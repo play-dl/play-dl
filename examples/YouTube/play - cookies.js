@@ -17,17 +17,13 @@ client.on('messageCreate', async message => {
         })
 		
 		let args = message.content.split('play ')[1].split(' ')[0]
-        let stream = await play.stream(args, {
-            cookie : COOKIE
-        })
+        let stream = await play.stream(args, COOKIE)
         /*
         OR if you want to get info about youtube link and then stream it
 
-        let yt_info = await play.video_info(args, {
-            cookie : COOKIE
-        })
+        let yt_info = await play.video_info(args, COOKIE)
         console.log(yt_info.video_details.title) 
-        let stream = await play.stream_from_info(yt_info)
+        let stream = await play.stream_from_info(yt_info, COOKIE)
         */
 
         let resource = createAudioResource(stream.stream, {
