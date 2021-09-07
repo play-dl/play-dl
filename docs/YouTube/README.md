@@ -52,11 +52,16 @@ let id = extractID(url)
         }) // This creates resource for playing
 ```
 
-### stream_from_info(info : `infoData`)
+### stream_from_info(info : `infoData`, cookie? : `string`)
 *This is basic to create a youtube stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function ].*
+
+**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
+
+**Note :*** cookies are required for retrying purposes.
 ```js
 let info = await video_info("url")
  let source = await stream_from_info(info) // This will create a stream Class which contains type and stream to be played.
+  let source = await stream_from_info(info, cookie) // This will create a stream Class which contains type and stream to be played and also give cookies if retrying.
  let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
