@@ -57,7 +57,7 @@ let id = extractID(url)
 
 **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
-**Note :** cookies are required for retrying purposes.
+**Note :** Here, cookies are required only for retrying purposes.
 ```js
 let info = await video_info("url")
  let source = await stream_from_info(info) // This will create a stream Class which contains type and stream to be played.
