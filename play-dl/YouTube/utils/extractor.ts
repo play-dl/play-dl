@@ -82,8 +82,8 @@ export async function video_basic_info(url : string, cookie? : string){
         format.push(...player_response.streamingData.adaptiveFormats)
         let LiveStreamData = {
             isLive : video_details.live,
-            dashManifestUrl : (player_response.streamingData?.dashManifestUrl) ? player_response.streamingData?.dashManifestUrl : null,
-            hlsManifestUrl : (player_response.streamingData?.hlsManifestUrl) ? player_response.streamingData?.hlsManifestUrl : null
+            dashManifestUrl : player_response.streamingData?.dashManifestUrl ?? null,
+            hlsManifestUrl : player_response.streamingData?.hlsManifestUrl ?? null
         }
         return {
             LiveStreamData,
@@ -135,7 +135,7 @@ export async function playlist_info(url : string, parseIncomplete : boolean = fa
         if(response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
             if(!parseIncomplete) throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
         }
-        else if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertRenderer.text.runs[0].text}`)
+        else if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n${response.alerts[0].alertRenderer.text.runs[0].text}`)
         else throw new Error('While parsing playlist url\n Unknown Playlist Error')
     }
 
