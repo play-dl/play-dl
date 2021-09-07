@@ -45,7 +45,7 @@ export async function video_basic_info(url : string, cookie? : string){
             video_id = extractID(url)
         }
         else video_id = url
-        let new_url = 'https://www.youtube.com/watch?v=' + video_id
+        let new_url = `https://www.youtube.com/watch?v=${video_id}`
         let body = await url_get(new_url, {
             headers : (cookie) ? { 'cookie' : cookie } : {}
         })
@@ -53,13 +53,13 @@ export async function video_basic_info(url : string, cookie? : string){
         let initial_response = JSON.parse(body.split("var ytInitialData = ")[1].split("}};")[0] + '}}')
         let badge = initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges && initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges[0]
         if(player_response.playabilityStatus.status !== 'OK') throw new Error(`While getting info from url\n${player_response.playabilityStatus.reason || player_response.playabilityStatus.messages[0]}`)
-        let html5player =  'https://www.youtube.com' + body.split('"jsUrl":"')[1].split('"')[0]
+        let html5player =  `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`
         let format = []
         let vid = player_response.videoDetails
         let microformat = player_response.microformat.playerMicroformatRenderer
         let video_details = {
             id : vid.videoId,
-            url : 'https://www.youtube.com/watch?v=' + vid.videoId,
+            url : `https://www.youtube.com/watch?v=${vid.videoId}`,
             title : vid.title,
             description : vid.shortDescription,
             durationInSec : vid.lengthSeconds,
@@ -133,10 +133,10 @@ export async function playlist_info(url : string, parseIncomplete : boolean = fa
     let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
     if(response.alerts){ 
         if(response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
-            if(!parseIncomplete) throw new Error(`While parsing playlist url\n   ${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
+            if(!parseIncomplete) throw new Error(`While parsing playlist url\n${response.alerts[0].alertWithButtonRenderer.text.simpleText}`)
         }
         else if(response.alerts[0].alertRenderer?.type === 'ERROR') throw new Error(`While parsing playlist url\n${response.alerts[0].alertRenderer.text.runs[0].text}`)
-        else throw new Error('While parsing playlist url\n Unknown Playlist Error')
+        else throw new Error('While parsing playlist url\nUnknown Playlist Error')
     }
 
     let rawJSON = `${body.split('{"playlistVideoListRenderer":{"contents":')[1].split('}],"playlistId"')[0]}}]`;
