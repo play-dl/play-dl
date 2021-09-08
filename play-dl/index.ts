@@ -1,6 +1,6 @@
 export { playlist_info, video_basic_info, video_info, search, stream, stream_from_info, yt_validate, extractID } from "./YouTube";
 
-export { spotify, sp_validate, Authorization, StartSpotify } from './Spotify'
+export { spotify, sp_validate, Authorization, StartSpotify, RefreshToken, is_expired } from './Spotify'
 
 import { sp_validate, yt_validate } from ".";
 
