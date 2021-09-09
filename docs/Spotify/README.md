@@ -41,16 +41,16 @@ await RefreshToken()
 ### SpotifyVideo
 *Don't go by the name. This is class for a spotify track.*
 
-#### type `property`
+##### type `property`
 *This will always return as "track" for this class.*
 
-#### toJSON() `function`
+##### toJSON() `function`
 *converts class into a json format*
 
 ### SpotifyPlaylist
 *This is a spotify playlist class.*
 
-#### fetch() `function`
+##### fetch() `function`
 *This will fetch tracks in a playlist upto 1000 tracks only.*
 
 ```js
@@ -59,16 +59,53 @@ let data = await spotify(playlist_url)
 await data.fetch() // Fetches tracks more than 100 tracks in playlist
 ```
 
-#### type `property`
+##### tracksCount `property`
+*This will give no. of tracks in a playlist.*
+
+```js
+let data = await spotify(playlist_url)
+
+console.log(data.tracksCount) // Returns total tracks count in a playlist
+```
+##### page(page_number : `number`)
+*This will return array of tracks in that page.*
+
+> Same as youtube playlist pages
+
+```js
+let data = await spotify(playlist_url)
+
+console.log(data.page(1)) //This will give first 100 tracks in playlist.
+```
+ - total_pages `property`
+   *This give total pages that have been fetched so far.*
+   ```js
+    let data = await spotify(playlist_url)
+
+    console.log(data.total_pages) // This will tell no. of pages that have been fetched so far.
+    
+    for(let i = 1; i <= data.total_pages; i++){
+        queue.push(data.page(i)) //This will push all tracks to your queue system
+    }
+   ```
+ - total_tracks `property`
+  *This give total videos that have been fetched so far.*
+   ```js
+    let data = await spotify(playlist_url)
+
+    console.log(data.total_tracks) // This will tell no. of videos that have been fetched so far.
+   ```
+
+##### type `property`
 *This will always return as "playlist" for this class.*
 
-#### toJSON() `function`
+##### toJSON() `function`
 *converts class into a json format*
 
 ### SpotifyAlbum
 *This is a spotify albun class.*
 
-#### fetch() `function`
+##### fetch() `function`
 *This will fetch tracks in a album upto 500 tracks only.*
 
 ```js
@@ -77,10 +114,47 @@ let data = await spotify(playlist_url)
 await data.fetch() // Fetches tracks more than 50 tracks in album
 ```
 
-#### type `property`
+##### tracksCount `property`
+*This will give no. of tracks in a playlist.*
+
+```js
+let data = await spotify(playlist_url)
+
+console.log(data.tracksCount) // Returns total tracks count in a playlist
+```
+##### page(page_number : `number`)
+*This will return array of tracks in that page.*
+
+> Same as youtube playlist pages
+
+```js
+let data = await spotify(playlist_url)
+
+console.log(data.page(1)) //This will give first 100 tracks in playlist.
+```
+ - total_pages `property`
+   *This give total pages that have been fetched so far.*
+   ```js
+    let data = await spotify(playlist_url)
+
+    console.log(data.total_pages)
+    
+    for(let i = 1; i <= data.total_pages; i++){
+        queue.push(data.page(i)) //This will push all tracks to your queue system
+    }
+   ```
+ - total_tracks `property`
+  *This give total videos that have been fetched so far.*
+   ```js
+    let data = await spotify(playlist_url)
+
+    console.log(data.total_tracks)
+   ```
+
+##### type `property`
 *This will always return as "album" for this class.*
 
-#### toJSON() `function`
+##### toJSON() `function`
 *converts class into a json format*
 
 ## Validate
