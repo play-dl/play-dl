@@ -8,7 +8,7 @@ if(fs.existsSync('.data/spotify.data')){
     spotifyData = JSON.parse(fs.readFileSync('.data/spotify.data').toString())
 }
 
-interface SpotifyDataOptions{
+export interface SpotifyDataOptions{
     client_id : string;
     client_secret : string;
     redirect_url : string;
@@ -43,7 +43,7 @@ export async function spotify(url : string): Promise<SpotifyAlbum | SpotifyPlayl
                 "Authorization" : `${spotifyData.token_type} ${spotifyData.access_token}`
             }
         }).catch((err) => {return 0})
-        if(typeof response !== 'number') return new SpotifyAlbum(JSON.parse(response.body))
+        if(typeof response !== 'number') return new SpotifyAlbum(JSON.parse(response.body), spotifyData)
         else throw new Error('Failed to get spotify Album Data')
     }
     else if(url.indexOf('playlist/') !== -1){
@@ -53,7 +53,7 @@ export async function spotify(url : string): Promise<SpotifyAlbum | SpotifyPlayl
                 "Authorization" : `${spotifyData.token_type} ${spotifyData.access_token}`
             }
         }).catch((err) => {return 0})
-        if(typeof response !== 'number') return new SpotifyAlbum(JSON.parse(response.body))
+        if(typeof response !== 'number') return new SpotifyPlaylist(JSON.parse(response.body), spotifyData)
         else throw new Error('Failed to get spotify Playlist Data')
     }
     else throw new Error('URL is out of scope for play-dl.')

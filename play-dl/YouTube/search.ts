@@ -27,7 +27,9 @@ export async function search(search :string, options? : ParseSearchInterface): P
                 break
         }
     }
-    let body = await url_get(url)
+    let body = await url_get(url, {
+        headers : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
+    })
     let data = ParseSearchResult(body, options)
     return data
 }

@@ -15,6 +15,13 @@ This is a **light-weight** youtube downloader and searcher.
 npm install play-dl@latest
 ```
 
+### Importing
+```ts
+import * as play from 'play-dl' // ES-6 import or TS import
+
+const play = require('play-dl') //JS importing
+```
+
 ### Examples
 - [YouTube](https://github.com/play-dl/play-dl/tree/main/examples/YouTube)
 - [Spotify](https://github.com/play-dl/play-dl/tree/main/examples/Spotify)
