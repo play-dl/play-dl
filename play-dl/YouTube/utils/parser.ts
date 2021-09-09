@@ -3,7 +3,7 @@ import { PlayList } from "../classes/Playlist";
 import { Channel } from "../classes/Channel";
 
 export interface ParseSearchInterface {
-    type?: "video" | "playlist" | "channel" | "all";
+    type?: "video" | "playlist" | "channel" ;
     limit?: number;
 }
 
@@ -13,72 +13,34 @@ export interface thumbnail{
     url : string
 }
 
-export function ParseSearchResult(html :string, options? : ParseSearchInterface): (Video | PlayList | Channel)[] {
+export function ParseSearchResult(html : string, options? : ParseSearchInterface): (Video | PlayList | Channel)[] {
     if(!html) throw new Error('Can\'t parse Search result without data')
     if (!options) options = { type: "video", limit: 0 };
     if (!options.type) options.type = "video";
 
+    let data = html.split("var ytInitialData = ")[1].split("}};")[0] + '}}';
+    let json_data = JSON.parse(data)
     let results = []
-    let details = []
-    let fetched = false;
-
-    try {
-        let data = html.split("ytInitialData = JSON.parse('")[1].split("');</script>")[0];
-        html = data.replace(/\\x([0-9A-F]{2})/gi, (...items) => {
-            return String.fromCharCode(parseInt(items[1], 16));
-        });
-    } catch {
-        /* do nothing */
-    }
-
-    try {
-        details = JSON.parse(html.split('{"itemSectionRenderer":{"contents":')[html.split('{"itemSectionRenderer":{"contents":').length - 1].split(',"continuations":[{')[0]);
-        fetched = true;
-    } catch {
-        /* Do nothing*/
-    }
-
-    if (!fetched) {
-        try {
-            details = JSON.parse(html.split('{"itemSectionRenderer":')[html.split('{"itemSectionRenderer":').length - 1].split('},{"continuationItemRenderer":{')[0]).contents;
-            fetched = true;
-        } catch {
-            /* do nothing */
-        }
-    }
-
-    if (!fetched) throw new Error('Failed to Fetch the data')
-
-    for (let i = 0; i < details.length; i++) {
+    let details = json_data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents
+    for(let i = 0; i < details.length; i++){
         if (typeof options.limit === "number" && options.limit > 0 && results.length >= options.limit) break;
-        let data = details[i];
-        let res;
-        if (options.type === "all") {
-            if (!!data.videoRenderer) options.type = "video";
-            else if (!!data.channelRenderer) options.type = "channel";
-            else if (!!data.playlistRenderer) options.type = "playlist";
-            else continue;
-        }
-
         if (options.type === "video") {
-            const parsed = parseVideo(data);
+            const parsed = parseVideo(details[i]);
             if (!parsed) continue;
-            res = parsed;
+            results.push(parsed)
         } else if (options.type === "channel") {
-            const parsed = parseChannel(data);
+            const parsed = parseChannel(details[i]);
             if (!parsed) continue;
-            res = parsed;
+            results.push(parsed)
         } else if (options.type === "playlist") {
-            const parsed = parsePlaylist(data);
+            const parsed = parsePlaylist(details[i]);
             if (!parsed) continue;
-            res = parsed;
+            results.push(parsed)
         }
-
-        results.push(res);
     }
-
-return results as (Video | Channel | PlayList)[];
+    return results
 }
+
 
 function parseDuration(duration: string): number {
     duration ??= "0:00";
