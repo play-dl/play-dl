@@ -122,7 +122,7 @@ await data.fetch() // Fetches tracks more than 50 tracks in album
 ```js
 let data = await spotify(playlist_url)
 
-console.log(data.tracksCount) // Returns total tracks count in a playlist
+console.log(data.tracksCount) // Returns total tracks count in a album
 ```
 ##### page(page_number : `number`)
 *This will return array of tracks in that page.*
@@ -132,7 +132,7 @@ console.log(data.tracksCount) // Returns total tracks count in a playlist
 ```js
 let data = await spotify(playlist_url)
 
-console.log(data.page(1)) //This will give first 100 tracks in playlist.
+console.log(data.page(1)) //This will give first 50 tracks in album.
 ```
  - total_pages `property`
  
