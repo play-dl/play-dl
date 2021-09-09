@@ -158,17 +158,10 @@ export async function RefreshToken(): Promise<true | false>{
 
     if(typeof response === 'number') return false
     let resp_json = JSON.parse(response.body)
-    spotifyData = {
-        client_id : spotifyData.client_id,
-        client_secret : spotifyData.client_secret,
-        redirect_url : spotifyData.redirect_url,
-        access_token : resp_json.access_token,
-        refresh_token : spotifyData.refresh_token,
-        expires_in : Number(resp_json.expires_in),
-        expiry : Date.now() + (Number(resp_json.expires_in) * 1000),
-        token_type : resp_json.token_type,
-        market : spotifyData.market
-    }
+    spotifyData.access_token = resp_json.access_token
+    spotifyData.expires_in = Number(resp_json.expires_in)
+    spotifyData.expiry = Date.now() + (Number(resp_json.expires_in) * 1000)
+    spotifyData.token_type = resp_json.token_type
     fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4))
     return true
 }
