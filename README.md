@@ -22,6 +22,8 @@ import * as play from 'play-dl' // ES-6 import or TS import
 const play = require('play-dl') //JS importing
 ```
 
+**Instructions for Spotify** are [here](https://github.com/play-dl/play-dl/discussions/64)
+
 ### Examples
 - [YouTube](https://github.com/play-dl/play-dl/tree/main/examples/YouTube)
 - [Spotify](https://github.com/play-dl/play-dl/tree/main/examples/Spotify)
