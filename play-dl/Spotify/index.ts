@@ -4,6 +4,9 @@ import readline from 'readline'
 import fs from 'fs'
 
 var spotifyData : SpotifyDataOptions;
+if(fs.existsSync('.data/spotify.data')){
+    spotifyData = JSON.parse(fs.readFileSync('.data/spotify.data').toString())
+}
 
 interface SpotifyDataOptions{
     client_id : string;
@@ -21,6 +24,7 @@ interface SpotifyDataOptions{
 const pattern = /^((https:)?\/\/)?open.spotify.com\/(track|album|playlist)\//
 
 export async function spotify(url : string): Promise<SpotifyAlbum | SpotifyPlaylist | SpotifyVideo>{
+    if(!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?')
     if(!url.match(pattern)) throw new Error('This is not a Spotify URL')
     if(url.indexOf('track/') !== -1){
         let trackID = url.split('track/')[1].split('&')[0].split('?')[0]
@@ -91,7 +95,7 @@ export function Authorization(){
                     }
                     console.log('\nNow Go to your browser and Paste this url. Authroize it and paste the redirected url here. \n')
                     console.log(`https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(redirect_url)} \n`)
-                    ask.question('Redirected URL : ', (url) => {
+                    ask.question('Redirected URL : ',async (url) => {
                         if (!fs.existsSync('.data')) fs.mkdirSync('.data')
                         spotifyData = {
                             client_id,
@@ -100,7 +104,8 @@ export function Authorization(){
                             authorization_code : url.split('code=')[1],
                             market
                         }
-                        fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4))
+                        let check = await SpotifyAuthorize(spotifyData)
+                        if(check === false) throw new Error('Failed to get access Token.')
                         ask.close()
                     })
                 })
@@ -109,19 +114,7 @@ export function Authorization(){
     })
 }
 
-export async function StartSpotify(){
-    if(!fs.existsSync('.data/spotify.data')) throw new Error('Spotify Data is Missing\nDid you forgot to do authorization ?')
-    
-    if(!spotifyData) spotifyData = JSON.parse(fs.readFileSync('.data/spotify.data').toString())
-
-    if(spotifyData.authorization_code) {
-        let check = await SpotifyAuthorize(spotifyData)
-        if(check !== false) spotifyData = check
-        fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4))
-    } 
-}
-
-async function SpotifyAuthorize(data : SpotifyDataOptions): Promise<SpotifyDataOptions | false>{
+async function SpotifyAuthorize(data : SpotifyDataOptions): Promise<boolean>{
     let response = await got.post(`https://accounts.spotify.com/api/token?grant_type=authorization_code&code=${data.authorization_code}&redirect_uri=${encodeURI(data.redirect_url)}`, {
         headers : {
             "Authorization" : `Basic ${Buffer.from(`${data.client_id}:${data.client_secret}`).toString('base64')}`,
@@ -133,7 +126,7 @@ async function SpotifyAuthorize(data : SpotifyDataOptions): Promise<SpotifyDataO
     
     if(typeof response === 'number') return false
     let resp_json = JSON.parse(response.body)
-    return{
+    spotifyData = {
         client_id : data.client_id,
         client_secret : data.client_secret,
         redirect_url : data.redirect_url,
@@ -144,6 +137,8 @@ async function SpotifyAuthorize(data : SpotifyDataOptions): Promise<SpotifyDataO
         token_type : resp_json.token_type,
         market : data.market
     }
+    fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4))
+    return true
 }
 
 export function is_expired(){
