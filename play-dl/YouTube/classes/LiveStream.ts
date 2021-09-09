@@ -115,6 +115,7 @@ export class Stream {
     private url : string
     private bytes_count : number;
     private per_sec_bytes : number;
+    private timer : NodeJS.Timeout | null;
     private content_length : number
     private request : Request | null
     constructor(url : string, type : StreamType, duration : number, contentLength : number){
@@ -125,6 +126,7 @@ export class Stream {
         this.per_sec_bytes = Math.ceil(contentLength / duration)
         this.content_length = contentLength
         this.request = null
+        this.timer = null
         this.stream.on('close', () => {
             this.cleanup()
         })
@@ -132,8 +134,10 @@ export class Stream {
     }
 
     private cleanup(){
+        clearTimeout(this.timer as NodeJS.Timeout)
         this.request?.unpipe(this.stream)
         this.request?.destroy()
+        this.timer = null
         this.request = null
         this.url = ''
         this.bytes_count = 0
@@ -162,9 +166,9 @@ export class Stream {
             this.bytes_count += chunk.length
         })
 
-        stream.on('end', () => {
+        setTimeout(() => {
             if(end < this.content_length) this.loop()
             else this.cleanup()
-        })
+        }, 280 * 1000)
     }
 }
