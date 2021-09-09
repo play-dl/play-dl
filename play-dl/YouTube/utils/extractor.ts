@@ -47,12 +47,12 @@ export async function video_basic_info(url : string, cookie? : string){
         else video_id = url
         let new_url = `https://www.youtube.com/watch?v=${video_id}`
         let body = await url_get(new_url, {
-            headers : (cookie) ? { 'cookie' : cookie } : {}
+            headers : (cookie) ? { 'cookie' : cookie, 'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' } : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
         })
         let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split("}};")[0] + '}}')
         let initial_response = JSON.parse(body.split("var ytInitialData = ")[1].split("}};")[0] + '}}')
         let badge = initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges && initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges[0]
-        if(player_response.playabilityStatus.status !== 'OK') throw new Error(`While getting info from url\n${player_response.playabilityStatus.reason || player_response.playabilityStatus.messages[0]}`)
+        if(player_response.playabilityStatus.status !== 'OK') throw new Error(`While getting info from url\n${player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ?? player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText}`)
         let html5player =  `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`
         let format = []
         let vid = player_response.videoDetails
@@ -129,7 +129,9 @@ export async function playlist_info(url : string, parseIncomplete : boolean = fa
     else Playlist_id = url
     let new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`
     
-    let body = await url_get(new_url)
+    let body = await url_get(new_url, {
+        headers : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
+    })
     let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
     if(response.alerts){ 
         if(response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {

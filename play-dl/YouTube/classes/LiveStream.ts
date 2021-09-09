@@ -115,7 +115,7 @@ export class Stream {
     private url : string
     private bytes_count : number;
     private per_sec_bytes : number;
-    private timer : NodeJS.Timer | null
+    private content_length : number
     private request : Request | null
     constructor(url : string, type : StreamType, duration : number, contentLength : number){
         this.url = url
@@ -123,7 +123,7 @@ export class Stream {
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.bytes_count = 0
         this.per_sec_bytes = Math.ceil(contentLength / duration)
-        this.timer = null
+        this.content_length = contentLength
         this.request = null
         this.stream.on('close', () => {
             this.cleanup()
@@ -132,13 +132,12 @@ export class Stream {
     }
 
     private cleanup(){
-        clearTimeout(this.timer as NodeJS.Timer)
         this.request?.unpipe(this.stream)
         this.request?.destroy()
         this.request = null
-        this.timer = null
         this.url = ''
         this.bytes_count = 0
+        this.per_sec_bytes = 0
     }
 
     private loop(){
@@ -146,10 +145,10 @@ export class Stream {
             this.cleanup()
             return
         }
-        let absolute_bytes : number = 0
+        let end : number = this.bytes_count + this.per_sec_bytes * 300;
         let stream = got.stream(this.url, {
             headers : {
-                "range" : `bytes=${this.bytes_count}-`
+                "range" : `bytes=${this.bytes_count}-${end >= this.content_length ? '' : end}`
             }
         })
         this.request = stream
@@ -160,20 +159,12 @@ export class Stream {
         })
 
         stream.on('data', (chunk: any) => {
-            absolute_bytes += chunk.length
             this.bytes_count += chunk.length
-            if(absolute_bytes > (this.per_sec_bytes * 300)){
-                stream.destroy()
-            }
         })
 
         stream.on('end', () => {
-            this.cleanup()
+            if(end < this.content_length) this.loop()
+            else this.cleanup()
         })
-
-        this.timer = setTimeout(() => {
-            this.request?.unpipe(this.stream)
-            this.loop()
-        }, 280 * 1000)
     }
 }

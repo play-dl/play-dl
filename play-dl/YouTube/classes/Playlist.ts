@@ -109,7 +109,7 @@ export class PlayList{
     }
 
     page(number : number): Video[]{
-        if(!number) throw new Error('Given Page number is not provided')
+        if(!number) throw new Error('Page number is not provided')
         if(!this.fetched_videos.has(`page${number}`)) throw new Error('Given Page number is invalid')
         return this.fetched_videos.get(`page${number}`) as Video[]
     }

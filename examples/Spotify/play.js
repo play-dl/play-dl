@@ -14,7 +14,9 @@ client.on('messageCreate', async message => {
             guildId : message.guild.id,
             adapterCreator: message.guild.voiceAdapterCreator
         })
-		
+		if(play.is_expired()){
+            await play.RefreshToken() // This will check if access token has expired or not. If yes, then refresh the token.
+        }
 		let args = message.content.split('play ')[1].split(' ')[0]
         let sp_data = await play.spotify(args) // This will get spotify data from the url [ I used track url, make sure to make a logic for playlist, album ]
         let searched = await play.search(`${sp_data.name}`, { limit : 1 }) // This will search the found track on youtube.

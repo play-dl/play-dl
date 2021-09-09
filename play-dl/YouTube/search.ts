@@ -13,6 +13,7 @@ enum SearchType {
 
 export async function search(search :string, options? : ParseSearchInterface): Promise<(Video | Channel | PlayList)[]> {
     let url = 'https://www.youtube.com/results?search_query=' + search.replaceAll(' ', '+')
+    if(!options || options.type) options = { type : "video" }
     if(!url.match('&sp=')){
         url += '&sp='
         switch(options?.type){
@@ -27,7 +28,9 @@ export async function search(search :string, options? : ParseSearchInterface): P
                 break
         }
     }
-    let body = await url_get(url)
+    let body = await url_get(url, {
+        headers : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
+    })
     let data = ParseSearchResult(body, options)
     return data
 }
