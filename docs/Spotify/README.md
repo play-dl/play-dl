@@ -78,6 +78,7 @@ let data = await spotify(playlist_url)
 console.log(data.page(1)) //This will give first 100 tracks in playlist.
 ```
  - total_pages `property`
+ 
    *This give total pages that have been fetched so far.*
    ```js
     let data = await spotify(playlist_url)
@@ -89,12 +90,13 @@ console.log(data.page(1)) //This will give first 100 tracks in playlist.
     }
    ```
  - total_tracks `property`
-  *This give total videos that have been fetched so far.*
-   ```js
-    let data = await spotify(playlist_url)
+ 
+   *This give total videos that have been fetched so far.*
+    ```js
+     let data = await spotify(playlist_url)
 
-    console.log(data.total_tracks) // This will tell no. of videos that have been fetched so far.
-   ```
+     console.log(data.total_tracks) // This will tell no. of videos that have been fetched so far.
+    ```
 
 ##### type `property`
 *This will always return as "playlist" for this class.*
@@ -133,23 +135,25 @@ let data = await spotify(playlist_url)
 console.log(data.page(1)) //This will give first 100 tracks in playlist.
 ```
  - total_pages `property`
+ 
    *This give total pages that have been fetched so far.*
    ```js
     let data = await spotify(playlist_url)
 
-    console.log(data.total_pages)
+    console.log(data.total_pages) // This will tell no. of pages that have been fetched so far.
     
     for(let i = 1; i <= data.total_pages; i++){
         queue.push(data.page(i)) //This will push all tracks to your queue system
     }
    ```
  - total_tracks `property`
-  *This give total videos that have been fetched so far.*
-   ```js
-    let data = await spotify(playlist_url)
+ 
+   *This give total videos that have been fetched so far.*
+    ```js
+     let data = await spotify(playlist_url)
 
-    console.log(data.total_tracks)
-   ```
+     console.log(data.total_tracks) // This will tell no. of videos that have been fetched so far.
+    ```
 
 ##### type `property`
 *This will always return as "album" for this class.*
