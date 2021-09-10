@@ -139,10 +139,8 @@ export class Stream {
                 this.stream.removeAllListeners('pause')
             }
             else if(this.playing_count === 280){
-                this.loop()
-            }
-            else if(this.playing_count >= 300){
                 this.playing_count = 0
+                this.loop()
             }
         })
         this.loop()
