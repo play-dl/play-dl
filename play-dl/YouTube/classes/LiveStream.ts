@@ -115,8 +115,9 @@ export class Stream {
     private url : string
     private bytes_count : number;
     private per_sec_bytes : number;
-    private timer : NodeJS.Timeout | null;
-    private content_length : number
+    private content_length : number;
+    private data_ended : boolean;
+    private playing_count : number;
     private request : Request | null
     constructor(url : string, type : StreamType, duration : number, contentLength : number){
         this.url = url
@@ -126,18 +127,30 @@ export class Stream {
         this.per_sec_bytes = Math.ceil(contentLength / duration)
         this.content_length = contentLength
         this.request = null
-        this.timer = null
+        this.data_ended = false
+        this.playing_count = 0
         this.stream.on('close', () => {
             this.cleanup()
+        })
+        this.stream.on('pause', () => {
+            this.playing_count++;
+            if(this.data_ended){
+                this.cleanup()
+                this.stream.removeAllListeners('pause')
+            }
+            else if(this.playing_count === 280){
+                this.loop()
+            }
+            else if(this.playing_count >= 300){
+                this.playing_count = 0
+            }
         })
         this.loop()
     }
 
     private cleanup(){
-        clearTimeout(this.timer as NodeJS.Timeout)
         this.request?.unpipe(this.stream)
         this.request?.destroy()
-        this.timer = null
         this.request = null
         this.url = ''
         this.bytes_count = 0
@@ -166,9 +179,8 @@ export class Stream {
             this.bytes_count += chunk.length
         })
 
-        setTimeout(() => {
-            if(end < this.content_length) this.loop()
-            else this.cleanup()
-        }, 280 * 1000)
+        stream.on('end', () => {
+            if(end >= this.content_length) this.data_ended = true
+        })
     }
 }
