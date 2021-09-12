@@ -1,5 +1,5 @@
 import { URL } from 'url'
-import { url_get } from './request'
+import { request } from './request'
 import querystring from 'querystring'
 
 interface formatOptions {
@@ -131,7 +131,6 @@ function deciper_signature(tokens : string[], signature :string){
 
 function swappositions(array : string[], position : number){
   let first = array[0]
-  let pos_args = array[position]
   array[0] = array[position]
   array[position] = first
   return array
@@ -154,7 +153,7 @@ function download_url(format: formatOptions, sig : string){
 }
 
 export async function format_decipher(formats: formatOptions[], html5player : string){
-  let body = await url_get(html5player)
+  let body = await request(html5player)
   let tokens = js_tokens(body)
   formats.forEach((format) => {
     let cipher = format.signatureCipher || format.cipher;

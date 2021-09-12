@@ -1,4 +1,4 @@
-import got from "got/dist/source"
+import { request } from "../YouTube/utils/request";
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyVideo } from "./classes"
 import readline from 'readline'
 import fs from 'fs'
@@ -28,32 +28,32 @@ export async function spotify(url : string): Promise<SpotifyAlbum | SpotifyPlayl
     if(!url.match(pattern)) throw new Error('This is not a Spotify URL')
     if(url.indexOf('track/') !== -1){
         let trackID = url.split('track/')[1].split('&')[0].split('?')[0]
-        let response = await got(`https://api.spotify.com/v1/tracks/${trackID}?market=${spotifyData.market}`, {
+        let response = await request(`https://api.spotify.com/v1/tracks/${trackID}?market=${spotifyData.market}`, {
             headers : {
                 "Authorization" : `${spotifyData.token_type} ${spotifyData.access_token}`
             }
         }).catch((err) => {return 0})
-        if(typeof response !== 'number') return new SpotifyVideo(JSON.parse(response.body))
+        if(typeof response !== 'number') return new SpotifyVideo(JSON.parse(response))
         else throw new Error('Failed to get spotify Track Data')
     }
     else if(url.indexOf('album/') !== -1){
         let albumID = url.split('album/')[1].split('&')[0].split('?')[0]
-        let response = await got(`https://api.spotify.com/v1/albums/${albumID}?market=${spotifyData.market}`, {
+        let response = await request(`https://api.spotify.com/v1/albums/${albumID}?market=${spotifyData.market}`, {
             headers : {
                 "Authorization" : `${spotifyData.token_type} ${spotifyData.access_token}`
             }
         }).catch((err) => {return 0})
-        if(typeof response !== 'number') return new SpotifyAlbum(JSON.parse(response.body), spotifyData)
+        if(typeof response !== 'number') return new SpotifyAlbum(JSON.parse(response), spotifyData)
         else throw new Error('Failed to get spotify Album Data')
     }
     else if(url.indexOf('playlist/') !== -1){
         let playlistID = url.split('playlist/')[1].split('&')[0].split('?')[0]
-        let response = await got(`https://api.spotify.com/v1/playlists/${playlistID}?market=${spotifyData.market}`, {
+        let response = await request(`https://api.spotify.com/v1/playlists/${playlistID}?market=${spotifyData.market}`, {
             headers : {
                 "Authorization" : `${spotifyData.token_type} ${spotifyData.access_token}`
             }
         }).catch((err) => {return 0})
-        if(typeof response !== 'number') return new SpotifyPlaylist(JSON.parse(response.body), spotifyData)
+        if(typeof response !== 'number') return new SpotifyPlaylist(JSON.parse(response), spotifyData)
         else throw new Error('Failed to get spotify Playlist Data')
     }
     else throw new Error('URL is out of scope for play-dl.')
@@ -115,17 +115,19 @@ export function Authorization(){
 }
 
 async function SpotifyAuthorize(data : SpotifyDataOptions): Promise<boolean>{
-    let response = await got.post(`https://accounts.spotify.com/api/token?grant_type=authorization_code&code=${data.authorization_code}&redirect_uri=${encodeURI(data.redirect_url)}`, {
+    let response = await request(`https://accounts.spotify.com/api/token`, {
         headers : {
             "Authorization" : `Basic ${Buffer.from(`${data.client_id}:${data.client_secret}`).toString('base64')}`,
             "Content-Type" : "application/x-www-form-urlencoded"
-        }
+        },
+        body : `grant_type=authorization_code&code=${data.authorization_code}&redirect_uri=${encodeURI(data.redirect_url)}`,
+        method : "POST"
     }).catch(() => {
         return 0
     })
     
     if(typeof response === 'number') return false
-    let resp_json = JSON.parse(response.body)
+    let resp_json = JSON.parse(response)
     spotifyData = {
         client_id : data.client_id,
         client_secret : data.client_secret,
@@ -147,17 +149,19 @@ export function is_expired(){
 }
 
 export async function RefreshToken(): Promise<true | false>{
-    let response = await got.post(`https://accounts.spotify.com/api/token?grant_type=refresh_token&refresh_token=${spotifyData.refresh_token}`, {
+    let response = await request(`https://accounts.spotify.com/api/token`, {
         headers : {
             "Authorization" : `Basic ${Buffer.from(`${spotifyData.client_id}:${spotifyData.client_secret}`).toString('base64')}`,
             "Content-Type" : "application/x-www-form-urlencoded"
-        }
+        },
+        body : `grant_type=refresh_token&refresh_token=${spotifyData.refresh_token}`,
+        method : "POST"
     }).catch(() => {
         return 0
     })
 
     if(typeof response === 'number') return false
-    let resp_json = JSON.parse(response.body)
+    let resp_json = JSON.parse(response)
     spotifyData.access_token = resp_json.access_token
     spotifyData.expires_in = Number(resp_json.expires_in)
     spotifyData.expiry = Date.now() + (Number(resp_json.expires_in) * 1000)

@@ -1,4 +1,4 @@
-import { url_get } from "./utils/request";
+import { request } from "./utils/request";
 import { ParseSearchInterface, ParseSearchResult } from "./utils/parser";
 import { Video } from "./classes/Video";
 import { Channel } from "./classes/Channel";
@@ -29,7 +29,7 @@ export async function search(search :string, options? : ParseSearchInterface): P
                 break
         }
     }
-    let body = await url_get(url, {
+    let body = await request(url, {
         headers : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
     })
     let data = ParseSearchResult(body, options)

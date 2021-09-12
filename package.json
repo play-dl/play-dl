@@ -38,7 +38,7 @@
   "files": [
     "dist/*"
   ],
-  "dependencies": {
-    "got": "^11.8.2"
+  "devDependencies": {
+    "@types/node": "^16.9.1"
   }
 }

@@ -1,4 +1,4 @@
-import { url_get } from './request'
+import { request } from './request'
 import { format_decipher, js_tokens } from './cipher'
 import { Video } from '../classes/Video'
 import { PlayList } from '../classes/Playlist'
@@ -46,7 +46,7 @@ export async function video_basic_info(url : string, cookie? : string){
         }
         else video_id = url
         let new_url = `https://www.youtube.com/watch?v=${video_id}`
-        let body = await url_get(new_url, {
+        let body = await request(new_url, {
             headers : (cookie) ? { 'cookie' : cookie, 'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' } : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
         })
         let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split("}};")[0] + '}}')
@@ -129,7 +129,7 @@ export async function playlist_info(url : string, parseIncomplete : boolean = fa
     else Playlist_id = url
     let new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`
     
-    let body = await url_get(new_url, {
+    let body = await request(new_url, {
         headers : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
     })
     let response = JSON.parse(body.split("var ytInitialData = ")[1].split(";</script>")[0])
