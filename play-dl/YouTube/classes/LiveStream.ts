@@ -116,14 +116,22 @@ export class Stream {
     private bytes_count : number;
     private per_sec_bytes : number;
     private content_length : number;
+    private video_url : string;
+    private timer : NodeJS.Timer;
+    private cookie : string;
     private data_ended : boolean;
     private playing_count : number;
     private request : IncomingMessage | null
-    constructor(url : string, type : StreamType, duration : number, contentLength : number){
+    constructor(url : string, type : StreamType, duration : number, contentLength : number, video_url : string, cookie : string){
         this.url = url
         this.type = type
         this.stream = new PassThrough({ highWaterMark : 10 * 1000 * 1000 })
         this.bytes_count = 0
+        this.video_url = video_url
+        this.cookie = cookie
+        this.timer = setInterval(() => {
+            this.retry()
+        }, 7200 * 1000)
         this.per_sec_bytes = Math.ceil(contentLength / duration)
         this.content_length = contentLength
         this.request = null
@@ -146,7 +154,13 @@ export class Stream {
         this.loop()
     }
 
+    private async retry(){
+        let info = await video_info(this.video_url, this.cookie)
+        this.url = info.format[info.format.length - 1].url
+    }
+
     private cleanup(){
+        clearInterval(this.timer)
         this.request?.unpipe(this.stream)
         this.request?.destroy()
         this.request = null
@@ -166,6 +180,11 @@ export class Stream {
                 "range" : `bytes=${this.bytes_count}-${end >= this.content_length ? '' : end}`
             }
         })
+        if(Number(stream.statusCode) >= 400){
+            this.cleanup()
+            await this.retry()
+            this.loop()
+        }
         this.request = stream
         stream.pipe(this.stream, { end : false })
 

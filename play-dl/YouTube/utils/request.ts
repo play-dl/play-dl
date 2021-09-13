@@ -14,7 +14,8 @@ async function https_getter(req_url : string, options : RequestOpts = {}): Promi
         let req_options : RequestOptions = {
             host : s.hostname,
             path : s.pathname + s.search,
-            headers : (options.headers) ? options.headers : {}
+            headers : (options.headers) ? options.headers : {},
+            method : options.method
         }
 
         let req = https.request(req_options, (response) => {
@@ -47,9 +48,6 @@ export async function request_stream(url : string, options? : RequestOpts): Prom
         let res = await https_getter(url, options)
         if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
             res = await https_getter(res.headers.location as string, options)
-        }
-        else if(Number(res.statusCode) > 400){
-            reject(`Got ${res.statusCode} from the request`)
         }
         resolve(res)
     })

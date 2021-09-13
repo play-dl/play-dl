@@ -135,7 +135,7 @@ async function SpotifyAuthorize(data : SpotifyDataOptions): Promise<boolean>{
         access_token : resp_json.access_token,
         refresh_token : resp_json.refresh_token,
         expires_in : Number(resp_json.expires_in),
-        expiry : Date.now() + (Number(resp_json.expires_in) * 1000),
+        expiry : Date.now() + ((resp_json.expires_in - 1) * 1000),
         token_type : resp_json.token_type,
         market : data.market
     }
@@ -164,7 +164,7 @@ export async function RefreshToken(): Promise<true | false>{
     let resp_json = JSON.parse(response)
     spotifyData.access_token = resp_json.access_token
     spotifyData.expires_in = Number(resp_json.expires_in)
-    spotifyData.expiry = Date.now() + (Number(resp_json.expires_in) * 1000)
+    spotifyData.expiry = Date.now() + ((resp_json.expires_in - 1) * 1000)
     spotifyData.token_type = resp_json.token_type
     fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4))
     return true
