@@ -1,4 +1,4 @@
-import got, { Response } from "got/dist/source";
+import { request } from "../YouTube/utils/request";
 import { SpotifyDataOptions } from ".";
 
 
@@ -126,14 +126,14 @@ export class SpotifyPlaylist{
         let work = []
         for(let i = 2; i <= Math.ceil(fetching/100); i++){
             work.push(new Promise(async (resolve, reject) => {
-                let response = await got(`https://api.spotify.com/v1/playlists/${this.id}/tracks?offset=${(i-1)*100}&limit=100&market=${this.spotifyData.market}`, {
+                let response = await request(`https://api.spotify.com/v1/playlists/${this.id}/tracks?offset=${(i-1)*100}&limit=100&market=${this.spotifyData.market}`, {
                     headers : {
                         "Authorization" : `${this.spotifyData.token_type} ${this.spotifyData.access_token}`
                     }
                 }).catch((err) => reject(`Response Error : \n${err}`))
                 let videos: SpotifyVideo[] = []
-                let res = response as Response<string>
-                let json_data = JSON.parse(res.body)
+                if(typeof response !== 'string') return
+                let json_data = JSON.parse(response)
                 json_data.items.forEach((v : any) => {
                     videos.push(new SpotifyVideo(v.track))
                 })
@@ -223,14 +223,14 @@ export class SpotifyAlbum{
         let work = []
         for(let i = 2; i <= Math.ceil(fetching/50); i++){
             work.push(new Promise(async (resolve, reject) => {
-                let response = await got(`https://api.spotify.com/v1/albums/${this.id}/tracks?offset=${(i-1)*50}&limit=50&market=${this.spotifyData.market}`, {
+                let response = await request(`https://api.spotify.com/v1/albums/${this.id}/tracks?offset=${(i-1)*50}&limit=50&market=${this.spotifyData.market}`, {
                     headers : {
                         "Authorization" : `${this.spotifyData.token_type} ${this.spotifyData.access_token}`
                     }
                 }).catch((err) => reject(`Response Error : \n${err}`))
                 let videos: SpotifyTracks[] = []
-                let res = response as Response<string>
-                let json_data = JSON.parse(res.body)
+                if(typeof response !== 'string') return
+                let json_data = JSON.parse(response)
                 json_data.items.forEach((v : any) => {
                     videos.push(new SpotifyTracks(v))
                 })

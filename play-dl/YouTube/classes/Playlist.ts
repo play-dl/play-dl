@@ -1,5 +1,5 @@
 import { getPlaylistVideos, getContinuationToken } from "../utils/extractor";
-import { url_get } from "../utils/request";
+import { request } from "../utils/request";
 import { Thumbnail } from "./Thumbnail";
 import { Channel } from "./Channel";
 import { Video } from "./Video";
@@ -62,7 +62,7 @@ export class PlayList{
     async next(limit: number = Infinity): Promise<Video[]> {
         if (!this._continuation || !this._continuation.token) return [];
 
-        let nextPage = await url_get(`${BASE_API}${this._continuation.api}`, {
+        let nextPage = await request(`${BASE_API}${this._continuation.api}`, {
             method: "POST",
             body: JSON.stringify({
                 continuation: this._continuation.token,
