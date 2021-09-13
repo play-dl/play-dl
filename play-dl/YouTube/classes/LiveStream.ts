@@ -187,6 +187,7 @@ export class Stream {
             this.cleanup()
             await this.retry()
             this.loop()
+            return
         }
         this.request = stream
         stream.pipe(this.stream, { end : false })
