@@ -47,16 +47,16 @@ export async function stream(url : string, cookie? : string): Promise<Stream | L
 
     if(opusFormats.length === 0){
         type = StreamType.Arbitrary
-        final.push(audioFormat[audioFormat.length - 1])
+	if(audioFormat.length === 0){
+            final.push(info.format[info.format.length - 1])
+	}
+	else{
+            final.push(audioFormat[audioFormat.length - 1])
+	}
     }
     else{
         type = StreamType.WebmOpus
         final.push(opusFormats[opusFormats.length - 1])
-    }
-
-    if(final.length === 0) {
-        type = StreamType.Arbitrary
-        final.push(info.format[info.format.length - 1])
     }
     
     return new Stream(final[0].url, type, info.video_details.durationInSec, Number(final[0].contentLength), info.video_details.url, cookie as string)
@@ -74,16 +74,16 @@ export async function stream_from_info(info : InfoData, cookie? : string): Promi
 
     if(opusFormats.length === 0){
         type = StreamType.Arbitrary
-        final.push(audioFormat[audioFormat.length - 1])
+	if(audioFormat.length === 0){
+            final.push(info.format[info.format.length - 1])
+	}
+	else{
+            final.push(audioFormat[audioFormat.length - 1])
+	}
     }
     else{
         type = StreamType.WebmOpus
         final.push(opusFormats[opusFormats.length - 1])
-    }
-
-    if(final.length === 0) {
-        type = StreamType.Arbitrary
-        final.push(info.format[info.format.length - 1])
     }
     
     return new Stream(final[0].url, type, info.video_details.durationInSec, Number(final[0].contentLength), info.video_details.url, cookie as string)
