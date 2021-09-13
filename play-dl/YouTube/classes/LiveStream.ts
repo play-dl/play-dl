@@ -117,7 +117,7 @@ export class Stream {
     private per_sec_bytes : number;
     private content_length : number;
     private video_url : string;
-    private timer : NodeJS.Timer;
+    private timer : NodeJS.Timer | null;
     private cookie : string;
     private data_ended : boolean;
     private playing_count : number;
@@ -162,9 +162,10 @@ export class Stream {
     }
 
     private cleanup(){
-        clearInterval(this.timer)
+        clearInterval(this.timer as NodeJS.Timer)
         this.request?.unpipe(this.stream)
         this.request?.destroy()
+        this.timer = null
         this.request = null
         this.url = ''
     }
