@@ -1,13 +1,12 @@
 import { video_info } from "."
 import { LiveStreaming, Stream } from "./classes/LiveStream"
-import { request } from "./utils/request"
 
 export enum StreamType{
     Arbitrary = 'arbitrary',
-	Raw = 'raw',
-	OggOpus = 'ogg/opus',
-	WebmOpus = 'webm/opus',
-	Opus = 'opus',
+    Raw = 'raw',
+    OggOpus = 'ogg/opus',
+    WebmOpus = 'webm/opus',
+    Opus = 'opus',
 }
 
 interface InfoData{

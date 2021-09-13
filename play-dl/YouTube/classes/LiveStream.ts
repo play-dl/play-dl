@@ -180,7 +180,7 @@ export class Stream {
                 "range" : `bytes=${this.bytes_count}-${end >= this.content_length ? '' : end}`
             }
         })
-        if(Number(stream.statusCode) >= 400){
+        if(Number(stream.statusCode) >= 400 && this.bytes_count === 0){
             this.cleanup()
             await this.retry()
             this.loop()

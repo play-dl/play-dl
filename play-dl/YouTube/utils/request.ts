@@ -1,5 +1,5 @@
 import https, { RequestOptions } from 'https'
-import {IncomingMessage } from 'http'
+import { IncomingMessage } from 'http'
 import { URL } from 'url'
 
 interface RequestOpts extends RequestOptions{
@@ -10,11 +10,11 @@ interface RequestOpts extends RequestOptions{
 async function https_getter(req_url : string, options : RequestOpts = {}): Promise<IncomingMessage>{
     return new Promise((resolve, reject) => {
         let s = new URL(req_url)
-        if(!options.method) options.method = "GET"
+        options.method ??= "GET"
         let req_options : RequestOptions = {
             host : s.hostname,
             path : s.pathname + s.search,
-            headers : (options.headers) ? options.headers : {},
+            headers : options.headers ?? {},
             method : options.method
         }
 
@@ -44,7 +44,6 @@ export async function request(url : string, options? : RequestOpts): Promise<str
 
 export async function request_stream(url : string, options? : RequestOpts): Promise<IncomingMessage>{
     return new Promise(async (resolve, reject) => {
-        let data = ''
         let res = await https_getter(url, options)
         if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
             res = await https_getter(res.headers.location as string, options)
