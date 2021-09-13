@@ -129,7 +129,7 @@ export class Stream {
         this.bytes_count = 0
         this.video_url = video_url
         this.cookie = cookie
-        this.timer = setTimeout(() => {
+        this.timer = setInterval(() => {
             this.retry()
         }, 7200 * 1000)
         this.per_sec_bytes = Math.ceil(contentLength / duration)
@@ -159,9 +159,6 @@ export class Stream {
     private async retry(){
         let info = await video_info(this.video_url, this.cookie)
         this.url = info.format[info.format.length - 1].url
-        this.timer = setTimeout(() => {
-            this.retry()
-        }, 7200 * 1000)
     }
 
     private cleanup(){
@@ -187,6 +184,11 @@ export class Stream {
             this.cleanup()
             await this.retry()
             this.loop()
+            if(!this.timer){
+                this.timer = setInterval(() => {
+                    this.retry()
+                }, 7200 * 1000)
+            }
             return
         }
         this.request = stream
