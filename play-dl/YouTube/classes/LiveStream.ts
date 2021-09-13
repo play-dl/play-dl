@@ -143,6 +143,8 @@ export class Stream {
         this.stream.on('pause', () => {
             this.playing_count++;
             if(this.data_ended){
+                this.bytes_count = 0
+                this.per_sec_bytes = 0
                 this.cleanup()
                 this.stream.removeAllListeners('pause')
             }
@@ -168,8 +170,6 @@ export class Stream {
         this.request?.destroy()
         this.request = null
         this.url = ''
-        this.bytes_count = 0
-        this.per_sec_bytes = 0
     }
 
     private async loop(){
@@ -183,7 +183,7 @@ export class Stream {
                 "range" : `bytes=${this.bytes_count}-${end >= this.content_length ? '' : end}`
             }
         })
-        if(Number(stream.statusCode) >= 400 && this.bytes_count === 0){
+        if(Number(stream.statusCode) >= 400){
             this.cleanup()
             await this.retry()
             this.loop()
