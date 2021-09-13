@@ -91,16 +91,20 @@ export class LiveStreaming{
                 continue
             }
             await new Promise(async(resolve, reject) => {
-                let stream = await request_stream(this.base_url + segment)
-                this.request = stream
-                stream.pipe(this.stream, { end : false })
-                stream.on('end', () => {
-                    this.packet_count++
-                    resolve('')
-                })
-                stream.once('error', (err) => {
+                try{
+                    this.request = await request_stream(this.base_url + segment)
+                    this.request.pipe(this.stream, { end : false })
+                    this.request.on('end', () => {
+                        this.packet_count++
+                        resolve('')
+                    })
+                    this.request.once('error', (err) => {
+                        this.stream.emit('error', err)
+                    })
+                }
+                catch(err){
                     this.stream.emit('error', err)
-                })
+                }
             })
         }
         this.timer = setTimeout(() => {
@@ -175,36 +179,40 @@ export class Stream {
             this.cleanup()
             return
         }
-        let end : number = this.bytes_count + this.per_sec_bytes * 300;
-        let stream = await request_stream(this.url, {
-            headers : {
-                "range" : `bytes=${this.bytes_count}-${end >= this.content_length ? '' : end}`
+        try{
+            let end : number = this.bytes_count + this.per_sec_bytes * 300;
+            this.request = await request_stream(this.url, {
+                headers : {
+                    "range" : `bytes=${this.bytes_count}-${end >= this.content_length ? '' : end}`
+                }
+            })
+            if(Number(this.request.statusCode) >= 400){
+                this.cleanup()
+                await this.retry()
+                this.loop()
+                if(!this.timer){
+                    this.timer = setInterval(() => {
+                        this.retry()
+                    }, 7200 * 1000)
+                }
+                return
             }
-        })
-        if(Number(stream.statusCode) >= 400){
-            this.cleanup()
-            await this.retry()
-            this.loop()
-            if(!this.timer){
-                this.timer = setInterval(() => {
-                    this.retry()
-                }, 7200 * 1000)
-            }
-            return
+            this.request.pipe(this.stream, { end : false })
+    
+            this.request.once('error', (err) => {
+                this.stream.emit('error', err)
+            })
+    
+            this.request.on('data', (chunk: any) => {
+                this.bytes_count += chunk.length
+            })
+    
+            this.request.on('end', () => {
+                if(end >= this.content_length) this.data_ended = true
+            })
         }
-        this.request = stream
-        stream.pipe(this.stream, { end : false })
-
-        stream.once('error', (err) => {
+        catch(err){
             this.stream.emit('error', err)
-        })
-
-        stream.on('data', (chunk: any) => {
-            this.bytes_count += chunk.length
-        })
-
-        stream.on('end', () => {
-            if(end >= this.content_length) this.data_ended = true
-        })
+        }
     }
 }
