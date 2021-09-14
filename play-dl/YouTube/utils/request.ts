@@ -7,7 +7,7 @@ interface RequestOpts extends RequestOptions{
     method? : "GET" | "POST"
 }
 
-async function https_getter(req_url : string, options : RequestOpts = {}): Promise<IncomingMessage>{
+function https_getter(req_url : string, options : RequestOpts = {}): Promise<IncomingMessage>{
     return new Promise((resolve, reject) => {
         let s = new URL(req_url)
         options.method ??= "GET"
