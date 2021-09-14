@@ -35,9 +35,11 @@ async function https_getter(req_url : string, options : RequestOpts = {}): Promi
 export async function request(url : string, options? : RequestOpts): Promise<string>{
     return new Promise(async (resolve, reject) => {
         let data = ''
-        let res = await https_getter(url, options)
+        let res = await https_getter(url, options).catch((err: string) => err)
+        if(typeof res === 'string') throw new Error(res)
         if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
-            res = await https_getter(res.headers.location as string , options)
+            res = await https_getter(res.headers.location as string , options).catch((err: string) => err)
+            if(typeof res === 'string') throw new Error(res)
         }
         else if(Number(res.statusCode) > 400){
             reject(`Got ${res.statusCode} from the request`)
@@ -50,7 +52,8 @@ export async function request(url : string, options? : RequestOpts): Promise<str
 
 export async function request_stream(url : string, options? : RequestOpts): Promise<IncomingMessage>{
     return new Promise(async (resolve, reject) => {
-        let res = await https_getter(url, options)
+        let res = await https_getter(url, options).catch((err: string) => err)
+        if(typeof res === 'string') throw new Error(res)
         if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
             res = await https_getter(res.headers.location as string, options)
         }
