@@ -7,7 +7,7 @@ interface RequestOpts extends RequestOptions{
     method? : "GET" | "POST"
 }
 
-async function https_getter(req_url : string, options : RequestOpts = {}): Promise<IncomingMessage>{
+function https_getter(req_url : string, options : RequestOpts = {}): Promise<IncomingMessage>{
     return new Promise((resolve, reject) => {
         let s = new URL(req_url)
         options.method ??= "GET"
@@ -25,7 +25,7 @@ async function https_getter(req_url : string, options : RequestOpts = {}): Promi
     })
 }
 
-export async function request(url : string, options? : RequestOpts): Promise<string>{
+export function request(url : string, options? : RequestOpts): Promise<string>{
     return new Promise(async (resolve, reject) => {
         try{
             let data = ''
@@ -47,16 +47,9 @@ export async function request(url : string, options? : RequestOpts): Promise<str
 }
 
 export async function request_stream(url : string, options? : RequestOpts): Promise<IncomingMessage>{
-    return new Promise(async (resolve, reject) => {
-        try{
-            let res = await https_getter(url, options)
-            if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
-                res = await https_getter(res.headers.location as string, options)
-            }
-            resolve(res)
-        }
-        catch(err){
-            reject(err)
-        }
-    })
+    let res = await https_getter(url, options)
+    if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
+        res = await https_getter(res.headers.location as string, options)
+    }
+    return res
 }
