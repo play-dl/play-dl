@@ -18,9 +18,7 @@ async function https_getter(req_url : string, options : RequestOpts = {}): Promi
             method : options.method
         }
 
-        let req = https.request(req_options, (response) => {
-            resolve(response)
-        })
+        let req = https.request(req_options, resolve)
         req.on('error', reject)
         if(options.method === "POST") req.write(options.body)
         req.end()

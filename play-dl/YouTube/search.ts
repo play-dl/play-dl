@@ -11,10 +11,9 @@ enum SearchType {
     Channel = 'EgIQAg%253D%253D',
 }
 
-export async function search(search :string, options? : ParseSearchInterface): Promise<(Video | Channel | PlayList)[]> {
+export async function search(search :string, options : ParseSearchInterface = {}): Promise<(Video | Channel | PlayList)[]> {
     let url = 'https://www.youtube.com/results?search_query=' + search.replaceAll(' ', '+')
-    if(!options) options = { type : "video"}
-    if(!options.type) options.type = "video" 
+    options.type ??= "video"
     if(!url.match('&sp=')){
         url += '&sp='
         switch(options?.type){
