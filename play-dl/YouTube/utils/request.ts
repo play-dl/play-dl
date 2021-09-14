@@ -18,9 +18,7 @@ function https_getter(req_url : string, options : RequestOpts = {}): Promise<Inc
             method : options.method
         }
 
-        let req = https.request(req_options, (response) => {
-            resolve(response)
-        })
+        let req = https.request(req_options, resolve)
         req.on('error', (err) => {
             reject(err)
         })
