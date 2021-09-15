@@ -30,8 +30,8 @@ function https_getter(req_url : string, options : RequestOpts = {}): Promise<Inc
 export async function request(url : string, options? : RequestOpts): Promise<string>{
     return new Promise(async (resolve, reject) => {
         let data = ''
-        let res = await https_getter(url, options).catch((err) => err as string)
-        if(typeof res === 'string') {reject(res); return}
+        let res = await https_getter(url, options).catch((err: Error) => err)
+        if(res instanceof Error) {reject(res); return}
         if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
             res = await https_getter(res.headers.location as string , options)
         }
@@ -46,8 +46,8 @@ export async function request(url : string, options? : RequestOpts): Promise<str
 
 export async function request_stream(url : string, options? : RequestOpts): Promise<IncomingMessage>{
     return new Promise(async (resolve, reject) => {
-        let res = await https_getter(url, options).catch((err) => err as string)
-        if(typeof res === 'string') {reject(res); return}
+        let res = await https_getter(url, options).catch((err: Error) => err)
+        if(res instanceof Error) {reject(res); return}
         if(Number(res.statusCode) >= 300 && Number(res.statusCode) < 400){
             res = await https_getter(res.headers.location as string, options)
         }
