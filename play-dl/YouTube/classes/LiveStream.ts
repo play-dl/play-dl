@@ -91,7 +91,8 @@ export class LiveStreaming{
                 continue
             }
             await new Promise(async(resolve, reject) => {
-                let stream = await request_stream(this.base_url + segment)
+                let stream = await request_stream(this.base_url + segment).catch((err) => {this.stream.emit('error', err); return null})
+                if(!stream) return
                 this.request = stream
                 stream.pipe(this.stream, { end : false })
                 stream.on('end', () => {
@@ -180,7 +181,14 @@ export class Stream {
             headers : {
                 "range" : `bytes=${this.bytes_count}-${end >= this.content_length ? '' : end}`
             }
-        })
+        }).catch((err) => {this.stream.emit('error', err); return null})
+        if(!stream) {
+            this.data_ended = true
+            this.bytes_count = 0
+            this.per_sec_bytes = 0
+            this.cleanup()
+            return
+        }
         if(Number(stream.statusCode) >= 400){
             this.cleanup()
             await this.retry()
