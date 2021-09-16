@@ -36,7 +36,7 @@ export async function request(url : string, options? : RequestOpts): Promise<str
             res = await https_getter(res.headers.location as string , options)
         }
         else if(Number(res.statusCode) > 400){
-            reject(`Got ${res.statusCode} from the request`)
+            reject(new Error(`Got ${res.statusCode} from the request`))
         }
         res.setEncoding('utf-8')
         res.on('data', (c) => data+=c)
