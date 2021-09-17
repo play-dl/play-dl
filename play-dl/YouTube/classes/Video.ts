@@ -1,9 +1,9 @@
-import { Channel } from "./Channel";
-import { Thumbnail } from "./Thumbnail";
+import { Channel } from './Channel';
+import { Thumbnail } from './Thumbnail';
 
 interface VideoOptions {
     id?: string;
-    url? : string;
+    url?: string;
     title?: string;
     description?: string;
     durationRaw: string;
@@ -12,21 +12,21 @@ interface VideoOptions {
     views: number;
     thumbnail?: {
         id: string | undefined;
-        width: number | undefined ;
+        width: number | undefined;
         height: number | undefined;
         url: string | undefined;
     };
     channel?: {
-        name : string,
-        id : string,
-        icon : string
+        name: string;
+        id: string;
+        icon: string;
     };
     videos?: Video[];
-    type : string;
-    ratings : {   
+    type: string;
+    ratings: {
         likes: number;
         dislikes: number;
-    }
+    };
     live: boolean;
     private: boolean;
     tags: string[];
@@ -34,7 +34,7 @@ interface VideoOptions {
 
 export class Video {
     id?: string;
-    url? : string;
+    url?: string;
     title?: string;
     description?: string;
     durationRaw: string;
@@ -50,35 +50,35 @@ export class Video {
     private: boolean;
     tags: string[];
 
-    constructor(data : any){
-        if(!data) throw new Error(`Can not initiate ${this.constructor.name} without data`)
-        
+    constructor(data: any) {
+        if (!data) throw new Error(`Can not initiate ${this.constructor.name} without data`);
+
         this.id = data.id || undefined;
-        this.url = `https://www.youtube.com/watch?v=${this.id}`
+        this.url = `https://www.youtube.com/watch?v=${this.id}`;
         this.title = data.title || undefined;
         this.description = data.description || undefined;
-        this.durationRaw = data.duration_raw || "0:00";
+        this.durationRaw = data.duration_raw || '0:00';
         this.durationInSec = (data.duration < 0 ? 0 : data.duration) || 0;
         this.uploadedAt = data.uploadedAt || undefined;
         this.views = parseInt(data.views) || 0;
         this.thumbnail = data.thumbnail || {};
         this.channel = data.channel || {};
-        this.likes = data.ratings?.likes as number || 0;
+        this.likes = (data.ratings?.likes as number) || 0;
         this.dislikes = data.ratings?.dislikes || 0;
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
     }
 
-    get type(): "video" {
-        return "video";
+    get type(): 'video' {
+        return 'video';
     }
 
     get toString(): string {
-        return this.url || "";
+        return this.url || '';
     }
 
-    get toJSON(): VideoOptions{
+    get toJSON(): VideoOptions {
         return {
             id: this.id,
             url: this.url,
