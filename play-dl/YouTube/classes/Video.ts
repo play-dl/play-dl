@@ -41,7 +41,12 @@ export class Video {
     durationInSec: number;
     uploadedAt?: string;
     views: number;
-    thumbnail?: Thumbnail;
+    thumbnail?: {
+        id: string | undefined;
+        width: number | undefined;
+        height: number | undefined;
+        url: string | undefined;
+    };
     channel?: Channel;
     videos?: Video[];
     likes: number;
@@ -87,7 +92,7 @@ export class Video {
             durationInSec: this.durationInSec,
             durationRaw: this.durationRaw,
             uploadedAt: this.uploadedAt,
-            thumbnail: this.thumbnail?.toJSON(),
+            thumbnail: this.thumbnail,
             channel: {
                 name: this.channel?.name as string,
                 id: this.channel?.id as string,
