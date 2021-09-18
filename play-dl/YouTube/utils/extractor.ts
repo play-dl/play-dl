@@ -53,11 +53,6 @@ export async function video_basic_info(url: string, cookie?: string) {
     });
     const player_response = JSON.parse(body.split('var ytInitialPlayerResponse = ')[1].split('}};')[0] + '}}');
     const initial_response = JSON.parse(body.split('var ytInitialData = ')[1].split('}};')[0] + '}}');
-    const badge =
-        initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
-            ?.owner?.videoOwnerRenderer?.badges &&
-        initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
-            ?.owner?.videoOwnerRenderer?.badges[0];
     if (player_response.playabilityStatus.status !== 'OK')
         throw new Error(
             `While getting info from url\n${
@@ -65,6 +60,11 @@ export async function video_basic_info(url: string, cookie?: string) {
                 player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
             }`
         );
+    const badge =
+        initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
+            ?.owner?.videoOwnerRenderer?.badges &&
+        initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
+            ?.owner?.videoOwnerRenderer?.badges[0];
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const format = [];
     const vid = player_response.videoDetails;
