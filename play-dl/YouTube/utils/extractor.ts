@@ -1,5 +1,5 @@
 import { request } from './request';
-import { format_decipher, js_tokens } from './cipher';
+import { format_decipher } from './cipher';
 import { Video } from '../classes/Video';
 import { PlayList } from '../classes/Playlist';
 
@@ -90,8 +90,8 @@ export async function video_basic_info(url: string, cookie?: string) {
         live: vid.isLiveContent,
         private: vid.isPrivate
     };
-    if (!video_details.live) format.push(player_response.streamingData.formats[0]);
-    format.push(...player_response.streamingData.adaptiveFormats);
+    format.push(...player_response.streamingData.formats ?? []);
+    format.push(...player_response.streamingData.adaptiveFormats ?? []);
     const LiveStreamData = {
         isLive: video_details.live,
         dashManifestUrl: player_response.streamingData?.dashManifestUrl ?? null,
