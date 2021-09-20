@@ -48,7 +48,7 @@ export class SoundCloudTrack {
         artist: string;
         contains_music: boolean;
         writer_composer: string;
-    };
+    } | null;
     thumbanil: string;
     user: SoundCloudUser;
     constructor(data: any) {
@@ -59,13 +59,15 @@ export class SoundCloudTrack {
         this.type = 'track';
         this.durationInSec = Number(data.duration) / 1000;
         this.durationInMs = Number(data.duration);
-        this.publisher = {
-            name: data.publisher_metadata.publisher,
-            id: data.publisher_metadata.id,
-            artist: data.publisher_metadata.artist,
-            contains_music: Boolean(data.publisher_metadata.contains_music) || false,
-            writer_composer: data.publisher_metadata.writer_composer
-        };
+        if (data.publisher_metadata)
+            this.publisher = {
+                name: data.publisher_metadata.publisher,
+                id: data.publisher_metadata.id,
+                artist: data.publisher_metadata.artist,
+                contains_music: Boolean(data.publisher_metadata.contains_music) || false,
+                writer_composer: data.publisher_metadata.writer_composer
+            };
+        else this.publisher = null;
         this.formats = data.media.transcodings;
         this.user = {
             name: data.user.username,
@@ -131,12 +133,12 @@ export class SoundCloudPlaylist {
         this.tracks = tracks;
     }
 
-    async fetch() {
+    async fetch(): Promise<void> {
         const work: any[] = [];
         for (let i = 0; i < this.tracks.length; i++) {
             if (!this.tracks[i].fetched) {
                 work.push(
-                    new Promise(async (resolve, reject) => {
+                    new Promise(async (resolve) => {
                         const num = i;
                         const data = await request(
                             `https://api-v2.soundcloud.com/tracks/${this.tracks[i].id}?client_id=${this.client_id}`
@@ -158,16 +160,20 @@ export class Stream {
     private url: string;
     private playing_count: number;
     private downloaded_time: number;
-    private request : IncomingMessage | null
+    private downloaded_segments: number;
+    private request: IncomingMessage | null;
+    private data_ended: boolean;
     private time: number[];
     private segment_urls: string[];
-    constructor(url: string, type: StreamType = StreamType.Arbitrary, client_id: string) {
+    constructor(url: string, type: StreamType = StreamType.Arbitrary) {
         this.type = type;
-        this.url = url + client_id;
+        this.url = url;
         this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.playing_count = 0;
         this.downloaded_time = 0;
-        this.request = null
+        this.request = null;
+        this.downloaded_segments = 0;
+        this.data_ended = false;
         this.time = [];
         this.segment_urls = [];
         this.stream.on('close', () => {
@@ -175,6 +181,13 @@ export class Stream {
         });
         this.stream.on('pause', () => {
             this.playing_count++;
+            if (this.data_ended) {
+                this.cleanup();
+                this.stream.removeAllListeners('pause');
+            } else if (this.playing_count === 120) {
+                this.playing_count = 0;
+                this.start();
+            }
         });
         this.start();
     }
@@ -200,26 +213,47 @@ export class Stream {
             this.cleanup();
             return;
         }
+        this.time = [];
+        this.segment_urls = [];
         await this.parser();
-        for await (const segment of this.segment_urls) {
-            await new Promise(async (resolve, reject) => {
-                const stream = await request_stream(segment).catch((err: Error) => err);
-                if (stream instanceof Error) {
-                    this.stream.emit('error', stream);
-                    reject(stream)
-                    return;
-                }
-                this.request = stream
-                stream.pipe(this.stream, { end : false })
-                stream.on('end', () => {
-                    resolve('');
-                });
-                stream.once('error', (err) => {
-                    this.stream.emit('error', err);
-                });
-            });
-        }
+        this.downloaded_time = 0;
+        this.segment_urls.splice(0, this.downloaded_segments);
+        this.loop();
     }
 
-    private cleanup() {}
+    private async loop() {
+        if (this.stream.destroyed) {
+            this.cleanup();
+            return;
+        }
+        if (this.time.length === 0 || this.segment_urls.length === 0) {
+            this.data_ended = true;
+            return;
+        }
+        this.downloaded_time += this.time.shift() as number;
+        this.downloaded_segments++;
+        const stream = await request_stream(this.segment_urls.shift() as string).catch((err: Error) => err);
+        if (stream instanceof Error) throw stream;
+
+        stream.pipe(this.stream, { end: false });
+        stream.on('end', () => {
+            if (this.downloaded_time >= 300) return;
+            else this.loop();
+        });
+        stream.once('error', (err) => {
+            this.stream.emit('error', err);
+        });
+    }
+
+    private cleanup() {
+        this.request?.unpipe(this.stream);
+        this.request?.destroy();
+        this.url = '';
+        this.playing_count = 0;
+        this.downloaded_time = 0;
+        this.downloaded_segments = 0;
+        this.request = null;
+        this.time = [];
+        this.segment_urls = [];
+    }
 }

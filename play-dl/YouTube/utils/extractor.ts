@@ -8,7 +8,7 @@ const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)/;
 
-export function yt_validate(url: string): 'playlist' | 'video' | boolean {
+export function yt_validate(url: string): 'playlist' | 'video' | false {
     if (url.indexOf('list=') === -1) {
         if (!url.match(video_pattern)) return false;
         else return 'video';
@@ -90,8 +90,8 @@ export async function video_basic_info(url: string, cookie?: string) {
         live: vid.isLiveContent,
         private: vid.isPrivate
     };
-    format.push(...player_response.streamingData.formats ?? []);
-    format.push(...player_response.streamingData.adaptiveFormats ?? []);
+    format.push(...(player_response.streamingData.formats ?? []));
+    format.push(...(player_response.streamingData.adaptiveFormats ?? []));
     const LiveStreamData = {
         isLive: video_details.live,
         dashManifestUrl: player_response.streamingData?.dashManifestUrl ?? null,

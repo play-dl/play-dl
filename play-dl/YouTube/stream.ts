@@ -9,7 +9,7 @@ export enum StreamType {
     Opus = 'opus'
 }
 
-interface InfoData {
+export interface InfoData {
     LiveStreamData: {
         isLive: boolean;
         dashManifestUrl: string;

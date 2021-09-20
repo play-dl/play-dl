@@ -1,30 +1,39 @@
-import readline from 'readline';
-
-export {
-    playlist_info,
-    video_basic_info,
-    video_info,
-    search,
-    stream,
-    stream_from_info,
-    yt_validate,
-    extractID
-} from './YouTube';
-
+export { playlist_info, video_basic_info, video_info, search, yt_validate, extractID } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired } from './Spotify';
+export { soundcloud, so_validate } from './SoundCloud';
 
-export { soundcloud } from './SoundCloud';
-
-import { sp_validate, yt_validate } from '.';
-import { SpotifyAuthorize } from './Spotify';
+import readline from 'readline';
 import fs from 'fs';
-import { check_id } from './SoundCloud';
+import { sp_validate, yt_validate, so_validate } from '.';
+import { SpotifyAuthorize } from './Spotify';
+import { check_id, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
+import { InfoData, stream as yt_stream, stream_from_info as yt_stream_info } from './YouTube/stream';
+import { SoundCloudTrack, Stream as SoStream } from './SoundCloud/classes';
+import { LiveStreaming, Stream } from './YouTube/classes/LiveStream';
 
-export function validate(url: string): string | boolean {
+export async function stream(url: string, cookie?: string): Promise<Stream | LiveStreaming | SoStream> {
+    if (url.indexOf('soundcloud') !== -1) return await so_stream(url);
+    else return await yt_stream(url, cookie);
+}
+
+export async function stream_from_info(
+    info: InfoData | SoundCloudTrack,
+    cookie?: string
+): Promise<Stream | LiveStreaming | SoStream> {
+    if (info instanceof SoundCloudTrack) return await so_stream_info(info);
+    else return await yt_stream_info(info, cookie);
+}
+
+export async function validate(url: string): Promise<string | boolean> {
     if (url.indexOf('spotify') !== -1) {
         const check = sp_validate(url);
         if (check) {
             return 'sp_' + check;
+        } else return check;
+    } else if (url.indexOf('soundcloud') !== -1) {
+        const check = await so_validate(url);
+        if (check) {
+            return 'so_' + check;
         } else return check;
     } else {
         const check = yt_validate(url);
@@ -34,7 +43,7 @@ export function validate(url: string): string | boolean {
     }
 }
 
-export function authorization() {
+export function authorization(): void {
     const ask = readline.createInterface({
         input: process.stdin,
         output: process.stdout

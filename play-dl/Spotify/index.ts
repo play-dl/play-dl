@@ -64,7 +64,7 @@ export async function spotify(url: string): Promise<SpotifyAlbum | SpotifyPlayli
     } else throw new Error('URL is out of scope for play-dl.');
 }
 
-export function sp_validate(url: string): 'track' | 'playlist' | 'album' | boolean {
+export function sp_validate(url: string): 'track' | 'playlist' | 'album' | false {
     if (!url.match(pattern)) return false;
     if (url.indexOf('track/') !== -1) {
         return 'track';
@@ -105,12 +105,12 @@ export async function SpotifyAuthorize(data: SpotifyDataOptions): Promise<boolea
     return true;
 }
 
-export function is_expired() {
+export function is_expired(): boolean {
     if (Date.now() >= (spotifyData.expiry as number)) return true;
     else return false;
 }
 
-export async function refreshToken(): Promise<true | false> {
+export async function refreshToken(): Promise<boolean> {
     const response = await request(`https://accounts.spotify.com/api/token`, {
         headers: {
             'Authorization': `Basic ${Buffer.from(`${spotifyData.client_id}:${spotifyData.client_secret}`).toString(
@@ -123,7 +123,7 @@ export async function refreshToken(): Promise<true | false> {
     }).catch((err: Error) => {
         return err;
     });
-    if (response instanceof Error) throw response;
+    if (response instanceof Error) return false;
     const resp_json = JSON.parse(response);
     spotifyData.access_token = resp_json.access_token;
     spotifyData.expires_in = Number(resp_json.expires_in);
