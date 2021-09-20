@@ -184,7 +184,7 @@ export class Stream {
             if (this.data_ended) {
                 this.cleanup();
                 this.stream.removeAllListeners('pause');
-            } else if (this.playing_count === 120) {
+            } else if (this.playing_count === 110) {
                 this.playing_count = 0;
                 this.start();
             }
