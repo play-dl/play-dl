@@ -10,7 +10,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "build:check": "tsc --noEmit --incremental false"
+    "build:check": "tsc --noEmit --incremental false",
+    "pretty": "prettier --config .prettierrc \"play-dl/*.ts\" \"play-dl/*/*.ts\" \"play-dl/*/*/*.ts\" --write "
   },
   "repository": {
     "type": "git",
@@ -39,6 +40,7 @@
     "dist/*"
   ],
   "devDependencies": {
-    "@types/node": "^16.9.1"
+    "@types/node": "^16.9.1",
+    "prettier": "^2.3.1"
   }
 }

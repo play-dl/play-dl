@@ -34,19 +34,19 @@ export class Channel {
      * @param {object} options Icon options
      * @param {number} [options.size=0] Icon size. **Default is 0**
      */
-    iconURL(options = { size: 0 }): string | undefined{
-        if (typeof options.size !== "number" || options.size < 0) throw new Error("invalid icon size");
+    iconURL(options = { size: 0 }): string | undefined {
+        if (typeof options.size !== 'number' || options.size < 0) throw new Error('invalid icon size');
         if (!this.icon?.url) return undefined;
-        const def = this.icon.url.split("=s")[1].split("-c")[0];
+        const def = this.icon.url.split('=s')[1].split('-c')[0];
         return this.icon.url.replace(`=s${def}-c`, `=s${options.size}-c`);
     }
 
-    get type(): "channel" {
-        return "channel";
+    get type(): 'channel' {
+        return 'channel';
     }
 
     toString(): string {
-        return this.name || "";
+        return this.name || '';
     }
 
     toJSON() {

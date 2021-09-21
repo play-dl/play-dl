@@ -4,7 +4,6 @@ const { createAudioPlayer, createAudioResource , StreamType, demuxProbe, joinVoi
 const play = require('play-dl')
 const client = new discord.Client({ intents : [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES] , partials : ['CHANNEL', 'MESSAGE']})
 const token = '< YOUR BOT TOKEN >'
-const COOKIE = '< YOUR COOKIES >'
 
 
 client.on('messageCreate', async message => {
@@ -17,13 +16,13 @@ client.on('messageCreate', async message => {
         })
 		
 		let args = message.content.split('play ')[1].split(' ')[0]
-        let stream = await play.stream(args, COOKIE)
+        let stream = await play.stream(args)
         /*
-        OR if you want to get info about youtube link and then stream it
+        OR if you want to get info about soundcloud link and then stream it
 
-        let yt_info = await play.video_info(args, COOKIE)
-        console.log(yt_info.video_details.title) 
-        let stream = await play.stream_from_info(yt_info, COOKIE)
+        let so_info = await play.soundcloud(args) // Make sure that url is track url only. For playlist, make some logic.
+        console.log(so_info.name) 
+        let stream = await play.stream_from_info(so_info)
         */
 
         let resource = createAudioResource(stream, {
