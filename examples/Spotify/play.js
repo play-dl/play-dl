@@ -22,7 +22,7 @@ client.on('messageCreate', async message => {
         let searched = await play.search(`${sp_data.name}`, { limit : 1 }) // This will search the found track on youtube.
         let stream = await play.stream(searched[0].url) // This will create stream from the above search
 
-        let resource = createAudioResource(stream, {
+        let resource = createAudioResource(stream.stream, {
             inputType : stream.type
         })
         let player = createAudioPlayer({

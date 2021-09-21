@@ -51,7 +51,7 @@ _This is basic to create a stream from a youtube or soundcloud url._
 ```js
 let source = await stream("url") // This will create a stream Class.
 
-let resource = createAudioResource(source, {
+let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
 ```
@@ -66,12 +66,12 @@ _This is basic to create a stream from a info [ from [video_info](https://github
 
 ```js
  let source = await stream_from_info(info) // This will create a stream Class from video_info or SoundCoudTrack Class.
- 
+
  /* OR
   let source = await stream_from_info(info, cookie) This will create a stream Class and also give cookies if retrying.
  */
- 
- let resource = createAudioResource(source, {
+
+ let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
 ```

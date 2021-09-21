@@ -10,7 +10,8 @@ export interface FormatInterface {
     maxDvrDurationSec: number;
 }
 
-export class LiveStreaming extends PassThrough {
+export class LiveStreaming {
+    stream : PassThrough;
     type: StreamType;
     private base_url: string;
     private url: string;
@@ -22,7 +23,7 @@ export class LiveStreaming extends PassThrough {
     private segments_urls: string[];
     private request: IncomingMessage | null;
     constructor(dash_url: string, target_interval: number, video_url: string) {
-        super({ highWaterMark: 10 * 1000 * 1000 });
+        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 })
         this.type = StreamType.Arbitrary;
         this.url = dash_url;
         this.base_url = '';
@@ -35,7 +36,7 @@ export class LiveStreaming extends PassThrough {
         this.dash_timer = setTimeout(() => {
             this.dash_updater();
         }, 1800000);
-        this.on('close', () => {
+        this.stream.on('close', () => {
             this.cleanup();
         });
         this.start();
@@ -71,7 +72,7 @@ export class LiveStreaming extends PassThrough {
     private cleanup() {
         clearTimeout(this.timer as NodeJS.Timer);
         clearTimeout(this.dash_timer as NodeJS.Timer);
-        this.request?.unpipe(this);
+        this.request?.unpipe(this.stream);
         this.request?.destroy();
         this.dash_timer = null;
         this.video_url = '';
@@ -85,7 +86,7 @@ export class LiveStreaming extends PassThrough {
     }
 
     private async start() {
-        if (this.destroyed) {
+        if (this.stream.destroyed) {
             this.cleanup();
             return;
         }
@@ -99,17 +100,17 @@ export class LiveStreaming extends PassThrough {
             await new Promise(async (resolve, reject) => {
                 const stream = await request_stream(this.base_url + segment).catch((err: Error) => err);
                 if (stream instanceof Error) {
-                    this.emit('error', stream);
+                    this.stream.emit('error', stream);
                     return;
                 }
                 this.request = stream;
-                stream.pipe(this, { end: false });
+                stream.pipe(this.stream, { end: false });
                 stream.on('end', () => {
                     this.packet_count++;
                     resolve('');
                 });
                 stream.once('error', (err) => {
-                    this.emit('error', err);
+                    this.stream.emit('error', err);
                 });
             });
         }
@@ -119,7 +120,8 @@ export class LiveStreaming extends PassThrough {
     }
 }
 
-export class Stream extends PassThrough {
+export class Stream {
+    stream : PassThrough;
     type: StreamType;
     private url: string;
     private bytes_count: number;
@@ -139,7 +141,7 @@ export class Stream extends PassThrough {
         video_url: string,
         cookie: string
     ) {
-        super({ highWaterMark: 10 * 1000 * 1000 });
+        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.url = url;
         this.type = type;
         this.bytes_count = 0;
@@ -153,16 +155,16 @@ export class Stream extends PassThrough {
         this.request = null;
         this.data_ended = false;
         this.playing_count = 0;
-        this.on('close', () => {
+        this.stream.on('close', () => {
             this.cleanup();
         });
-        this.on('pause', () => {
+        this.stream.on('pause', () => {
             this.playing_count++;
             if (this.data_ended) {
                 this.bytes_count = 0;
                 this.per_sec_bytes = 0;
                 this.cleanup();
-                this.removeAllListeners('pause');
+                this.stream.removeAllListeners('pause');
             } else if (this.playing_count === 280) {
                 this.playing_count = 0;
                 this.loop();
@@ -178,7 +180,7 @@ export class Stream extends PassThrough {
 
     private cleanup() {
         clearInterval(this.timer as NodeJS.Timer);
-        this.request?.unpipe(this);
+        this.request?.unpipe(this.stream);
         this.request?.destroy();
         this.timer = null;
         this.request = null;
@@ -186,7 +188,7 @@ export class Stream extends PassThrough {
     }
 
     private async loop() {
-        if (this.destroyed) {
+        if (this.stream.destroyed) {
             this.cleanup();
             return;
         }
@@ -197,7 +199,7 @@ export class Stream extends PassThrough {
             }
         }).catch((err: Error) => err);
         if (stream instanceof Error) {
-            this.emit('error', stream);
+            this.stream.emit('error', stream);
             this.data_ended = true;
             this.bytes_count = 0;
             this.per_sec_bytes = 0;
@@ -216,10 +218,10 @@ export class Stream extends PassThrough {
             return;
         }
         this.request = stream;
-        stream.pipe(this, { end: false });
+        stream.pipe(this.stream, { end: false });
 
         stream.once('error', (err) => {
-            this.emit('error', err);
+            this.stream.emit('error', err);
         });
 
         stream.on('data', (chunk: any) => {
