@@ -34,7 +34,7 @@ _This refreshes the access token._
 await refreshToken()
 ```
 
-## Classes [ Returned by spotify() function ]
+## Classes [ Returned by `spotify(url)` function ]
 
 ### SpotifyVideo
 
