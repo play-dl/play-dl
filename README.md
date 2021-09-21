@@ -6,7 +6,7 @@
 
 ## Support
 
-You can contact us for support on our [chat server]()
+You can contact us for support on our [chat server](https://discord.gg/8H3xWcv3D7)
 
 ## Stream videos/playlists or search for videos
 
