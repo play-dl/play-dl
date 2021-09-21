@@ -39,11 +39,11 @@ const play = require('play-dl') //JS importing
 
 -   [YouTube](https://github.com/play-dl/play-dl/tree/main/examples/YouTube)
 -   [Spotify](https://github.com/play-dl/play-dl/tree/main/examples/Spotify)
--   [SoundCloud]()
+-   [SoundCloud](https://github.com/play-dl/play-dl/tree/main/examples/SoundCloud)
 
 ### Docs
 
 -   [Main](https://github.com/play-dl/play-dl/tree/main/docs#play-dl-commands)
 -   [YouTube](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#youtube)
 -   [Spotify](https://github.com/play-dl/play-dl/tree/main/docs/Spotify#spotify)
--   [SoundCloud]()
+-   [SoundCloud](https://github.com/play-dl/play-dl/tree/main/docs/SoundCloud)
