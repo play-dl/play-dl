@@ -85,9 +85,9 @@ data.tracks.forEach((track) => {
 _This give total videos that have been fetched so far._
 
 ```js
-    let data = await soundcloud(playlist_url)
+let data = await soundcloud(playlist_url)
 
-    console.log(data.total_tracks) // This will tell no. of videos that have been fetched so far.
+console.log(data.total_tracks) // This will tell no. of videos that have been fetched so far.
 ```
 
 ##### type `property`
