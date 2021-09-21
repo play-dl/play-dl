@@ -154,9 +154,8 @@ export class SoundCloudPlaylist {
     }
 }
 
-export class Stream {
+export class Stream extends PassThrough {
     type: StreamType;
-    stream: PassThrough;
     private url: string;
     private playing_count: number;
     private downloaded_time: number;
@@ -166,9 +165,9 @@ export class Stream {
     private time: number[];
     private segment_urls: string[];
     constructor(url: string, type: StreamType = StreamType.Arbitrary) {
+        super({ highWaterMark: 10 * 1000 * 1000 });
         this.type = type;
         this.url = url;
-        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.playing_count = 0;
         this.downloaded_time = 0;
         this.request = null;
@@ -176,14 +175,14 @@ export class Stream {
         this.data_ended = false;
         this.time = [];
         this.segment_urls = [];
-        this.stream.on('close', () => {
+        this.on('close', () => {
             this.cleanup();
         });
-        this.stream.on('pause', () => {
+        this.on('pause', () => {
             this.playing_count++;
             if (this.data_ended) {
                 this.cleanup();
-                this.stream.removeAllListeners('pause');
+                this.removeAllListeners('pause');
             } else if (this.playing_count === 110) {
                 this.playing_count = 0;
                 this.start();
@@ -209,7 +208,7 @@ export class Stream {
     }
 
     private async start() {
-        if (this.stream.destroyed) {
+        if (this.destroyed) {
             this.cleanup();
             return;
         }
@@ -222,7 +221,7 @@ export class Stream {
     }
 
     private async loop() {
-        if (this.stream.destroyed) {
+        if (this.destroyed) {
             this.cleanup();
             return;
         }
@@ -235,18 +234,18 @@ export class Stream {
         const stream = await request_stream(this.segment_urls.shift() as string).catch((err: Error) => err);
         if (stream instanceof Error) throw stream;
 
-        stream.pipe(this.stream, { end: false });
+        stream.pipe(this, { end: false });
         stream.on('end', () => {
             if (this.downloaded_time >= 300) return;
             else this.loop();
         });
         stream.once('error', (err) => {
-            this.stream.emit('error', err);
+            this.emit('error', err);
         });
     }
 
     private cleanup() {
-        this.request?.unpipe(this.stream);
+        this.request?.unpipe(this);
         this.request?.destroy();
         this.url = '';
         this.playing_count = 0;
