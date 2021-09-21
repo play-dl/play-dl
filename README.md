@@ -32,8 +32,8 @@ const play = require('play-dl') //JS importing
 ## Instructions
 
 -   1.0 release change brings some code changes, make sure to read docs once again.
--   [**Spotify**](https://github.com/play-dl/play-dl/discussions/64)
--   [**SoundCloud**]()
+-   [Spotify](https://github.com/play-dl/play-dl/discussions/64)
+-   [SoundCloud]()
 
 ### Examples
 
