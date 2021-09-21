@@ -28,7 +28,7 @@ if(!check) // Invalid SoundCloud URL
 if(check === 'track') // SoundCloud Track URL
 ```
 
-## Classes [ Returned by soundcloud() function ]
+## Classes [ Returned by `soundcloud(url)` function ]
 
 ### SoundCloudTrack
 
