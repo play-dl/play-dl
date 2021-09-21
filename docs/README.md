@@ -4,7 +4,7 @@ For source specific commands :-
 
 -   [YouTube](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#youtube)
 -   [Spotify](https://github.com/play-dl/play-dl/tree/main/docs/Spotify#spotify)
--   [SoundCloud]()
+-   [SoundCloud](https://github.com/play-dl/play-dl/tree/main/docs/SoundCloud)
 
 ### Validate
 
