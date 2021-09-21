@@ -18,7 +18,7 @@ client.on('messageCreate', async message => {
 		let args = message.content.split('play')[1]
         let yt_info = await play.search(args, { limit : 1 })
 		let stream = await play.stream(yt_info[0].url)
-        let resource = createAudioResource(stream, {
+        let resource = createAudioResource(stream.stream, {
             inputType : stream.type
         })
         let player = createAudioPlayer({

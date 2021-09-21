@@ -26,7 +26,7 @@ client.on('messageCreate', async message => {
         let stream = await play.stream_from_info(yt_info, COOKIE)
         */
 
-        let resource = createAudioResource(stream, {
+        let resource = createAudioResource(stream.stream, {
             inputType : stream.type
         })
         let player = createAudioPlayer({
