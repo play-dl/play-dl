@@ -49,7 +49,7 @@ export class SoundCloudTrack {
         contains_music: boolean;
         writer_composer: string;
     } | null;
-    thumbanil: string;
+    thumbnail: string;
     user: SoundCloudUser;
     constructor(data: any) {
         this.name = data.title;
@@ -81,7 +81,23 @@ export class SoundCloudTrack {
             last_name: data.user.last_name,
             thumbnail: data.user.avatar_url
         };
-        this.thumbanil = data.artwork_url;
+        this.thumbnail = data.artwork_url;
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            id: this.id,
+            type: this.type,
+            url: this.url,
+            fetched : this.fetched,
+            durationInMs: this.durationInMs,
+            durationInSec: this.durationInSec,
+            publisher: this.publisher,
+            formats: this.formats,
+            thumbnail: this.thumbnail,
+            user : this.user
+        };
     }
 }
 
@@ -151,6 +167,30 @@ export class SoundCloudPlaylist {
             }
         }
         await Promise.allSettled(work);
+    }
+
+    get total_tracks(){
+        let count = 0
+        this.tracks.forEach((track) => {
+            if(track instanceof SoundCloudTrack) count++
+            else return
+        })
+        return count
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            id: this.id,
+            type: this.type,
+            sub_type : this.sub_type,
+            url: this.url,
+            durationInMs: this.durationInMs,
+            durationInSec: this.durationInSec,
+            tracksCount : this.tracksCount,
+            user : this.user,
+            tracks : this.tracks
+        };
     }
 }
 

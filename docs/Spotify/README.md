@@ -1,8 +1,10 @@
 # Spotify
 
 ## Main
+
 ### spotify(url : `string`)
-*This returns data from a track | playlist | album url.*
+
+_This returns data from a track | playlist | album url._
 
 ```js
 let data = await spotify(url) //Gets the data
@@ -10,15 +12,9 @@ let data = await spotify(url) //Gets the data
 console.log(data.type) // Console logs the type of data that you got.
 ```
 
-### Authorization()
-*This creates basic spotify data to be stored locally.*
-
-```js
-Authorization() //After then you will be asked client-id, client-secret, redirect url, market, redirected URL.
-```
-
 ### is_expired()
-*This tells that whether the access token is expired or not*
+
+_This tells that whether the access token is expired or not_
 
 **Returns :** `boolean`
 
@@ -28,30 +24,37 @@ if(is_expired()){
 }
 ```
 
-### RefreshToken()
-*This refreshes the access token.*
+### refreshToken()
+
+_This refreshes the access token._
 
 **Returns :** `boolean` for telling whether access token is refreshed or not
 
 ```js
-await RefreshToken()
+await refreshToken()
 ```
 
 ## Classes [ Returned by spotify() function ]
+
 ### SpotifyVideo
-*Don't go by the name. This is class for a spotify track.*
+
+_Don't go by the name. This is class for a spotify track._
 
 ##### type `property`
-*This will always return as "track" for this class.*
+
+_This will always return as "track" for this class._
 
 ##### toJSON() `function`
-*converts class into a json format*
+
+_converts class into a json format_
 
 ### SpotifyPlaylist
-*This is a spotify playlist class.*
+
+_This is a spotify playlist class._
 
 ##### fetch() `function`
-*This will fetch tracks in a playlist upto 1000 tracks only.*
+
+_This will fetch tracks in a playlist upto 1000 tracks only._
 
 ```js
 let data = await spotify(playlist_url)
@@ -60,15 +63,18 @@ await data.fetch() // Fetches tracks more than 100 tracks in playlist
 ```
 
 ##### tracksCount `property`
-*This will give no. of tracks in a playlist.*
+
+_This will give no. of tracks in a playlist._
 
 ```js
 let data = await spotify(playlist_url)
 
 console.log(data.tracksCount) // Returns total tracks count in a playlist
 ```
+
 ##### page(page_number : `number`)
-*This will return array of tracks in that page.*
+
+_This will return array of tracks in that page._
 
 > Same as youtube playlist pages
 
@@ -77,21 +83,25 @@ let data = await spotify(playlist_url)
 
 console.log(data.page(1)) //This will give first 100 tracks in playlist.
 ```
- - total_pages `property`
- 
-   *This give total pages that have been fetched so far.*
-   ```js
-    let data = await spotify(playlist_url)
 
-    console.log(data.total_pages) // This will tell no. of pages that have been fetched so far.
-    
-    for(let i = 1; i <= data.total_pages; i++){
-        queue.push(data.page(i)) //This will push all tracks to your queue system
-    }
-   ```
- - total_tracks `property`
- 
-   *This give total videos that have been fetched so far.*
+-   total_pages `property`
+
+    _This give total pages that have been fetched so far._
+
+    ```js
+     let data = await spotify(playlist_url)
+
+     console.log(data.total_pages) // This will tell no. of pages that have been fetched so far.
+
+     for(let i = 1; i <= data.total_pages; i++){
+         queue.push(data.page(i)) //This will push all tracks to your queue system
+     }
+    ```
+
+-   total_tracks `property`
+
+    _This give total videos that have been fetched so far._
+
     ```js
      let data = await spotify(playlist_url)
 
@@ -99,16 +109,20 @@ console.log(data.page(1)) //This will give first 100 tracks in playlist.
     ```
 
 ##### type `property`
-*This will always return as "playlist" for this class.*
+
+_This will always return as "playlist" for this class._
 
 ##### toJSON() `function`
-*converts class into a json format*
+
+_converts class into a json format_
 
 ### SpotifyAlbum
-*This is a spotify albun class.*
+
+_This is a spotify albun class._
 
 ##### fetch() `function`
-*This will fetch tracks in a album upto 500 tracks only.*
+
+_This will fetch tracks in a album upto 500 tracks only._
 
 ```js
 let data = await spotify(playlist_url)
@@ -117,15 +131,18 @@ await data.fetch() // Fetches tracks more than 50 tracks in album
 ```
 
 ##### tracksCount `property`
-*This will give no. of tracks in a playlist.*
+
+_This will give no. of tracks in a playlist._
 
 ```js
 let data = await spotify(playlist_url)
 
 console.log(data.tracksCount) // Returns total tracks count in a album
 ```
+
 ##### page(page_number : `number`)
-*This will return array of tracks in that page.*
+
+_This will return array of tracks in that page._
 
 > Same as youtube playlist pages
 
@@ -134,21 +151,25 @@ let data = await spotify(playlist_url)
 
 console.log(data.page(1)) //This will give first 50 tracks in album.
 ```
- - total_pages `property`
- 
-   *This give total pages that have been fetched so far.*
-   ```js
-    let data = await spotify(playlist_url)
 
-    console.log(data.total_pages) // This will tell no. of pages that have been fetched so far.
-    
-    for(let i = 1; i <= data.total_pages; i++){
-        queue.push(data.page(i)) //This will push all tracks to your queue system
-    }
-   ```
- - total_tracks `property`
- 
-   *This give total videos that have been fetched so far.*
+-   total_pages `property`
+
+    _This give total pages that have been fetched so far._
+
+    ```js
+     let data = await spotify(playlist_url)
+
+     console.log(data.total_pages) // This will tell no. of pages that have been fetched so far.
+
+     for(let i = 1; i <= data.total_pages; i++){
+         queue.push(data.page(i)) //This will push all tracks to your queue system
+     }
+    ```
+
+-   total_tracks `property`
+
+    _This give total videos that have been fetched so far._
+
     ```js
      let data = await spotify(playlist_url)
 
@@ -156,16 +177,21 @@ console.log(data.page(1)) //This will give first 50 tracks in album.
     ```
 
 ##### type `property`
-*This will always return as "album" for this class.*
+
+_This will always return as "album" for this class._
 
 ##### toJSON() `function`
-*converts class into a json format*
+
+_converts class into a json format_
 
 ## Validate
+
 ### sp_validate(url : `string`)
-*This checks that given url is spotify url or not.*
+
+_This checks that given url is spotify url or not._
 
 **Returns :** `track` | `album` | `playlist` | `false`
+
 ```js
 let check = sp_validate(url)
 

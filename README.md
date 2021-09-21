@@ -6,8 +6,8 @@
 
 This is a **light-weight** youtube downloader and searcher.
 
-- searches by video, playlist, channel
-- obtains audio playback url
+-   searches by video, playlist, channel
+-   obtains audio playback url
 
 ### Installation
 
@@ -16,6 +16,7 @@ npm install play-dl@latest
 ```
 
 ### Importing
+
 ```ts
 import * as play from 'play-dl' // ES-6 import or TS import
 
@@ -25,12 +26,14 @@ const play = require('play-dl') //JS importing
 **Instructions for Spotify** are [here](https://github.com/play-dl/play-dl/discussions/64)
 
 ### Examples
-- [YouTube](https://github.com/play-dl/play-dl/tree/main/examples/YouTube)
-- [Spotify](https://github.com/play-dl/play-dl/tree/main/examples/Spotify)
 
+-   [YouTube](https://github.com/play-dl/play-dl/tree/main/examples/YouTube)
+-   [Spotify](https://github.com/play-dl/play-dl/tree/main/examples/Spotify)
+-   [SoundCloud]()
 
 ### Docs
 
-- [Main](https://github.com/play-dl/play-dl/tree/main/docs#play-dl-commands)
-- [YouTube](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#youtube)
-- [Spotify](https://github.com/play-dl/play-dl/tree/main/docs/Spotify#spotify)
+-   [Main](https://github.com/play-dl/play-dl/tree/main/docs#play-dl-commands)
+-   [YouTube](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#youtube)
+-   [Spotify](https://github.com/play-dl/play-dl/tree/main/docs/Spotify#spotify)
+-   [SoundCloud]()

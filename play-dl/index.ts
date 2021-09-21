@@ -9,9 +9,9 @@ import { SpotifyAuthorize } from './Spotify';
 import { check_id, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
 import { InfoData, stream as yt_stream, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { SoundCloudTrack, Stream as SoStream } from './SoundCloud/classes';
-import { LiveStreaming, Stream } from './YouTube/classes/LiveStream';
+import { LiveStreaming, Stream as YTStream } from './YouTube/classes/LiveStream';
 
-export async function stream(url: string, cookie?: string): Promise<Stream | LiveStreaming | SoStream> {
+export async function stream(url: string, cookie?: string): Promise<YTStream | LiveStreaming | SoStream> {
     if (url.indexOf('soundcloud') !== -1) return await so_stream(url);
     else return await yt_stream(url, cookie);
 }
@@ -19,7 +19,7 @@ export async function stream(url: string, cookie?: string): Promise<Stream | Liv
 export async function stream_from_info(
     info: InfoData | SoundCloudTrack,
     cookie?: string
-): Promise<Stream | LiveStreaming | SoStream> {
+): Promise<YTStream | LiveStreaming | SoStream> {
     if (info instanceof SoundCloudTrack) return await so_stream_info(info);
     else return await yt_stream_info(info, cookie);
 }
