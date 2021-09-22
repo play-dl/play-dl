@@ -44,7 +44,7 @@ export class PlayList {
         this.thumbnail = data.thumbnail || undefined;
         this.videos = data.videos || [];
         this.__count++;
-        this.fetched_videos.set(`page${this.__count}`, this.videos as Video[]);
+        this.fetched_videos.set(`${this.__count}`, this.videos as Video[]);
         this._continuation.api = data.continuation?.api ?? undefined;
         this._continuation.token = data.continuation?.token ?? undefined;
         this._continuation.clientVersion = data.continuation?.clientVersion ?? '<important data>';
@@ -89,7 +89,7 @@ export class PlayList {
         if (!contents) return [];
 
         const playlist_videos = getPlaylistVideos(contents, limit);
-        this.fetched_videos.set(`page${this.__count}`, playlist_videos);
+        this.fetched_videos.set(`${this.__count}`, playlist_videos);
         this._continuation.token = getContinuationToken(contents);
         return playlist_videos;
     }
@@ -115,8 +115,8 @@ export class PlayList {
 
     page(number: number): Video[] {
         if (!number) throw new Error('Page number is not provided');
-        if (!this.fetched_videos.has(`page${number}`)) throw new Error('Given Page number is invalid');
-        return this.fetched_videos.get(`page${number}`) as Video[];
+        if (!this.fetched_videos.has(`${number}`)) throw new Error('Given Page number is invalid');
+        return this.fetched_videos.get(`${number}`) as Video[];
     }
 
     get total_pages() {
@@ -125,7 +125,7 @@ export class PlayList {
 
     get total_videos() {
         const page_number: number = this.total_pages;
-        return (page_number - 1) * 100 + (this.fetched_videos.get(`page${page_number}`) as Video[]).length;
+        return (page_number - 1) * 100 + (this.fetched_videos.get(`${page_number}`) as Video[]).length;
     }
 
     toJSON() {
