@@ -163,7 +163,7 @@ export class SpotifyPlaylist {
 
     get total_tracks() {
         const page_number: number = this.total_pages;
-        return (page_number - 1) * 100 + (this.fetched_tracks.get(`page${page_number}`) as SpotifyVideo[]).length;
+        return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyVideo[]).length;
     }
 
     toJSON() {
@@ -267,7 +267,7 @@ export class SpotifyAlbum {
 
     get total_tracks() {
         const page_number: number = this.total_pages;
-        return (page_number - 1) * 100 + (this.fetched_tracks.get(`page${page_number}`) as SpotifyVideo[]).length;
+        return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyVideo[]).length;
     }
 
     toJSON() {
