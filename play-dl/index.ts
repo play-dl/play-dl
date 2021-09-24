@@ -26,10 +26,10 @@ export async function stream_from_info(
 
 export async function validate(url: string): Promise<"so_playlist" | "so_track" | "sp_track" | "sp_album" | "sp_playlist" | "yt_video" | "yt_playlist" | false> {
     let check;
-    if (url.includes('spotify')) {
+    if (url.indexOf('spotify') !== -1) {
         check = sp_validate(url);
         return check !== false ? 'sp_' + check as "sp_track" | "sp_album" | "sp_playlist" : false;
-    } else if (url.includes('soundcloud')) {
+    } else if (url.indexOf('soundcloud') !== -1) {
         check = await so_validate(url);
         return check !== false ? 'so_' + check as "so_playlist" | "so_track" : false;
     } else {
