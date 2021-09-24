@@ -55,7 +55,7 @@ authorization() //After then you will be asked about type of data you want to cr
 
     }
 
-#### search(query : `string`, options? : [`SearchOptions`]())
+#### search(query : `string`, options? : [`SearchOptions`](https://github.com/play-dl/play-dl/tree/main/docs#searchoptions-))
 
 _This is basic to search with any source._
 
@@ -76,7 +76,7 @@ let data = await search('Rick Roll', { limit: 1, source { spotify : "tracks" } }
 -   quality : `number` :- Sets quality of stream [ 0 = Lowest, 1 = Medium ]. Leave this empty to get highest audio quality.
 -   cookie : `string` :- **[Cookies](https://github.com/play-dl/play-dl/discussions/34)** are optional and are required for playing age restricted videos.
 
-#### stream(url : `string`, options? : [`StreamOptions`]())
+#### stream(url : `string`, options? : [`StreamOptions`](https://github.com/play-dl/play-dl/tree/main/docs#streamoptions-))
 
 _This is basic to create a stream from a youtube or soundcloud url._
 
@@ -88,9 +88,9 @@ let resource = createAudioResource(source.stream, {
         }) // This creates resource for playing
 ```
 
-#### stream_from_info(info : `infoData`, options? : [`StreamOptions`]())
+#### stream_from_info(info : `infoData`, options? : [`StreamOptions`](https://github.com/play-dl/play-dl/tree/main/docs#streamoptions-))
 
-_This is basic to create a stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function or [soundcloud]() function [**Only SoundCloudTrack class is allowed**] ]._
+_This is basic to create a stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function or [soundcloud](https://github.com/play-dl/play-dl/tree/main/docs/SoundCloud#soundcloudurl--string) function [**Only SoundCloudTrack class is allowed**] ]._
 
 **Note :** Here, cookies are required only for retrying purposes.
 
