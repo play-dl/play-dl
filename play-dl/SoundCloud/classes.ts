@@ -22,7 +22,7 @@ interface SoundCloudTrackDeprecated {
     type: 'track';
 }
 
-interface SoundCloudTrackFormat {
+export interface SoundCloudTrackFormat {
     url: string;
     preset: string;
     duration: number;
@@ -90,13 +90,13 @@ export class SoundCloudTrack {
             id: this.id,
             type: this.type,
             url: this.url,
-            fetched : this.fetched,
+            fetched: this.fetched,
             durationInMs: this.durationInMs,
             durationInSec: this.durationInSec,
             publisher: this.publisher,
             formats: this.formats,
             thumbnail: this.thumbnail,
-            user : this.user
+            user: this.user
         };
     }
 }
@@ -169,13 +169,13 @@ export class SoundCloudPlaylist {
         await Promise.allSettled(work);
     }
 
-    get total_tracks(){
-        let count = 0
+    get total_tracks() {
+        let count = 0;
         this.tracks.forEach((track) => {
-            if(track instanceof SoundCloudTrack) count++
-            else return
-        })
-        return count
+            if (track instanceof SoundCloudTrack) count++;
+            else return;
+        });
+        return count;
     }
 
     toJSON() {
@@ -183,19 +183,19 @@ export class SoundCloudPlaylist {
             name: this.name,
             id: this.id,
             type: this.type,
-            sub_type : this.sub_type,
+            sub_type: this.sub_type,
             url: this.url,
             durationInMs: this.durationInMs,
             durationInSec: this.durationInSec,
-            tracksCount : this.tracksCount,
-            user : this.user,
-            tracks : this.tracks
+            tracksCount: this.tracksCount,
+            user: this.user,
+            tracks: this.tracks
         };
     }
 }
 
 export class Stream {
-    stream : PassThrough;
+    stream: PassThrough;
     type: StreamType;
     private url: string;
     private playing_count: number;

@@ -110,6 +110,45 @@ export function is_expired(): boolean {
     else return false;
 }
 
+export async function sp_search(
+    query: string,
+    type: 'album' | 'playlist' | 'track',
+    limit: number = 10
+): Promise<(SpotifyAlbum | SpotifyPlaylist | SpotifyVideo)[]> {
+    const results: (SpotifyAlbum | SpotifyPlaylist | SpotifyVideo)[] = [];
+    if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
+    if (query.length === 0) throw new Error('Pass some query to search.');
+    if (limit > 50 || limit < 0) throw new Error(`You crossed limit range of Spotify [ 0 - 50 ]`);
+    const response = await request(
+        `https://api.spotify.com/v1/search?type=${type}&q=${query.replaceAll(' ', '+')}&limit=${limit}&market=${
+            spotifyData.market
+        }`,
+        {
+            headers: {
+                Authorization: `${spotifyData.token_type} ${spotifyData.access_token}`
+            }
+        }
+    ).catch((err: Error) => {
+        return err;
+    });
+    if (response instanceof Error) throw response;
+    const json_data = JSON.parse(response);
+    if (type === 'track') {
+        json_data.tracks.items.forEach((track: any) => {
+            results.push(new SpotifyVideo(track));
+        });
+    } else if (type === 'album') {
+        json_data.albums.items.forEach((album: any) => {
+            results.push(new SpotifyAlbum(album, spotifyData));
+        });
+    } else if (type === 'playlist') {
+        json_data.playlists.items.forEach((playlist: any) => {
+            results.push(new SpotifyPlaylist(playlist, spotifyData));
+        });
+    }
+    return results;
+}
+
 export async function refreshToken(): Promise<boolean> {
     const response = await request(`https://accounts.spotify.com/api/token`, {
         headers: {

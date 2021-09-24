@@ -11,7 +11,7 @@ export interface FormatInterface {
 }
 
 export class LiveStreaming {
-    stream : PassThrough;
+    stream: PassThrough;
     type: StreamType;
     private base_url: string;
     private url: string;
@@ -23,7 +23,7 @@ export class LiveStreaming {
     private segments_urls: string[];
     private request: IncomingMessage | null;
     constructor(dash_url: string, target_interval: number, video_url: string) {
-        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 })
+        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.type = StreamType.Arbitrary;
         this.url = dash_url;
         this.base_url = '';
@@ -121,7 +121,7 @@ export class LiveStreaming {
 }
 
 export class Stream {
-    stream : PassThrough;
+    stream: PassThrough;
     type: StreamType;
     private url: string;
     private bytes_count: number;

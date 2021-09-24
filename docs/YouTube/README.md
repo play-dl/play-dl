@@ -41,24 +41,6 @@ _This will return videoID or playlistID from a url_
 let id = extractID(url)
 ```
 
-## Search
-
-### search(url : `string`, options? : [SearchOptions](https://github.com/play-dl/play-dl/tree/main/play-dl/YouTube#searchoptions))
-
-_This enables all searching mechanism (video, channel, playlist)_
-
-```js
-const options = {
-    limit : 1
-}
-const results = await youtube.search('never gonna give you up', options);
-console.log(results[0].url);
-```
-
--   #### SearchOptions
-    -   _type_ : `video` | `channel` | `playlist`
-    -   _limit_ : `integer`
-
 ## Video
 
 ### video_basic_info(url : `string`, cookie? : `string`)
