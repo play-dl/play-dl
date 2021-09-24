@@ -59,7 +59,7 @@ let resource = createAudioResource(source.stream, {
         }) // This creates resource for playing
 ```
 
-### stream_from_info(info : `infoData`, options? : `StreamOptions`)
+#### stream_from_info(info : `infoData`, options? : `StreamOptions`)
 
 _This is basic to create a stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function or [soundcloud]() function [**Only SoundCloudTrack class is allowed**] ]._
 
