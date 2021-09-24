@@ -9,6 +9,11 @@ export enum StreamType {
     Opus = 'opus'
 }
 
+export interface StreamOptions {
+    quality?: number;
+    cookie?: string;
+}
+
 export interface InfoData {
     LiveStreamData: {
         isLive: boolean;
@@ -33,10 +38,9 @@ function parseAudioFormats(formats: any[]) {
     return result;
 }
 
-export async function stream(url: string, cookie?: string): Promise<Stream | LiveStreaming> {
-    const info = await video_info(url, cookie);
+export async function stream(url: string, options: StreamOptions = {}): Promise<Stream | LiveStreaming> {
+    const info = await video_info(url, options.cookie);
     const final: any[] = [];
-    let type: StreamType;
     if (
         info.LiveStreamData.isLive === true &&
         info.LiveStreamData.hlsManifestUrl !== null &&
@@ -50,33 +54,26 @@ export async function stream(url: string, cookie?: string): Promise<Stream | Liv
     }
 
     const audioFormat = parseAudioFormats(info.format);
-    const opusFormats = filterFormat(audioFormat, 'opus');
-
-    if (opusFormats.length === 0) {
-        type = StreamType.Arbitrary;
-        if (audioFormat.length === 0) {
-            final.push(info.format[info.format.length - 1]);
-        } else {
-            final.push(audioFormat[audioFormat.length - 1]);
-        }
-    } else {
-        type = StreamType.WebmOpus;
-        final.push(opusFormats[opusFormats.length - 1]);
-    }
-
+    if (!options.quality) options.quality = audioFormat.length - 1;
+    else if (options.quality <= 0) options.quality = 0;
+    else if (options.quality > audioFormat.length) options.quality = audioFormat.length - 1;
+    final.push(audioFormat[options.quality]);
+    let type: StreamType =
+        audioFormat[options.quality].codec === 'opus' && audioFormat[options.quality].container === 'webm'
+            ? StreamType.WebmOpus
+            : StreamType.Arbitrary;
     return new Stream(
         final[0].url,
         type,
         info.video_details.durationInSec,
         Number(final[0].contentLength),
         info.video_details.url,
-        cookie as string
+        options.cookie as string
     );
 }
 
-export async function stream_from_info(info: InfoData, cookie?: string): Promise<Stream | LiveStreaming> {
+export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<Stream | LiveStreaming> {
     const final: any[] = [];
-    let type: StreamType;
     if (
         info.LiveStreamData.isLive === true &&
         info.LiveStreamData.hlsManifestUrl !== null &&
@@ -90,34 +87,20 @@ export async function stream_from_info(info: InfoData, cookie?: string): Promise
     }
 
     const audioFormat = parseAudioFormats(info.format);
-    const opusFormats = filterFormat(audioFormat, 'opus');
-
-    if (opusFormats.length === 0) {
-        type = StreamType.Arbitrary;
-        if (audioFormat.length === 0) {
-            final.push(info.format[info.format.length - 1]);
-        } else {
-            final.push(audioFormat[audioFormat.length - 1]);
-        }
-    } else {
-        type = StreamType.WebmOpus;
-        final.push(opusFormats[opusFormats.length - 1]);
-    }
-
+    if (!options.quality) options.quality = audioFormat.length - 1;
+    else if (options.quality <= 0) options.quality = 0;
+    else if (options.quality > audioFormat.length) options.quality = audioFormat.length - 1;
+    final.push(audioFormat[options.quality]);
+    let type: StreamType =
+        audioFormat[options.quality].codec === 'opus' && audioFormat[options.quality].container === 'webm'
+            ? StreamType.WebmOpus
+            : StreamType.Arbitrary;
     return new Stream(
         final[0].url,
         type,
         info.video_details.durationInSec,
         Number(final[0].contentLength),
         info.video_details.url,
-        cookie as string
+        options.cookie as string
     );
-}
-
-function filterFormat(formats: any[], codec: string) {
-    const result: any[] = [];
-    formats.forEach((format) => {
-        if (format.codec === codec) result.push(format);
-    });
-    return result;
 }

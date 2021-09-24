@@ -66,10 +66,13 @@ export async function video_basic_info(url: string, cookie?: string) {
         initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
             ?.owner?.videoOwnerRenderer?.badges[0];
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
-    const related: any[] = []
-    initial_response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.forEach((res: any) => {
-        if(res.compactVideoRenderer) related.push(`https://www.youtube.com/watch?v=${res.compactVideoRenderer.videoId}`)
-    })
+    const related: any[] = [];
+    initial_response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.forEach(
+        (res: any) => {
+            if (res.compactVideoRenderer)
+                related.push(`https://www.youtube.com/watch?v=${res.compactVideoRenderer.videoId}`);
+        }
+    );
     const format = [];
     const vid = player_response.videoDetails;
     const microformat = player_response.microformat.playerMicroformatRenderer;
@@ -106,7 +109,7 @@ export async function video_basic_info(url: string, cookie?: string) {
         html5player,
         format,
         video_details,
-        related_videos : related
+        related_videos: related
     };
 }
 

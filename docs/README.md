@@ -42,11 +42,14 @@ authorization() //After then you will be asked about type of data you want to cr
 
 ### Stream
 
-#### stream(url : `string`, cookie? : `string`)
+### StreamOptions :
+
+-   quality : `number` :- Sets quality of stream [ 0 = Lowest, 1 = Medium ]. Leave this empty to get highest audio quality.
+-   cookie : `string` :- **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
+
+#### stream(url : `string`, options? : `StreamOptions`)
 
 _This is basic to create a stream from a youtube or soundcloud url._
-
-**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
 ```js
 let source = await stream("url") // This will create a stream Class.
@@ -56,11 +59,9 @@ let resource = createAudioResource(source.stream, {
         }) // This creates resource for playing
 ```
 
-### stream_from_info(info : `infoData`, cookie? : `string`)
+### stream_from_info(info : `infoData`, options? : `StreamOptions`)
 
 _This is basic to create a stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function or [soundcloud]() function [**Only SoundCloudTrack class is allowed**] ]._
-
-**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
 **Note :** Here, cookies are required only for retrying purposes.
 
@@ -68,7 +69,7 @@ _This is basic to create a stream from a info [ from [video_info](https://github
  let source = await stream_from_info(info) // This will create a stream Class from video_info or SoundCoudTrack Class.
 
  /* OR
-  let source = await stream_from_info(info, cookie) This will create a stream Class and also give cookies if retrying.
+  let source = await stream_from_info(info, { cookie }) This will create a stream Class and also give cookies if retrying.
  */
 
  let resource = createAudioResource(source.stream, {
