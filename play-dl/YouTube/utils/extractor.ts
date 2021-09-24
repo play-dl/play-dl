@@ -68,7 +68,7 @@ export async function video_basic_info(url: string, cookie?: string) {
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const related: any[] = []
     initial_response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.forEach((res: any) => {
-        if(res.compactVideoRenderer) related.push(res.compactVideoRenderer.videoId)
+        if(res.compactVideoRenderer) related.push(`https://www.youtube.com/watch?v=${res.compactVideoRenderer.videoId}`)
     })
     const format = [];
     const vid = player_response.videoDetails;
