@@ -64,11 +64,11 @@ _This is basic to search with any source._
 ```js
 let data = await search('Rick Roll', { limit : 1 }) // Searches for youtube video
 
-let data = await search('Rick Roll', { limit : 1, source { youtube : "video" } }) // Searches for youtube video
+let data = await search('Rick Roll', { limit : 1, source : { youtube : "video" } }) // Searches for youtube video
 
-let data = await search('Rick Roll', { limit: 1, source { spotify : "track" } }) // Searches for spotify track.
+let data = await search('Rick Roll', { limit: 1, source : { spotify : "track" } }) // Searches for spotify track.
 
-let data = await search('Rick Roll', { limit: 1, source { soundcloud : "tracks" } }) // Searches for soundcloud track.
+let data = await search('Rick Roll', { limit: 1, source : { soundcloud : "tracks" } }) // Searches for soundcloud track.
 ```
 
 ### Stream
