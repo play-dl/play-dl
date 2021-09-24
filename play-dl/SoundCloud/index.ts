@@ -39,9 +39,9 @@ export async function stream(url: string, quality?: number): Promise<Stream> {
     if (data instanceof SoundCloudPlaylist) throw new Error("Streams can't be created from Playlist url");
 
     const HLSformats = parseHlsFormats(data.formats);
-    if (!quality) quality = HLSformats.length - 1;
+    if (typeof quality !== 'number') quality = HLSformats.length - 1;
     else if (quality <= 0) quality = 0;
-    else if (quality > HLSformats.length) quality = HLSformats.length - 1;
+    else if (quality >= HLSformats.length) quality = HLSformats.length - 1;
     const req_url = HLSformats[quality].url + '?client_id=' + soundData.client_id;
     const s_data = JSON.parse(await request(req_url));
     const type = HLSformats[quality].format.mime_type.startsWith('audio/ogg')
@@ -52,9 +52,9 @@ export async function stream(url: string, quality?: number): Promise<Stream> {
 
 export async function stream_from_info(data: SoundCloudTrack, quality?: number): Promise<Stream> {
     const HLSformats = parseHlsFormats(data.formats);
-    if (!quality) quality = HLSformats.length - 1;
+    if (typeof quality !== 'number') quality = HLSformats.length - 1;
     else if (quality <= 0) quality = 0;
-    else if (quality > HLSformats.length) quality = HLSformats.length - 1;
+    else if (quality >= HLSformats.length) quality = HLSformats.length - 1;
     const req_url = HLSformats[quality].url + '?client_id=' + soundData.client_id;
     const s_data = JSON.parse(await request(req_url));
     const type = HLSformats[quality].format.mime_type.startsWith('audio/ogg')

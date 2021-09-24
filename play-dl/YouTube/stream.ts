@@ -54,9 +54,9 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     }
 
     const audioFormat = parseAudioFormats(info.format);
-    if (!options.quality) options.quality = audioFormat.length - 1;
+    if (typeof options.quality !== 'number') options.quality = audioFormat.length - 1;
     else if (options.quality <= 0) options.quality = 0;
-    else if (options.quality > audioFormat.length) options.quality = audioFormat.length - 1;
+    else if (options.quality >= audioFormat.length) options.quality = audioFormat.length - 1;
     final.push(audioFormat[options.quality]);
     let type: StreamType =
         audioFormat[options.quality].codec === 'opus' && audioFormat[options.quality].container === 'webm'
@@ -87,9 +87,9 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
     }
 
     const audioFormat = parseAudioFormats(info.format);
-    if (!options.quality) options.quality = audioFormat.length - 1;
+    if (typeof options.quality !== 'number') options.quality = audioFormat.length - 1;
     else if (options.quality <= 0) options.quality = 0;
-    else if (options.quality > audioFormat.length) options.quality = audioFormat.length - 1;
+    else if (options.quality >= audioFormat.length) options.quality = audioFormat.length - 1;
     final.push(audioFormat[options.quality]);
     let type: StreamType =
         audioFormat[options.quality].codec === 'opus' && audioFormat[options.quality].container === 'webm'
