@@ -12,9 +12,9 @@ import { SoundCloudTrack, Stream as SoStream } from './SoundCloud/classes';
 import { LiveStreaming, Stream as YTStream } from './YouTube/classes/LiveStream';
 
 export async function stream(url: string, options: StreamOptions = {}): Promise<YTStream | LiveStreaming | SoStream> {
-    if(url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.')
+    if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
     if (url.indexOf('soundcloud') !== -1) return await so_stream(url, options.quality);
-    else return await yt_stream(url, { cookie : options.cookie });
+    else return await yt_stream(url, { cookie: options.cookie });
 }
 
 export async function stream_from_info(
@@ -22,7 +22,7 @@ export async function stream_from_info(
     options: StreamOptions = {}
 ): Promise<YTStream | LiveStreaming | SoStream> {
     if (info instanceof SoundCloudTrack) return await so_stream_info(info);
-    else return await yt_stream_info(info, { cookie : options.cookie });
+    else return await yt_stream_info(info, { cookie: options.cookie });
 }
 
 export async function validate(url: string): Promise<string | boolean> {

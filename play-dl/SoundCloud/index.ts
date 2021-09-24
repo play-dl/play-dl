@@ -33,15 +33,15 @@ export async function soundcloud(url: string): Promise<SoundCloudTrack | SoundCl
     else return new SoundCloudPlaylist(json_data, soundData.client_id);
 }
 
-export async function stream(url: string, quality? : number): Promise<Stream> {
+export async function stream(url: string, quality?: number): Promise<Stream> {
     const data = await soundcloud(url);
 
     if (data instanceof SoundCloudPlaylist) throw new Error("Streams can't be created from Playlist url");
 
-    const HLSformats = parseHlsFormats(data.formats)
-    if(!quality) quality = HLSformats.length - 1;
-    else if(quality <= 0) quality = 0;
-    else if(quality > HLSformats.length) quality = HLSformats.length - 1; 
+    const HLSformats = parseHlsFormats(data.formats);
+    if (!quality) quality = HLSformats.length - 1;
+    else if (quality <= 0) quality = 0;
+    else if (quality > HLSformats.length) quality = HLSformats.length - 1;
     const req_url = HLSformats[quality].url + '?client_id=' + soundData.client_id;
     const s_data = JSON.parse(await request(req_url));
     const type = HLSformats[quality].format.mime_type.startsWith('audio/ogg')
@@ -50,11 +50,11 @@ export async function stream(url: string, quality? : number): Promise<Stream> {
     return new Stream(s_data.url, type);
 }
 
-export async function stream_from_info(data: SoundCloudTrack, quality? :number): Promise<Stream> {
-    const HLSformats = parseHlsFormats(data.formats)
-    if(!quality) quality = HLSformats.length - 1;
-    else if(quality <= 0) quality = 0;
-    else if(quality > HLSformats.length) quality = HLSformats.length - 1; 
+export async function stream_from_info(data: SoundCloudTrack, quality?: number): Promise<Stream> {
+    const HLSformats = parseHlsFormats(data.formats);
+    if (!quality) quality = HLSformats.length - 1;
+    else if (quality <= 0) quality = 0;
+    else if (quality > HLSformats.length) quality = HLSformats.length - 1;
     const req_url = HLSformats[quality].url + '?client_id=' + soundData.client_id;
     const s_data = JSON.parse(await request(req_url));
     const type = HLSformats[quality].format.mime_type.startsWith('audio/ogg')
@@ -86,10 +86,10 @@ export async function so_validate(url: string): Promise<false | 'track' | 'playl
     else return false;
 }
 
-function parseHlsFormats(data : SoundCloudTrackFormat[]){
+function parseHlsFormats(data: SoundCloudTrackFormat[]) {
     const result: SoundCloudTrackFormat[] = [];
     data.forEach((format) => {
-        if(format.format.protocol === 'hls') result.push(format)
+        if (format.format.protocol === 'hls') result.push(format);
     });
     return result;
 }
