@@ -20,7 +20,7 @@ _This tells that whether the access token is expired or not_
 
 ```js
 if(is_expired()){
-    await RefreshToken()
+    await refreshToken()
 }
 ```
 
