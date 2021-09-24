@@ -33,6 +33,23 @@ export async function soundcloud(url: string): Promise<SoundCloudTrack | SoundCl
     else return new SoundCloudPlaylist(json_data, soundData.client_id);
 }
 
+export async function so_search(
+    query: string,
+    type: 'tracks' | 'playlists' | 'albums',
+    limit: number = 10
+): Promise<(SoundCloudPlaylist | SoundCloudTrack)[]> {
+    const response = await request(
+        `https://api-v2.soundcloud.com/search/${type}?q=${query}&client_id=${soundData.client_id}&limit=${limit}`
+    );
+    const results: (SoundCloudPlaylist | SoundCloudTrack)[] = [];
+    const json_data = JSON.parse(response);
+    json_data.collection.forEach((x: any) => {
+        if (type === 'tracks') results.push(new SoundCloudTrack(x));
+        else results.push(new SoundCloudPlaylist(x, soundData.client_id));
+    });
+    return results;
+}
+
 export async function stream(url: string, quality?: number): Promise<Stream> {
     const data = await soundcloud(url);
 

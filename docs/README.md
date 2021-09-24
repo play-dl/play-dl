@@ -40,14 +40,43 @@ _This creates basic spotify / soundcloud data to be stored locally._
 authorization() //After then you will be asked about type of data you want to create and then follow the steps properly.
 ```
 
+### Search
+
+#### SearchOptions :
+
+-   limit : `number` :- Sets total amount of results you want.
+-   source : {
+
+    youtube: `video` | `playlist` | `channel` ;
+
+    spotify: `album` | `playlist` | `track` ;
+
+    soundcloud: `tracks` | `playlists` | `albums` ;
+
+    }
+
+#### search(query : `string`, options? : [`SearchOptions`]())
+
+_This is basic to search with any source._
+
+**NOTE :-** If no options.source is not specified, then it will default to youtube video search.
+
+```js
+let data = await search('Rick Roll', { limit : 1, source { youtube : "video" } }) // Searches for youtube video
+
+let data = await search('Rick Roll', { limit: 1, source { soundcloud : "track" } }) // Searches for spotify track.
+
+let data = await search('Rick Roll', { limit: 1, source { spotify : "tracks" } }) // Searches for soundcloud track.
+```
+
 ### Stream
 
-### StreamOptions :
+#### StreamOptions :
 
 -   quality : `number` :- Sets quality of stream [ 0 = Lowest, 1 = Medium ]. Leave this empty to get highest audio quality.
--   cookie : `string` :- **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
+-   cookie : `string` :- **[Cookies](https://github.com/play-dl/play-dl/discussions/34)** are optional and are required for playing age restricted videos.
 
-#### stream(url : `string`, options? : `StreamOptions`)
+#### stream(url : `string`, options? : [`StreamOptions`]())
 
 _This is basic to create a stream from a youtube or soundcloud url._
 
@@ -59,7 +88,7 @@ let resource = createAudioResource(source.stream, {
         }) // This creates resource for playing
 ```
 
-#### stream_from_info(info : `infoData`, options? : `StreamOptions`)
+#### stream_from_info(info : `infoData`, options? : [`StreamOptions`]())
 
 _This is basic to create a stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function or [soundcloud]() function [**Only SoundCloudTrack class is allowed**] ]._
 

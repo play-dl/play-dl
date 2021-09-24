@@ -10,7 +10,7 @@ enum SearchType {
     Channel = 'EgIQAg%253D%253D'
 }
 
-export async function search(
+export async function yt_search(
     search: string,
     options: ParseSearchInterface = {}
 ): Promise<(Video | Channel | PlayList)[]> {
