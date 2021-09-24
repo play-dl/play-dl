@@ -59,9 +59,11 @@ authorization() //After then you will be asked about type of data you want to cr
 
 _This is basic to search with any source._
 
-**NOTE :-** If no options.source is not specified, then it will default to youtube video search.
+**NOTE :-** If options.source is not specified, then it will default to youtube video search.
 
 ```js
+let data = await search('Rick Roll', { limit : 1 }) // Searches for youtube video
+
 let data = await search('Rick Roll', { limit : 1, source { youtube : "video" } }) // Searches for youtube video
 
 let data = await search('Rick Roll', { limit: 1, source { soundcloud : "track" } }) // Searches for spotify track.
