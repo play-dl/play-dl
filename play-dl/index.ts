@@ -43,33 +43,31 @@ export function authorization(): void {
         input: process.stdin,
         output: process.stdout
     });
-    ask.question('SoundCloud/ Spotify (so/sp) : ', (msg) => {
+    ask.question('Choose your service - so (for SoundCloud) / sp (for Spotify) : ', (msg) => {
         if (msg.toLowerCase().startsWith('sp')) {
             let client_id: string, client_secret: string, redirect_url: string, market: string;
-            ask.question('Client ID : ', (id) => {
+            ask.question('Start by entering your Client ID : ', (id) => {
                 client_id = id;
-                ask.question('Client Secret : ', (secret) => {
+                ask.question('Now enter your Client Secret : ', (secret) => {
                     client_secret = secret;
-                    ask.question('Redirect URL : ', (url) => {
+                    ask.question('Enter your Redirect URL now : ', (url) => {
                         redirect_url = url;
-                        console.log(
-                            '\nMarket Selection URL : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
-                        );
-                        ask.question('Market : ', (mar) => {
+                        console.log('\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n');
+                        ask.question('Enter your region code (2-letter country code) : ', (mar) => {
                             if (mar.length === 2) market = mar;
                             else {
-                                console.log('Invalid Market, Selecting IN as market');
+                                console.log('That doesn\'t look like a valid region code, IN will be selected as default.');
                                 market = 'IN';
                             }
                             console.log(
-                                '\nNow Go to your browser and Paste this url. Authroize it and paste the redirected url here. \n'
+                                '\nNow open your browser and paste the below url, then authorize it and copy the redirected url. \n'
                             );
                             console.log(
                                 `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(
                                     redirect_url
                                 )} \n`
                             );
-                            ask.question('Redirected URL : ', async (url) => {
+                            ask.question('Paste the url which you just copied : ', async (url) => {
                                 if (!fs.existsSync('.data')) fs.mkdirSync('.data');
                                 const spotifyData = {
                                     client_id,
@@ -79,7 +77,7 @@ export function authorization(): void {
                                     market
                                 };
                                 const check = await SpotifyAuthorize(spotifyData);
-                                if (check === false) throw new Error('Failed to get access Token.');
+                                if (check === false) throw new Error('Failed to get access token.');
                                 ask.close();
                             });
                         });
@@ -91,21 +89,20 @@ export function authorization(): void {
             ask.question('Client ID : ', async (id) => {
                 client_id = id;
                 if (!client_id) {
-                    console.log("You didn't provided Client ID. Try again");
+                    console.log("You didn't provide a client ID. Try again...");
                     ask.close();
                     return;
                 }
                 if (!fs.existsSync('.data')) fs.mkdirSync('.data');
-                console.log('Checking Client ID...................');
+                console.log('Validating your client ID, hold on...');
                 if (await check_id(client_id)) {
-                    console.log('Congratulations! Client ID is correct');
+                    console.log('Client ID has been validated successfully.');
                     fs.writeFileSync('.data/soundcloud.data', JSON.stringify({ client_id }, undefined, 4));
-                } else console.log('Client ID is incorrect. Try to run this again with correct client ID.');
-
+                } else console.log('That doesn\'t look like a valid client ID. Retry with a correct client ID.');
                 ask.close();
             });
         } else {
-            console.log('Invalid Option, Please Try again');
+            console.log('That option doesn\'t exist. Try again...');
             ask.close();
         }
     });
