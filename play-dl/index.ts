@@ -1,27 +1,46 @@
-export { playlist_info, video_basic_info, video_info, search, yt_validate, extractID } from './YouTube';
+export { playlist_info, video_basic_info, video_info, yt_validate, extractID } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired } from './Spotify';
 export { soundcloud, so_validate } from './SoundCloud';
+
+interface SearchOptions {
+    limit?: number;
+    source?: {
+        youtube?: 'video' | 'playlist' | 'channel';
+        spotify?: 'album' | 'playlist' | 'track';
+        soundcloud?: 'tracks' | 'playlists' | 'albums';
+    };
+}
 
 import readline from 'readline';
 import fs from 'fs';
 import { sp_validate, yt_validate, so_validate } from '.';
-import { SpotifyAuthorize } from './Spotify';
-import { check_id, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
-import { InfoData, stream as yt_stream, stream_from_info as yt_stream_info } from './YouTube/stream';
+import { SpotifyAuthorize, sp_search } from './Spotify';
+import { check_id, so_search, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
+import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { SoundCloudTrack, Stream as SoStream } from './SoundCloud/classes';
 import { LiveStreaming, Stream as YTStream } from './YouTube/classes/LiveStream';
+import { yt_search } from './YouTube/search';
 
-export async function stream(url: string, cookie?: string): Promise<YTStream | LiveStreaming | SoStream> {
-    if (url.indexOf('soundcloud') !== -1) return await so_stream(url);
-    else return await yt_stream(url, cookie);
+export async function stream(url: string, options: StreamOptions = {}): Promise<YTStream | LiveStreaming | SoStream> {
+    if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
+    if (url.indexOf('soundcloud') !== -1) return await so_stream(url, options.quality);
+    else return await yt_stream(url, { cookie: options.cookie });
+}
+
+export async function search(query: string, options: SearchOptions = {}) {
+    if (!options.source) options.source = { youtube: 'video' };
+
+    if (options.source.youtube) return await yt_search(query, { limit: options.limit, type: options.source.youtube });
+    else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
+    else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
 }
 
 export async function stream_from_info(
     info: InfoData | SoundCloudTrack,
-    cookie?: string
+    options: StreamOptions = {}
 ): Promise<YTStream | LiveStreaming | SoStream> {
     if (info instanceof SoundCloudTrack) return await so_stream_info(info);
-    else return await yt_stream_info(info, cookie);
+    else return await yt_stream_info(info, { cookie: options.cookie });
 }
 
 export async function validate(url: string): Promise<"so_playlist" | "so_track" | "sp_track" | "sp_album" | "sp_playlist" | "yt_video" | "yt_playlist" | false> {

@@ -40,36 +40,77 @@ _This creates basic spotify / soundcloud data to be stored locally._
 authorization() //After then you will be asked about type of data you want to create and then follow the steps properly.
 ```
 
+### Search
+
+#### SearchOptions :
+
+-   limit : `number` :- Sets total amount of results you want.
+-   source : {
+
+    youtube: `video` | `playlist` | `channel` ;
+
+    spotify: `album` | `playlist` | `track` ;
+
+    soundcloud: `tracks` | `playlists` | `albums` ;
+
+    }
+
+#### search(query : `string`, options? : [`SearchOptions`](https://github.com/play-dl/play-dl/tree/main/docs#searchoptions-))
+
+_This is basic to search with any source._
+
+**NOTE :-** If options.source is not specified, then it will default to youtube video search.
+
+```js
+let data = await search('Rick Roll', { limit : 1 }) // Searches for youtube video
+
+let data = await search('Rick Roll', { limit : 1, source : { youtube : "video" } }) // Searches for youtube video
+
+let data = await search('Rick Roll', { limit: 1, source : { spotify : "track" } }) // Searches for spotify track.
+
+let data = await search('Rick Roll', { limit: 1, source : { soundcloud : "tracks" } }) // Searches for soundcloud track.
+```
+
 ### Stream
 
-#### stream(url : `string`, cookie? : `string`)
+#### StreamOptions :
+
+-   quality : `number` :- Sets quality of stream [ 0 = Lowest, 1 = Medium ]. Leave this empty to get highest audio quality.
+-   cookie : `string` :- **[Cookies](https://github.com/play-dl/play-dl/discussions/34)** are optional and are required for playing age restricted videos.
+
+#### stream(url : `string`, options? : [`StreamOptions`](https://github.com/play-dl/play-dl/tree/main/docs#streamoptions-))
 
 _This is basic to create a stream from a youtube or soundcloud url._
 
-**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
-
 ```js
-let source = await stream("url") // This will create a stream Class.
+let source = await stream("url") // This will create a stream Class. Highest Quality
+
+let source = await stream("url", { quality : 0 }) // Lowest quality
+
+let source = await stream("url", { quality : 1 }) // Next to Lowest quality.
+
+let source = await stream("url", { cookie: COOKIE }) //This will create a stream Class and also give cookies.
 
 let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
 ```
 
-### stream_from_info(info : `infoData`, cookie? : `string`)
+#### stream_from_info(info : `infoData`, options? : [`StreamOptions`](https://github.com/play-dl/play-dl/tree/main/docs#streamoptions-))
 
-_This is basic to create a stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function or [soundcloud]() function [**Only SoundCloudTrack class is allowed**] ]._
-
-**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
+_This is basic to create a stream from a info [ from [video_info](https://github.com/play-dl/play-dl#video_infourl--string) function or [soundcloud](https://github.com/play-dl/play-dl/tree/main/docs/SoundCloud#soundcloudurl--string) function [**Only SoundCloudTrack class is allowed**] ]._
 
 **Note :** Here, cookies are required only for retrying purposes.
 
 ```js
- let source = await stream_from_info(info) // This will create a stream Class from video_info or SoundCoudTrack Class.
+let source = await stream_from_info(info) // This will create a stream Class from video_info or SoundCoudTrack Class. Highest Quality
+ 
+let source = await stream_from_info(info, { quality : 0 }) // Lowest quality
 
- /* OR
-  let source = await stream_from_info(info, cookie) This will create a stream Class and also give cookies if retrying.
- */
+let source = await stream_from_info(info, { quality : 1 }) // Next to Lowest quality.
+
+let source = await stream_from_info(info, { cookie: COOKIE }) //This will create a stream Class and also give cookies if retrying.
+
 
  let resource = createAudioResource(source.stream, {
             inputType : source.type
