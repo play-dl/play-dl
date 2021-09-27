@@ -13,7 +13,7 @@ interface SearchOptions {
 
 import readline from 'readline';
 import fs from 'fs';
-import { sp_validate, yt_validate, so_validate, YouTubeStream, SoundCloudStream } from '.';
+import { sp_validate, yt_validate, so_validate, YouTubeStream, SoundCloudStream, YouTube, SoundCloud, Spotify } from '.';
 import { SpotifyAuthorize, sp_search } from './Spotify';
 import { check_id, so_search, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
 import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
@@ -30,7 +30,7 @@ import { yt_search } from './YouTube/search';
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
     if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
     if (url.indexOf('soundcloud') !== -1) return await so_stream(url, options.quality);
-    else return await yt_stream(url, { cookie: options.cookie });
+    else return await yt_stream(url, options);
 }
 
 /**
@@ -39,16 +39,17 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
  * @param options contains limit and source to choose.
  * @returns
  */
-export async function search(query: string, options: SearchOptions = {}) {
+export async function search(query: string, options: SearchOptions = {}): Promise<YouTube[] | Spotify[] | SoundCloud[]> {
     if (!options.source) options.source = { youtube: 'video' };
 
     if (options.source.youtube) return await yt_search(query, { limit: options.limit, type: options.source.youtube });
     else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
     else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
+    else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.')
 }
 
 /**
- *
+ *  Command to be used 
  * @param info
  * @param options
  * @returns
@@ -57,8 +58,8 @@ export async function stream_from_info(
     info: InfoData | SoundCloudTrack,
     options: StreamOptions = {}
 ): Promise<YouTubeStream | SoundCloudStream> {
-    if (info instanceof SoundCloudTrack) return await so_stream_info(info);
-    else return await yt_stream_info(info, { cookie: options.cookie });
+    if (info instanceof SoundCloudTrack) return await so_stream_info(info, options.quality);
+    else return await yt_stream_info(info, options);
 }
 
 export async function validate(

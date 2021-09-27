@@ -2,9 +2,19 @@ import https, { RequestOptions } from 'https';
 import { IncomingMessage } from 'http';
 import { URL } from 'url';
 
+interface ProxyOpts {
+    host : string,
+    port : number,
+    authentication? : {
+        username : string;
+        password : string;
+    }
+}
+
 interface RequestOpts extends RequestOptions {
     body?: string;
     method?: 'GET' | 'POST';
+    proxies? : string[] | ProxyOpts[]
 }
 
 function https_getter(req_url: string, options: RequestOpts = {}): Promise<IncomingMessage> {
