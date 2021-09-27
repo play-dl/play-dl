@@ -1,7 +1,7 @@
 import { request } from './request';
 import { format_decipher } from './cipher';
-import { Video } from '../classes/Video';
-import { PlayList } from '../classes/Playlist';
+import { YouTubeVideo } from '../classes/Video';
+import { YouTubePlayList } from '../classes/Playlist';
 
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
@@ -66,7 +66,7 @@ export async function video_basic_info(url: string, cookie?: string) {
         initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
             ?.owner?.videoOwnerRenderer?.badges[0];
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
-    const related: any[] = [];
+    const related: string[] = [];
     initial_response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.forEach(
         (res: any) => {
             if (res.compactVideoRenderer)
@@ -76,7 +76,7 @@ export async function video_basic_info(url: string, cookie?: string) {
     const format = [];
     const vid = player_response.videoDetails;
     const microformat = player_response.microformat.playerMicroformatRenderer;
-    const video_details = {
+    const video_details = new YouTubeVideo({
         id: vid.videoId,
         url: `https://www.youtube.com/watch?v=${vid.videoId}`,
         title: vid.title,
@@ -96,7 +96,7 @@ export async function video_basic_info(url: string, cookie?: string) {
         averageRating: vid.averageRating,
         live: vid.isLiveContent,
         private: vid.isPrivate
-    };
+    });
     format.push(...(player_response.streamingData.formats ?? []));
     format.push(...(player_response.streamingData.adaptiveFormats ?? []));
     const LiveStreamData = {
@@ -182,7 +182,7 @@ export async function playlist_info(url: string, parseIncomplete = false) {
             ?.runs.pop()?.text ?? null;
     const videosCount = data.stats[0].runs[0].text.replace(/[^0-9]/g, '') || 0;
 
-    const res = new PlayList({
+    const res = new YouTubePlayList({
         continuation: {
             api: API_KEY,
             token: getContinuationToken(parsed),
@@ -217,13 +217,13 @@ export async function playlist_info(url: string, parseIncomplete = false) {
         thumbnail: data.thumbnailRenderer.playlistVideoThumbnailRenderer?.thumbnail.thumbnails.length
             ? data.thumbnailRenderer.playlistVideoThumbnailRenderer.thumbnail.thumbnails[
                   data.thumbnailRenderer.playlistVideoThumbnailRenderer.thumbnail.thumbnails.length - 1
-              ].url
+              ]
             : null
     });
     return res;
 }
 
-export function getPlaylistVideos(data: any, limit = Infinity): Video[] {
+export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
     const videos = [];
 
     for (let i = 0; i < data.length; i++) {
@@ -232,7 +232,7 @@ export function getPlaylistVideos(data: any, limit = Infinity): Video[] {
         if (!info || !info.shortBylineText) continue;
 
         videos.push(
-            new Video({
+            new YouTubeVideo({
                 id: info.videoId,
                 index: parseInt(info.index?.simpleText) || 0,
                 duration: parseDuration(info.lengthText?.simpleText) || 0,

@@ -1,6 +1,6 @@
-export { playlist_info, video_basic_info, video_info, yt_validate, extractID } from './YouTube';
-export { spotify, sp_validate, refreshToken, is_expired } from './Spotify';
-export { soundcloud, so_validate } from './SoundCloud';
+export { playlist_info, video_basic_info, video_info, yt_validate, extractID, YouTube, YouTubeStream } from './YouTube';
+export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
+export { soundcloud, so_validate, SoundCloud, SoundCloudStream } from './SoundCloud';
 
 interface SearchOptions {
     limit?: number;
@@ -13,20 +13,32 @@ interface SearchOptions {
 
 import readline from 'readline';
 import fs from 'fs';
-import { sp_validate, yt_validate, so_validate } from '.';
+import { sp_validate, yt_validate, so_validate, YouTubeStream, SoundCloudStream } from '.';
 import { SpotifyAuthorize, sp_search } from './Spotify';
 import { check_id, so_search, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
 import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
-import { SoundCloudTrack, Stream as SoStream } from './SoundCloud/classes';
-import { LiveStreaming, Stream as YTStream } from './YouTube/classes/LiveStream';
+import { SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
 
-export async function stream(url: string, options: StreamOptions = {}): Promise<YTStream | LiveStreaming | SoStream> {
+/**
+ * Main stream Command for streaming through various sources
+ * @param url The video / track url to make stream of
+ * @param options contains quality and cookie to set for stream
+ * @returns YouTube / SoundCloud Stream to play
+ */
+
+export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
     if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
     if (url.indexOf('soundcloud') !== -1) return await so_stream(url, options.quality);
     else return await yt_stream(url, { cookie: options.cookie });
 }
 
+/**
+ *  Main Search Command for searching through various sources
+ * @param query string to search.
+ * @param options contains limit and source to choose.
+ * @returns
+ */
 export async function search(query: string, options: SearchOptions = {}) {
     if (!options.source) options.source = { youtube: 'video' };
 
@@ -35,25 +47,33 @@ export async function search(query: string, options: SearchOptions = {}) {
     else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
 }
 
+/**
+ *
+ * @param info
+ * @param options
+ * @returns
+ */
 export async function stream_from_info(
     info: InfoData | SoundCloudTrack,
     options: StreamOptions = {}
-): Promise<YTStream | LiveStreaming | SoStream> {
+): Promise<YouTubeStream | SoundCloudStream> {
     if (info instanceof SoundCloudTrack) return await so_stream_info(info);
     else return await yt_stream_info(info, { cookie: options.cookie });
 }
 
-export async function validate(url: string): Promise<"so_playlist" | "so_track" | "sp_track" | "sp_album" | "sp_playlist" | "yt_video" | "yt_playlist" | false> {
+export async function validate(
+    url: string
+): Promise<'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | false> {
     let check;
     if (url.indexOf('spotify') !== -1) {
         check = sp_validate(url);
-        return check !== false ? 'sp_' + check as "sp_track" | "sp_album" | "sp_playlist" : false;
+        return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
     } else if (url.indexOf('soundcloud') !== -1) {
         check = await so_validate(url);
-        return check !== false ? 'so_' + check as "so_playlist" | "so_track" : false;
+        return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
     } else {
         check = yt_validate(url);
-        return check !== false ? 'yt_' + check as "yt_video" | "yt_playlist" : false;
+        return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
     }
 }
 

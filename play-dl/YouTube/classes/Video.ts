@@ -1,5 +1,4 @@
-import { Channel } from './Channel';
-import { Thumbnail } from './Thumbnail';
+import { YouTubeChannel } from './Channel';
 
 interface VideoOptions {
     id?: string;
@@ -21,7 +20,6 @@ interface VideoOptions {
         id: string;
         icon: string;
     };
-    videos?: Video[];
     type: string;
     ratings: {
         likes: number;
@@ -32,9 +30,10 @@ interface VideoOptions {
     tags: string[];
 }
 
-export class Video {
+export class YouTubeVideo {
     id?: string;
-    url?: string;
+    url: string;
+    type: 'video' | 'playlist' | 'channel';
     title?: string;
     description?: string;
     durationRaw: string;
@@ -47,8 +46,7 @@ export class Video {
         height: number | undefined;
         url: string | undefined;
     };
-    channel?: Channel;
-    videos?: Video[];
+    channel?: YouTubeChannel;
     likes: number;
     dislikes: number;
     live: boolean;
@@ -60,6 +58,7 @@ export class Video {
 
         this.id = data.id || undefined;
         this.url = `https://www.youtube.com/watch?v=${this.id}`;
+        this.type = 'video';
         this.title = data.title || undefined;
         this.description = data.description || undefined;
         this.durationRaw = data.duration_raw || '0:00';
@@ -73,10 +72,6 @@ export class Video {
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
-    }
-
-    get type(): 'video' {
-        return 'video';
     }
 
     get toString(): string {

@@ -38,13 +38,15 @@ function parseAudioFormats(formats: any[]) {
     return result;
 }
 
-export async function stream(url: string, options: StreamOptions = {}): Promise<Stream | LiveStreaming> {
+export type YouTubeStream = Stream | LiveStreaming;
+
+export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
     const info = await video_info(url, options.cookie);
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
         info.LiveStreamData.hlsManifestUrl !== null &&
-        info.video_details.durationInSec === '0'
+        info.video_details.durationInSec === 0
     ) {
         return new LiveStreaming(
             info.LiveStreamData.dashManifestUrl,
@@ -72,7 +74,7 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     );
 }
 
-export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<Stream | LiveStreaming> {
+export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<YouTubeStream> {
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&

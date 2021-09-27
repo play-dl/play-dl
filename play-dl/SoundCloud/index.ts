@@ -33,11 +33,12 @@ export async function soundcloud(url: string): Promise<SoundCloudTrack | SoundCl
     else return new SoundCloudPlaylist(json_data, soundData.client_id);
 }
 
+export type SoundCloud = SoundCloudTrack | SoundCloudPlaylist;
 export async function so_search(
     query: string,
     type: 'tracks' | 'playlists' | 'albums',
     limit: number = 10
-): Promise<(SoundCloudPlaylist | SoundCloudTrack)[]> {
+): Promise<SoundCloud[]> {
     const response = await request(
         `https://api-v2.soundcloud.com/search/${type}?q=${query}&client_id=${soundData.client_id}&limit=${limit}`
     );
@@ -66,8 +67,8 @@ export async function stream(url: string, quality?: number): Promise<Stream> {
         : StreamType.Arbitrary;
     return new Stream(s_data.url, type);
 }
-
-export async function stream_from_info(data: SoundCloudTrack, quality?: number): Promise<Stream> {
+export type SoundCloudStream = Stream;
+export async function stream_from_info(data: SoundCloudTrack, quality?: number): Promise<SoundCloudStream> {
     const HLSformats = parseHlsFormats(data.formats);
     if (typeof quality !== 'number') quality = HLSformats.length - 1;
     else if (quality <= 0) quality = 0;

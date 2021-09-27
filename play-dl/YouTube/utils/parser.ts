@@ -1,6 +1,6 @@
-import { Video } from '../classes/Video';
-import { PlayList } from '../classes/Playlist';
-import { Channel } from '../classes/Channel';
+import { YouTubeVideo } from '../classes/Video';
+import { YouTubePlayList } from '../classes/Playlist';
+import { YouTubeChannel } from '../classes/Channel';
 
 export interface ParseSearchInterface {
     type?: 'video' | 'playlist' | 'channel';
@@ -13,7 +13,10 @@ export interface thumbnail {
     url: string;
 }
 
-export function ParseSearchResult(html: string, options?: ParseSearchInterface): (Video | PlayList | Channel)[] {
+export function ParseSearchResult(
+    html: string,
+    options?: ParseSearchInterface
+): (YouTubeVideo | YouTubePlayList | YouTubeChannel)[] {
     if (!html) throw new Error("Can't parse Search result without data");
     if (!options) options = { type: 'video', limit: 0 };
     if (!options.type) options.type = 'video';
@@ -62,14 +65,14 @@ function parseDuration(duration: string): number {
     return dur;
 }
 
-export function parseChannel(data?: any): Channel | void {
-    if (!data || !data.channelRenderer) return;
+export function parseChannel(data?: any): YouTubeChannel {
+    if (!data || !data.channelRenderer) throw new Error('Failed to Parse YouTube Channel');
     const badge = data.channelRenderer.ownerBadges && data.channelRenderer.ownerBadges[0];
     const url = `https://www.youtube.com${
         data.channelRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl ||
         data.channelRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url
     }`;
-    const res = new Channel({
+    const res = new YouTubeChannel({
         id: data.channelRenderer.channelId,
         name: data.channelRenderer.title.simpleText,
         icon: {
@@ -91,11 +94,11 @@ export function parseChannel(data?: any): Channel | void {
     return res;
 }
 
-export function parseVideo(data?: any): Video | void {
-    if (!data || !data.videoRenderer) return;
+export function parseVideo(data?: any): YouTubeVideo {
+    if (!data || !data.videoRenderer) throw new Error('Failed to Parse YouTube Video');
 
     const badge = data.videoRenderer.ownerBadges && data.videoRenderer.ownerBadges[0];
-    const res = new Video({
+    const res = new YouTubeVideo({
         id: data.videoRenderer.videoId,
         url: `https://www.youtube.com/watch?v=${data.videoRenderer.videoId}`,
         title: data.videoRenderer.title.runs[0].text,
@@ -131,10 +134,10 @@ export function parseVideo(data?: any): Video | void {
     return res;
 }
 
-export function parsePlaylist(data?: any): PlayList | void {
-    if (!data.playlistRenderer) return;
+export function parsePlaylist(data?: any): YouTubePlayList {
+    if (!data.playlistRenderer) throw new Error('Failed to Parse YouTube Playlist');
 
-    const res = new PlayList(
+    const res = new YouTubePlayList(
         {
             id: data.playlistRenderer.playlistId,
             title: data.playlistRenderer.title.simpleText,

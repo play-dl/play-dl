@@ -110,11 +110,13 @@ export function is_expired(): boolean {
     else return false;
 }
 
+export type Spotify = SpotifyAlbum | SpotifyPlaylist | SpotifyVideo;
+
 export async function sp_search(
     query: string,
     type: 'album' | 'playlist' | 'track',
     limit: number = 10
-): Promise<(SpotifyAlbum | SpotifyPlaylist | SpotifyVideo)[]> {
+): Promise<Spotify[]> {
     const results: (SpotifyAlbum | SpotifyPlaylist | SpotifyVideo)[] = [];
     if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
     if (query.length === 0) throw new Error('Pass some query to search.');
