@@ -59,14 +59,16 @@ authorization() //After then you will be asked about type of data you want to cr
 
 _This is basic to search with any source._
 
-**NOTE :-** If no options.source is not specified, then it will default to youtube video search.
+**NOTE :-** If options.source is not specified, then it will default to youtube video search.
 
 ```js
-let data = await search('Rick Roll', { limit : 1, source { youtube : "video" } }) // Searches for youtube video
+let data = await search('Rick Roll', { limit : 1 }) // Searches for youtube video
 
-let data = await search('Rick Roll', { limit: 1, source { soundcloud : "track" } }) // Searches for spotify track.
+let data = await search('Rick Roll', { limit : 1, source : { youtube : "video" } }) // Searches for youtube video
 
-let data = await search('Rick Roll', { limit: 1, source { spotify : "tracks" } }) // Searches for soundcloud track.
+let data = await search('Rick Roll', { limit: 1, source : { spotify : "track" } }) // Searches for spotify track.
+
+let data = await search('Rick Roll', { limit: 1, source : { soundcloud : "tracks" } }) // Searches for soundcloud track.
 ```
 
 ### Stream
@@ -81,7 +83,13 @@ let data = await search('Rick Roll', { limit: 1, source { spotify : "tracks" } }
 _This is basic to create a stream from a youtube or soundcloud url._
 
 ```js
-let source = await stream("url") // This will create a stream Class.
+let source = await stream("url") // This will create a stream Class. Highest Quality
+
+let source = await stream("url", { quality : 0 }) // Lowest quality
+
+let source = await stream("url", { quality : 1 }) // Next to Lowest quality.
+
+let source = await stream("url", { cookie: COOKIE }) //This will create a stream Class and also give cookies.
 
 let resource = createAudioResource(source.stream, {
             inputType : source.type
@@ -95,10 +103,13 @@ _This is basic to create a stream from a info [ from [video_info](https://github
 **Note :** Here, cookies are required only for retrying purposes.
 
 ```js
- let source = await stream_from_info(info) // This will create a stream Class from video_info or SoundCoudTrack Class.
+let source = await stream_from_info(info) // This will create a stream Class from video_info or SoundCoudTrack Class. Highest Quality
+ 
+let source = await stream_from_info(info, { quality : 0 }) // Lowest quality
 
+let source = await stream_from_info(info, { quality : 1 }) // Next to Lowest quality.
 
-  let source = await stream_from_info(info, { cookie }) //This will create a stream Class and also give cookies if retrying.
+let source = await stream_from_info(info, { cookie: COOKIE }) //This will create a stream Class and also give cookies if retrying.
 
 
  let resource = createAudioResource(source.stream, {
