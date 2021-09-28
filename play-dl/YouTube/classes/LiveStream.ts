@@ -174,7 +174,7 @@ export class Stream {
     }
 
     private async retry() {
-        const info = await video_info(this.video_url, this.cookie);
+        const info = await video_info(this.video_url, { cookie : this.cookie });
         this.url = info.format[info.format.length - 1].url;
     }
 
@@ -220,8 +220,15 @@ export class Stream {
         this.request = stream;
         stream.pipe(this.stream, { end: false });
 
-        stream.once('error', (err) => {
-            this.stream.emit('error', err);
+        stream.once('error', async(err) => {
+            this.cleanup()
+            await this.retry();
+            this.loop();
+            if (!this.timer) {
+                this.timer = setInterval(() => {
+                    this.retry();
+                }, 7200 * 1000);
+            }
         });
 
         stream.on('data', (chunk: any) => {

@@ -41,7 +41,7 @@ function parseAudioFormats(formats: any[]) {
 export type YouTubeStream = Stream | LiveStreaming;
 
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
-    const info = await video_info(url, options.cookie);
+    const info = await video_info(url, { cookie : options.cookie });
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
