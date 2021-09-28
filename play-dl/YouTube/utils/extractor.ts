@@ -1,7 +1,17 @@
-import { request } from './request';
+import { Proxy, request } from './request';
 import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
+
+interface InfoOptions{
+    cookie? : string;
+    proxy? : Proxy[]
+}
+
+interface PlaylistOptions {
+    incomplete? : boolean;
+    proxy? : Proxy[]
+}
 
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
@@ -36,7 +46,7 @@ export function extractID(url: string): string {
     } else return url;
 }
 
-export async function video_basic_info(url: string, cookie?: string) {
+export async function video_basic_info(url: string, options: InfoOptions = {}) {
     let video_id: string;
     if (url.startsWith('https')) {
         if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
@@ -44,9 +54,10 @@ export async function video_basic_info(url: string, cookie?: string) {
     } else video_id = url;
     const new_url = `https://www.youtube.com/watch?v=${video_id}`;
     const body = await request(new_url, {
-        headers: cookie
+        proxies : options.proxy ?? [],
+        headers: options.cookie
             ? {
-                  'cookie': cookie,
+                  'cookie': options.cookie,
                   'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
               }
             : { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
@@ -125,8 +136,8 @@ function parseSeconds(seconds: number): string {
     return hDisplay + mDisplay + sDisplay;
 }
 
-export async function video_info(url: string, cookie?: string) {
-    const data = await video_basic_info(url, cookie);
+export async function video_info(url: string, options: InfoOptions = {}) {
+    const data = await video_basic_info(url, options);
     if (data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null) {
         return data;
     } else if (data.format[0].signatureCipher || data.format[0].cipher) {
@@ -137,7 +148,7 @@ export async function video_info(url: string, cookie?: string) {
     }
 }
 
-export async function playlist_info(url: string, parseIncomplete = false) {
+export async function playlist_info(url: string, options : PlaylistOptions = {}) {
     if (!url || typeof url !== 'string') throw new Error(`Expected playlist url, received ${typeof url}!`);
     let Playlist_id: string;
     if (url.startsWith('https')) {
@@ -147,12 +158,13 @@ export async function playlist_info(url: string, parseIncomplete = false) {
     const new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`;
 
     const body = await request(new_url, {
+        proxies : options.proxy ?? [],
         headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
     });
     const response = JSON.parse(body.split('var ytInitialData = ')[1].split(';</script>')[0]);
     if (response.alerts) {
         if (response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
-            if (!parseIncomplete)
+            if (!options.incomplete)
                 throw new Error(
                     `While parsing playlist url\n${response.alerts[0].alertWithButtonRenderer.text.simpleText}`
                 );
