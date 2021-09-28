@@ -77,6 +77,7 @@ let data = await search('Rick Roll', { limit: 1, source : { soundcloud : "tracks
 
 -   quality : `number` :- Sets quality of stream [ 0 = Lowest, 1 = Medium ]. Leave this empty to get highest audio quality.
 -   cookie : `string` :- **[Cookies](https://github.com/play-dl/play-dl/discussions/34)** are optional and are required for playing age restricted videos.
+-   proxy : `Proxy` :- Optional parameter to add support of proxies. As of now, HTTPS proxies are only supported. So make sure to get HTTPS proxies only.
 
 #### stream(url : `string`, options? : [`StreamOptions`](https://github.com/play-dl/play-dl/tree/main/docs#streamoptions-))
 
@@ -91,6 +92,14 @@ let source = await stream("url", { quality : 1 }) // Next to Lowest quality.
 
 let source = await stream("url", { cookie: COOKIE }) //This will create a stream Class and also give cookies.
 
+let source = await stream(url, { proxy : ['url'] }) // Accepts a url which has port in in it.
+
+let source = await stream(url. {proxy : [{
+        host : "IP or hostname",
+        port : 8080
+    }]
+}) // Or add a json containing hostname and port.
+
 let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
@@ -104,7 +113,7 @@ _This is basic to create a stream from a info [ from [video_info](https://github
 
 ```js
 let source = await stream_from_info(info) // This will create a stream Class from video_info or SoundCoudTrack Class. Highest Quality
- 
+
 let source = await stream_from_info(info, { quality : 0 }) // Lowest quality
 
 let source = await stream_from_info(info, { quality : 1 }) // Next to Lowest quality.
@@ -112,7 +121,15 @@ let source = await stream_from_info(info, { quality : 1 }) // Next to Lowest qua
 let source = await stream_from_info(info, { cookie: COOKIE }) //This will create a stream Class and also give cookies if retrying.
 
 
- let resource = createAudioResource(source.stream, {
+let source = await stream_from_info(url, { proxy : ['url'] }) // Accepts a url which has port in in it.
+
+let source = await stream_from_info(url. {proxy : [{
+        host : "IP or hostname",
+        port : 8080
+    }]
+}) // Or add a json containing hostname and port.
+
+let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
 ```

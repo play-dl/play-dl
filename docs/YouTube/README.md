@@ -43,21 +43,36 @@ let id = extractID(url)
 
 ## Video
 
-### video_basic_info(url : `string`, cookie? : `string`)
+### InfoOptions
+
+_This are the info options that can be passed as a parameter in `video_info` and `video_basic_info`_
+
+-   cookie : **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
+-   proxy : Optional parameter to add support of proxies. As of now, HTTPS proxies are only supported. So make sure to get HTTPS proxies only.
+
+```js
+const video = await video_basic_info(url, { cookie : "cookies" }) // Gives cookies support
+
+const video = await video_basic_info(url, { proxy : ['url'] }) // Accepts a url which has port in in it.
+
+const video = await video_basic_info(url. {proxy : [{
+        host : "IP or hostname",
+        port : 8080
+    }]
+}) // Or add a json containing hostname and port.
+```
+
+### video_basic_info(url : `string`, options? : [`InfoOptions`]())
 
 _The basic video details `play-dl` fetches at first from url or videoID._
-
-**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
 ```js
 const video = await video_basic_info(url)
 ```
 
-### video_info(url : `string`, cookie? : `string`)
+### video_info(url : `string`, , options? : [`InfoOptions`]())
 
 _This contains everything with deciphered formats along with `video_details`. It can fetech data from url or videoID._
-
-**[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 
 ```js
 const video = await video_info(url)
@@ -74,18 +89,18 @@ const video = await video_info(url)
 
 ## Playlist
 
-### playlist_info(url : `string`, parseIncomplete : `boolean`)
+### playlist_info(url : `string`, options : `PlaylistOptions`)
 
 _This fetches all details about a playlist from a url or playlistID._
-
-**parseIncomplete** is optional parameter if you want to parse playlist with hidden videos.
 
 ```js
 const playlist = await playlist_info(url)
 //This only fetches first 100 videos from a playlist
 
-const playlist = await playlist_info(url, true)
+const playlist = await playlist_info(url, { incomplete : true })
 //This only fetches first 100 videos from a playlist and also parses playlist with hidden videos
+
+const playlist = await playlist_info(url, { proxy : [''] }) // Same 2 options as mentioned in InfoOptions
 ```
 
 -   #### fetch() `method`
