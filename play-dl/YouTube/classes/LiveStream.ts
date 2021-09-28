@@ -1,6 +1,6 @@
 import { PassThrough } from 'stream';
 import { IncomingMessage } from 'http';
-import { StreamType } from '../stream';
+import { parseAudioFormats, StreamType } from '../stream';
 import { request, request_stream } from '../utils/request';
 import { video_info } from '..';
 
@@ -132,6 +132,7 @@ export class Stream {
     private cookie: string;
     private data_ended: boolean;
     private playing_count: number;
+    private quality: number;
     private request: IncomingMessage | null;
     constructor(
         url: string,
@@ -139,10 +140,12 @@ export class Stream {
         duration: number,
         contentLength: number,
         video_url: string,
-        cookie: string
+        cookie: string,
+        quality: number
     ) {
         this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.url = url;
+        this.quality = quality;
         this.type = type;
         this.bytes_count = 0;
         this.video_url = video_url;
@@ -174,8 +177,9 @@ export class Stream {
     }
 
     private async retry() {
-        const info = await video_info(this.video_url, { cookie : this.cookie });
-        this.url = info.format[info.format.length - 1].url;
+        const info = await video_info(this.video_url, { cookie: this.cookie });
+        const audioFormat = parseAudioFormats(info.format);
+        this.url = audioFormat[this.quality].url;
     }
 
     private cleanup() {
@@ -220,8 +224,8 @@ export class Stream {
         this.request = stream;
         stream.pipe(this.stream, { end: false });
 
-        stream.once('error', async(err) => {
-            this.cleanup()
+        stream.once('error', async (err) => {
+            this.cleanup();
             await this.retry();
             this.loop();
             if (!this.timer) {

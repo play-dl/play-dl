@@ -3,14 +3,14 @@ import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 
-interface InfoOptions{
-    cookie? : string;
-    proxy? : Proxy[]
+interface InfoOptions {
+    cookie?: string;
+    proxy?: Proxy[];
 }
 
 interface PlaylistOptions {
-    incomplete? : boolean;
-    proxy? : Proxy[]
+    incomplete?: boolean;
+    proxy?: Proxy[];
 }
 
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
@@ -54,7 +54,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
     } else video_id = url;
     const new_url = `https://www.youtube.com/watch?v=${video_id}`;
     const body = await request(new_url, {
-        proxies : options.proxy ?? [],
+        proxies: options.proxy ?? [],
         headers: options.cookie
             ? {
                   'cookie': options.cookie,
@@ -148,7 +148,7 @@ export async function video_info(url: string, options: InfoOptions = {}) {
     }
 }
 
-export async function playlist_info(url: string, options : PlaylistOptions = {}) {
+export async function playlist_info(url: string, options: PlaylistOptions = {}) {
     if (!url || typeof url !== 'string') throw new Error(`Expected playlist url, received ${typeof url}!`);
     let Playlist_id: string;
     if (url.startsWith('https')) {
@@ -158,7 +158,7 @@ export async function playlist_info(url: string, options : PlaylistOptions = {})
     const new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`;
 
     const body = await request(new_url, {
-        proxies : options.proxy ?? [],
+        proxies: options.proxy ?? [],
         headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
     });
     const response = JSON.parse(body.split('var ytInitialData = ')[1].split(';</script>')[0]);
