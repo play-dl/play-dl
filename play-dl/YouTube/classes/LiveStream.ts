@@ -47,7 +47,7 @@ export class LiveStreaming {
         if (
             info.LiveStreamData.isLive === true &&
             info.LiveStreamData.hlsManifestUrl !== null &&
-            info.video_details.durationInSec === '0'
+            info.video_details.durationInSec === 0
         ) {
             this.url = info.LiveStreamData.dashManifestUrl;
         }
