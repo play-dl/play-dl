@@ -43,17 +43,19 @@ export async function stream_from_info(
     else return await yt_stream_info(info, { cookie: options.cookie });
 }
 
-export async function validate(url: string): Promise<"so_playlist" | "so_track" | "sp_track" | "sp_album" | "sp_playlist" | "yt_video" | "yt_playlist" | false> {
+export async function validate(
+    url: string
+): Promise<'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | false> {
     let check;
     if (url.indexOf('spotify') !== -1) {
         check = sp_validate(url);
-        return check !== false ? 'sp_' + check as "sp_track" | "sp_album" | "sp_playlist" : false;
+        return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
     } else if (url.indexOf('soundcloud') !== -1) {
         check = await so_validate(url);
-        return check !== false ? 'so_' + check as "so_playlist" | "so_track" : false;
+        return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
     } else {
         check = yt_validate(url);
-        return check !== false ? 'yt_' + check as "yt_video" | "yt_playlist" : false;
+        return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
     }
 }
 
@@ -62,7 +64,7 @@ export function authorization(): void {
         input: process.stdin,
         output: process.stdout
     });
-    ask.question('Choose your service - so (for SoundCloud) / sp (for Spotify) : ', (msg) => {
+    ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify) : ', (msg) => {
         if (msg.toLowerCase().startsWith('sp')) {
             let client_id: string, client_secret: string, redirect_url: string, market: string;
             ask.question('Start by entering your Client ID : ', (id) => {
@@ -71,11 +73,15 @@ export function authorization(): void {
                     client_secret = secret;
                     ask.question('Enter your Redirect URL now : ', (url) => {
                         redirect_url = url;
-                        console.log('\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n');
+                        console.log(
+                            '\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
+                        );
                         ask.question('Enter your region code (2-letter country code) : ', (mar) => {
                             if (mar.length === 2) market = mar;
                             else {
-                                console.log('That doesn\'t look like a valid region code, IN will be selected as default.');
+                                console.log(
+                                    "That doesn't look like a valid region code, IN will be selected as default."
+                                );
                                 market = 'IN';
                             }
                             console.log(
@@ -103,7 +109,7 @@ export function authorization(): void {
                     });
                 });
             });
-        } else if (msg.toLowerCase().startsWith('so')) {
+        } else if (msg.toLowerCase().startsWith('sc')) {
             let client_id: string;
             ask.question('Client ID : ', async (id) => {
                 client_id = id;
@@ -117,11 +123,11 @@ export function authorization(): void {
                 if (await check_id(client_id)) {
                     console.log('Client ID has been validated successfully.');
                     fs.writeFileSync('.data/soundcloud.data', JSON.stringify({ client_id }, undefined, 4));
-                } else console.log('That doesn\'t look like a valid client ID. Retry with a correct client ID.');
+                } else console.log("That doesn't look like a valid client ID. Retry with a correct client ID.");
                 ask.close();
             });
         } else {
-            console.log('That option doesn\'t exist. Try again...');
+            console.log("That option doesn't exist. Try again...");
             ask.close();
         }
     });
