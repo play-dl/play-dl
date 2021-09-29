@@ -26,8 +26,10 @@ interface SpotifyCopyright {
     text: string;
     type: string;
 }
-
-export class SpotifyVideo {
+/**
+ * Class for Spotify Track
+ */
+export class SpotifyTrack {
     name: string;
     type: 'track' | 'playlist' | 'album';
     id: string;
@@ -36,8 +38,8 @@ export class SpotifyVideo {
     durationInSec: number;
     durationInMs: number;
     artists: SpotifyArtists[];
-    album: SpotifyTrackAlbum;
-    thumbnail: SpotifyThumbnail;
+    album: SpotifyTrackAlbum | undefined;
+    thumbnail: SpotifyThumbnail | undefined;
     constructor(data: any) {
         this.name = data.name;
         this.id = data.id;
@@ -55,15 +57,19 @@ export class SpotifyVideo {
             });
         });
         this.artists = artists;
-        this.album = {
-            name: data.album.name,
-            url: data.external_urls.spotify,
-            id: data.album.id,
-            release_date: data.album.release_date,
-            release_date_precision: data.album.release_date_precision,
-            total_tracks: data.album.total_tracks
-        };
-        this.thumbnail = data.album.images[0];
+        if (!data.album?.name) this.album = undefined;
+        else {
+            this.album = {
+                name: data.album.name,
+                url: data.external_urls.spotify,
+                id: data.album.id,
+                release_date: data.album.release_date,
+                release_date_precision: data.album.release_date_precision,
+                total_tracks: data.album.total_tracks
+            };
+        }
+        if (!data.album?.images?.[0]) this.thumbnail = undefined;
+        else this.thumbnail = data.album.images[0];
     }
 
     toJSON() {
@@ -81,7 +87,9 @@ export class SpotifyVideo {
         };
     }
 }
-
+/**
+ * Class for Spotify Playlist
+ */
 export class SpotifyPlaylist {
     name: string;
     type: 'track' | 'playlist' | 'album';
@@ -93,7 +101,7 @@ export class SpotifyPlaylist {
     owner: SpotifyArtists;
     tracksCount: number;
     private spotifyData: SpotifyDataOptions;
-    private fetched_tracks: Map<string, SpotifyVideo[]>;
+    private fetched_tracks: Map<string, SpotifyTrack[]>;
     constructor(data: any, spotifyData: SpotifyDataOptions) {
         this.name = data.name;
         this.type = 'playlist';
@@ -108,9 +116,9 @@ export class SpotifyPlaylist {
             id: data.owner.id
         };
         this.tracksCount = Number(data.tracks.total);
-        const videos: SpotifyVideo[] = [];
+        const videos: SpotifyTrack[] = [];
         data.tracks.items.forEach((v: any) => {
-            videos.push(new SpotifyVideo(v.track));
+            videos.push(new SpotifyTrack(v.track));
         });
         this.fetched_tracks = new Map();
         this.fetched_tracks.set('1', videos);
@@ -136,11 +144,11 @@ export class SpotifyPlaylist {
                             }
                         }
                     ).catch((err) => reject(`Response Error : \n${err}`));
-                    const videos: SpotifyVideo[] = [];
+                    const videos: SpotifyTrack[] = [];
                     if (typeof response !== 'string') return;
                     const json_data = JSON.parse(response);
                     json_data.items.forEach((v: any) => {
-                        videos.push(new SpotifyVideo(v.track));
+                        videos.push(new SpotifyTrack(v.track));
                     });
                     this.fetched_tracks.set(`${i}`, videos);
                     resolve('Success');
@@ -163,7 +171,7 @@ export class SpotifyPlaylist {
 
     get total_tracks() {
         const page_number: number = this.total_pages;
-        return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyVideo[]).length;
+        return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyTrack[]).length;
     }
 
     toJSON() {
@@ -179,7 +187,9 @@ export class SpotifyPlaylist {
         };
     }
 }
-
+/**
+ * Class for Spotify Album
+ */
 export class SpotifyAlbum {
     name: string;
     type: 'track' | 'playlist' | 'album';
@@ -192,7 +202,7 @@ export class SpotifyAlbum {
     release_date_precision: string;
     trackCount: number;
     private spotifyData: SpotifyDataOptions;
-    private fetched_tracks: Map<string, SpotifyTracks[]>;
+    private fetched_tracks: Map<string, SpotifyTrack[]>;
     constructor(data: any, spotifyData: SpotifyDataOptions) {
         this.name = data.name;
         this.type = 'album';
@@ -212,9 +222,9 @@ export class SpotifyAlbum {
         this.release_date = data.release_date;
         this.release_date_precision = data.release_date_precision;
         this.trackCount = data.total_tracks;
-        const videos: SpotifyTracks[] = [];
+        const videos: SpotifyTrack[] = [];
         data.tracks.items.forEach((v: any) => {
-            videos.push(new SpotifyTracks(v));
+            videos.push(new SpotifyTrack(v));
         });
         this.fetched_tracks = new Map();
         this.fetched_tracks.set('1', videos);
@@ -240,11 +250,11 @@ export class SpotifyAlbum {
                             }
                         }
                     ).catch((err) => reject(`Response Error : \n${err}`));
-                    const videos: SpotifyTracks[] = [];
+                    const videos: SpotifyTrack[] = [];
                     if (typeof response !== 'string') return;
                     const json_data = JSON.parse(response);
                     json_data.items.forEach((v: any) => {
-                        videos.push(new SpotifyTracks(v));
+                        videos.push(new SpotifyTrack(v));
                     });
                     this.fetched_tracks.set(`${i}`, videos);
                     resolve('Success');
@@ -267,7 +277,7 @@ export class SpotifyAlbum {
 
     get total_tracks() {
         const page_number: number = this.total_pages;
-        return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyVideo[]).length;
+        return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyTrack[]).length;
     }
 
     toJSON() {
@@ -281,48 +291,6 @@ export class SpotifyAlbum {
             release_date: this.release_date,
             release_date_precision: this.release_date_precision,
             total_tracks: this.total_tracks
-        };
-    }
-}
-
-class SpotifyTracks {
-    name: string;
-    type: 'track' | 'playlist' | 'album';
-    id: string;
-    url: string;
-    explicit: boolean;
-    durationInSec: number;
-    durationInMs: number;
-    artists: SpotifyArtists[];
-    constructor(data: any) {
-        this.name = data.name;
-        this.id = data.id;
-        this.type = 'track';
-        this.url = data.external_urls.spotify;
-        this.explicit = data.explicit;
-        this.durationInMs = data.duration_ms;
-        this.durationInSec = Math.round(this.durationInMs / 1000);
-        const artists: SpotifyArtists[] = [];
-        data.artists.forEach((v: any) => {
-            artists.push({
-                name: v.name,
-                id: v.id,
-                url: v.external_urls.spotify
-            });
-        });
-        this.artists = artists;
-    }
-
-    toJSON() {
-        return {
-            name: this.name,
-            id: this.id,
-            type: this.type,
-            url: this.url,
-            explicit: this.explicit,
-            durationInMs: this.durationInMs,
-            durationInSec: this.durationInSec,
-            artists: this.artists
         };
     }
 }

@@ -3,7 +3,9 @@ import { request } from '../utils/request';
 import { YouTubeChannel } from './Channel';
 import { YouTubeVideo } from './Video';
 const BASE_API = 'https://www.youtube.com/youtubei/v1/browse?key=';
-
+/**
+ * Class for YouTube Playlist url
+ */
 export class YouTubePlayList {
     id?: string;
     title?: string;

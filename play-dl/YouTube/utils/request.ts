@@ -2,7 +2,9 @@ import https, { RequestOptions } from 'https';
 import tls from 'tls';
 import http, { ClientRequest, IncomingMessage } from 'http';
 import { URL } from 'url';
-
+/**
+ * Types for Proxy
+ */
 export type Proxy = ProxyOpts | string;
 
 interface ProxyOpts {
@@ -25,7 +27,12 @@ interface RequestOpts extends RequestOptions {
     method?: 'GET' | 'POST';
     proxies?: Proxy[];
 }
-
+/**
+ * Main module that play-dl uses for making a https request
+ * @param req_url URL to make https request to
+ * @param options Request options for https request
+ * @returns Incoming Message from the https request
+ */
 function https_getter(req_url: string, options: RequestOpts = {}): Promise<IncomingMessage> {
     return new Promise((resolve, reject) => {
         const s = new URL(req_url);
@@ -45,13 +52,23 @@ function https_getter(req_url: string, options: RequestOpts = {}): Promise<Incom
         req.end();
     });
 }
-
+/**
+ * Chooses one random number between max and min number.
+ * @param min Minimum number
+ * @param max Maximum number
+ * @returns Random Number
+ */
 function randomIntFromInterval(min: number, max: number): number {
     let x = Math.floor(Math.random() * (max - min + 1) + min);
     if (x === 0) return 0;
     else return x - 1;
 }
-
+/**
+ * Main module that play-dl uses for proxy.
+ * @param req_url URL to make https request to
+ * @param req_proxy Proxies array
+ * @returns Object with statusCode, head and body
+ */
 async function proxy_getter(req_url: string, req_proxy: Proxy[]): Promise<ProxyOutput> {
     return new Promise((resolve, reject) => {
         const proxy: string | ProxyOpts = req_proxy[randomIntFromInterval(0, req_proxy.length)];
@@ -127,7 +144,12 @@ async function proxy_getter(req_url: string, req_proxy: Proxy[]): Promise<ProxyO
         req.end();
     });
 }
-
+/**
+ * Main module which play-dl uses to make a proxy or normal request
+ * @param url URL to make https request to
+ * @param options Request options for https request
+ * @returns body of that request
+ */
 export async function request(url: string, options?: RequestOpts): Promise<string> {
     return new Promise(async (resolve, reject) => {
         if (!options?.proxies) {
@@ -160,7 +182,12 @@ export async function request(url: string, options?: RequestOpts): Promise<strin
         }
     });
 }
-
+/**
+ * Main module which play-dl uses to make a request to stream url.
+ * @param url URL to make https request to
+ * @param options Request options for https request
+ * @returns IncomingMessage from the request
+ */
 export async function request_stream(url: string, options?: RequestOpts): Promise<IncomingMessage> {
     return new Promise(async (resolve, reject) => {
         let res = await https_getter(url, options).catch((err: Error) => err);

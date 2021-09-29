@@ -32,7 +32,7 @@ import { yt_search } from './YouTube/search';
 /**
  * Main stream Command for streaming through various sources
  * @param url The video / track url to make stream of
- * @param options contains quality and cookie to set for stream
+ * @param options contains quality, cookie and proxy to set for stream
  * @returns YouTube / SoundCloud Stream to play
  */
 
@@ -46,7 +46,7 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
  *  Main Search Command for searching through various sources
  * @param query string to search.
  * @param options contains limit and source to choose.
- * @returns
+ * @returns Array of YouTube or Spotify or SoundCloud
  */
 export async function search(
     query: string,
@@ -61,10 +61,11 @@ export async function search(
 }
 
 /**
- *  Command to be used
- * @param info
- * @param options
- * @returns
+ *  stream Command for streaming through various sources using data from video_info or soundcloud
+ *  SoundCloud Track is only supported
+ * @param info video_info data or SoundCloud Track data.
+ * @param options contains quality, cookie and proxy to set for stream
+ * @returns YouTube / SoundCloud Stream to play
  */
 export async function stream_from_info(
     info: InfoData | SoundCloudTrack,
@@ -73,7 +74,11 @@ export async function stream_from_info(
     if (info instanceof SoundCloudTrack) return await so_stream_info(info, options.quality);
     else return await yt_stream_info(info, options);
 }
-
+/**
+ * Command to validate the provided url. It checks whether it supports play-dl or not.
+ * @param url url to validate
+ * @returns On failure, returns false else type of url.
+ */
 export async function validate(
     url: string
 ): Promise<'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | false> {
@@ -89,7 +94,9 @@ export async function validate(
         return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
     }
 }
-
+/**
+ * Authorization interface for Spotify and SoundCloud.
+ */
 export function authorization(): void {
     const ask = readline.createInterface({
         input: process.stdin,

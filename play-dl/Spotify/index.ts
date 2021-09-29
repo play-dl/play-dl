@@ -1,12 +1,14 @@
 import { request } from '../YouTube/utils/request';
-import { SpotifyAlbum, SpotifyPlaylist, SpotifyVideo } from './classes';
+import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './classes';
 import fs from 'fs';
 
 let spotifyData: SpotifyDataOptions;
 if (fs.existsSync('.data/spotify.data')) {
     spotifyData = JSON.parse(fs.readFileSync('.data/spotify.data').toString());
 }
-
+/**
+ * Spotify Data options that are stored in spotify.data file.
+ */
 export interface SpotifyDataOptions {
     client_id: string;
     client_secret: string;
@@ -21,8 +23,12 @@ export interface SpotifyDataOptions {
 }
 
 const pattern = /^((https:)?\/\/)?open.spotify.com\/(track|album|playlist)\//;
-
-export async function spotify(url: string): Promise<SpotifyAlbum | SpotifyPlaylist | SpotifyVideo> {
+/**
+ * Function to get Playlist | Album | Track
+ * @param url url of spotify from which you want info
+ * @returns Spotify type.
+ */
+export async function spotify(url: string): Promise<Spotify> {
     if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
     if (!url.match(pattern)) throw new Error('This is not a Spotify URL');
     if (url.indexOf('track/') !== -1) {
@@ -35,7 +41,7 @@ export async function spotify(url: string): Promise<SpotifyAlbum | SpotifyPlayli
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyVideo(JSON.parse(response));
+        return new SpotifyTrack(JSON.parse(response));
     } else if (url.indexOf('album/') !== -1) {
         const albumID = url.split('album/')[1].split('&')[0].split('?')[0];
         const response = await request(`https://api.spotify.com/v1/albums/${albumID}?market=${spotifyData.market}`, {
@@ -63,7 +69,11 @@ export async function spotify(url: string): Promise<SpotifyAlbum | SpotifyPlayli
         return new SpotifyPlaylist(JSON.parse(response), spotifyData);
     } else throw new Error('URL is out of scope for play-dl.');
 }
-
+/**
+ * Function to validate Spotify url
+ * @param url url for validation
+ * @returns type of url or false.
+ */
 export function sp_validate(url: string): 'track' | 'playlist' | 'album' | false {
     if (!url.match(pattern)) return false;
     if (url.indexOf('track/') !== -1) {
@@ -74,7 +84,11 @@ export function sp_validate(url: string): 'track' | 'playlist' | 'album' | false
         return 'playlist';
     } else return false;
 }
-
+/**
+ * Fuction for authorizing for spotify data.
+ * @param data Sportify Data options to validate
+ * @returns boolean.
+ */
 export async function SpotifyAuthorize(data: SpotifyDataOptions): Promise<boolean> {
     const response = await request(`https://accounts.spotify.com/api/token`, {
         headers: {
@@ -104,20 +118,31 @@ export async function SpotifyAuthorize(data: SpotifyDataOptions): Promise<boolea
     fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
     return true;
 }
-
+/**
+ * Function to check if authorization token is expired or not.
+ * @returns boolean
+ */
 export function is_expired(): boolean {
     if (Date.now() >= (spotifyData.expiry as number)) return true;
     else return false;
 }
-
-export type Spotify = SpotifyAlbum | SpotifyPlaylist | SpotifyVideo;
-
+/**
+ * type for Spotify Class
+ */
+export type Spotify = SpotifyAlbum | SpotifyPlaylist | SpotifyTrack;
+/**
+ * Function for searching songs on Spotify
+ * @param query searching query
+ * @param type "album" | "playlist" | "track"
+ * @param limit max no of results
+ * @returns Spotify type.
+ */
 export async function sp_search(
     query: string,
     type: 'album' | 'playlist' | 'track',
     limit: number = 10
 ): Promise<Spotify[]> {
-    const results: (SpotifyAlbum | SpotifyPlaylist | SpotifyVideo)[] = [];
+    const results: Spotify[] = [];
     if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
     if (query.length === 0) throw new Error('Pass some query to search.');
     if (limit > 50 || limit < 0) throw new Error(`You crossed limit range of Spotify [ 0 - 50 ]`);
@@ -137,7 +162,7 @@ export async function sp_search(
     const json_data = JSON.parse(response);
     if (type === 'track') {
         json_data.tracks.items.forEach((track: any) => {
-            results.push(new SpotifyVideo(track));
+            results.push(new SpotifyTrack(track));
         });
     } else if (type === 'album') {
         json_data.albums.items.forEach((album: any) => {
@@ -150,7 +175,10 @@ export async function sp_search(
     }
     return results;
 }
-
+/**
+ * Function to refresh Token
+ * @returns boolean to check whether token is refreshed or not
+ */
 export async function refreshToken(): Promise<boolean> {
     const response = await request(`https://accounts.spotify.com/api/token`, {
         headers: {

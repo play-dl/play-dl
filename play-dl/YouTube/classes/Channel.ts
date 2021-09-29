@@ -3,7 +3,9 @@ export interface ChannelIconInterface {
     width: number;
     height: number;
 }
-
+/**
+ * Class for YouTube Channel url
+ */
 export class YouTubeChannel {
     name?: string;
     verified?: boolean;

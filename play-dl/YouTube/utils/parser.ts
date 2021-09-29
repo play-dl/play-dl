@@ -1,6 +1,7 @@
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 import { YouTubeChannel } from '../classes/Channel';
+import { YouTube } from '..';
 
 export interface ParseSearchInterface {
     type?: 'video' | 'playlist' | 'channel';
@@ -12,11 +13,13 @@ export interface thumbnail {
     height: string;
     url: string;
 }
-
-export function ParseSearchResult(
-    html: string,
-    options?: ParseSearchInterface
-): (YouTubeVideo | YouTubePlayList | YouTubeChannel)[] {
+/**
+ * Main command which converts html body data and returns the type of data requested.
+ * @param html body of that request
+ * @param options limit & type of YouTube search you want.
+ * @returns Array of one of YouTube type.
+ */
+export function ParseSearchResult(html: string, options?: ParseSearchInterface): YouTube[] {
     if (!html) throw new Error("Can't parse Search result without data");
     if (!options) options = { type: 'video', limit: 0 };
     if (!options.type) options.type = 'video';
@@ -45,7 +48,11 @@ export function ParseSearchResult(
     }
     return results;
 }
-
+/**
+ * Function to convert [hour : minutes : seconds] format to seconds
+ * @param duration hour : minutes : seconds format
+ * @returns seconds
+ */
 function parseDuration(duration: string): number {
     duration ??= '0:00';
     const args = duration.split(':');
@@ -64,7 +71,11 @@ function parseDuration(duration: string): number {
 
     return dur;
 }
-
+/**
+ * Function to parse Channel searches
+ * @param data body of that channel request.
+ * @returns YouTubeChannel class
+ */
 export function parseChannel(data?: any): YouTubeChannel {
     if (!data || !data.channelRenderer) throw new Error('Failed to Parse YouTube Channel');
     const badge = data.channelRenderer.ownerBadges && data.channelRenderer.ownerBadges[0];
@@ -93,7 +104,11 @@ export function parseChannel(data?: any): YouTubeChannel {
 
     return res;
 }
-
+/**
+ * Function to parse Video searches
+ * @param data body of that video request.
+ * @returns YouTubeVideo class
+ */
 export function parseVideo(data?: any): YouTubeVideo {
     if (!data || !data.videoRenderer) throw new Error('Failed to Parse YouTube Video');
 
@@ -133,7 +148,11 @@ export function parseVideo(data?: any): YouTubeVideo {
 
     return res;
 }
-
+/**
+ * Function to parse Playlist searches
+ * @param data body of that playlist request.
+ * @returns YouTubePlaylist class
+ */
 export function parsePlaylist(data?: any): YouTubePlayList {
     if (!data.playlistRenderer) throw new Error('Failed to Parse YouTube Playlist');
 

@@ -1,7 +1,7 @@
 import { PassThrough } from 'stream';
 import { IncomingMessage } from 'http';
-import { parseAudioFormats, StreamType } from '../stream';
-import { request, request_stream } from '../utils/request';
+import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
+import { Proxy, request, request_stream } from '../utils/request';
 import { video_info } from '..';
 
 export interface FormatInterface {
@@ -119,7 +119,9 @@ export class LiveStreaming {
         }, this.interval);
     }
 }
-
+/**
+ * Class for YouTube Stream
+ */
 export class Stream {
     stream: PassThrough;
     type: StreamType;
@@ -133,6 +135,7 @@ export class Stream {
     private data_ended: boolean;
     private playing_count: number;
     private quality: number;
+    private proxy: Proxy[];
     private request: IncomingMessage | null;
     constructor(
         url: string,
@@ -141,11 +144,12 @@ export class Stream {
         contentLength: number,
         video_url: string,
         cookie: string,
-        quality: number
+        options: StreamOptions
     ) {
         this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.url = url;
-        this.quality = quality;
+        this.quality = options.quality as number;
+        this.proxy = options.proxy || [];
         this.type = type;
         this.bytes_count = 0;
         this.video_url = video_url;
@@ -177,7 +181,7 @@ export class Stream {
     }
 
     private async retry() {
-        const info = await video_info(this.video_url, { cookie: this.cookie });
+        const info = await video_info(this.video_url, { cookie: this.cookie, proxy: this.proxy });
         const audioFormat = parseAudioFormats(info.format);
         this.url = audioFormat[this.quality].url;
     }

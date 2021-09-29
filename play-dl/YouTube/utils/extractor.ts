@@ -17,7 +17,11 @@ const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)/;
-
+/**
+ * Command to validate a YouTube url
+ * @param url Url for validation
+ * @returns type of url or false.
+ */
 export function yt_validate(url: string): 'playlist' | 'video' | false {
     if (url.indexOf('list=') === -1) {
         if (!url.match(video_pattern)) return false;
@@ -31,7 +35,11 @@ export function yt_validate(url: string): 'playlist' | 'video' | false {
         return 'playlist';
     }
 }
-
+/**
+ * Function to extract ID of YouTube url.
+ * @param url ID or url of YouTube
+ * @returns ID of video or playlist.
+ */
 export function extractID(url: string): string {
     if (url.startsWith('https')) {
         if (url.indexOf('list=') === -1) {
@@ -45,7 +53,12 @@ export function extractID(url: string): string {
         }
     } else return url;
 }
-
+/**
+ * Basic function to get data from a YouTube url or ID.
+ * @param url YouTube url or ID
+ * @param options cookie and proxy parameters to add
+ * @returns Data containing video_details, LiveStreamData and formats of video url.
+ */
 export async function video_basic_info(url: string, options: InfoOptions = {}) {
     let video_id: string;
     if (url.startsWith('https')) {
@@ -123,7 +136,11 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
         related_videos: related
     };
 }
-
+/**
+ * Function to convert seconds to [hour : minutes : seconds] format
+ * @param seconds seconds to convert
+ * @returns [hour : minutes : seconds] format
+ */
 function parseSeconds(seconds: number): string {
     const d = Number(seconds);
     const h = Math.floor(d / 3600);
@@ -135,7 +152,12 @@ function parseSeconds(seconds: number): string {
     const sDisplay = s > 0 ? (s < 10 ? `0${s}` : s) : '00';
     return hDisplay + mDisplay + sDisplay;
 }
-
+/**
+ * Function which gets data from video_basic_info and deciphers it if it contains signatures.
+ * @param url YouTube Video URL
+ * @param options cookie and proxy parameters to add
+ * @returns Data containing video_details, LiveStreamData and formats of video url.
+ */
 export async function video_info(url: string, options: InfoOptions = {}) {
     const data = await video_basic_info(url, options);
     if (data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null) {
@@ -147,8 +169,13 @@ export async function video_info(url: string, options: InfoOptions = {}) {
         return data;
     }
 }
-
-export async function playlist_info(url: string, options: PlaylistOptions = {}) {
+/**
+ * Function to get YouTube playlist info from a playlist url.
+ * @param url Playlist URL
+ * @param options incomplete and proxy to add.
+ * @returns YouTube Playlist
+ */
+export async function playlist_info(url: string, options: PlaylistOptions = {}): Promise<YouTubePlayList> {
     if (!url || typeof url !== 'string') throw new Error(`Expected playlist url, received ${typeof url}!`);
     let Playlist_id: string;
     if (url.startsWith('https')) {
@@ -184,7 +211,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}) 
     const videos = getPlaylistVideos(parsed, 100);
 
     const data = playlistDetails[0].playlistSidebarPrimaryInfoRenderer;
-    if (!data.title.runs || !data.title.runs.length) return undefined;
+    if (!data.title.runs || !data.title.runs.length) throw new Error('Failed to Parse Playlist info.');
 
     const author = playlistDetails[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner;
     const views = data.stats.length === 3 ? data.stats[1].simpleText.replace(/[^0-9]/g, '') : 0;
@@ -234,7 +261,12 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}) 
     });
     return res;
 }
-
+/**
+ * Function to parse Playlist from YouTube search
+ * @param data html data of that request
+ * @param limit No. of videos to parse
+ * @returns Array of YouTubeVideo.
+ */
 export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
     const videos = [];
 
@@ -270,7 +302,11 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
     }
     return videos;
 }
-
+/**
+ * Function to convert [hour : minutes : seconds] format to seconds
+ * @param duration hour : minutes : seconds format
+ * @returns seconds
+ */
 function parseDuration(duration: string): number {
     duration ??= '0:00';
     const args = duration.split(':');
@@ -289,7 +325,11 @@ function parseDuration(duration: string): number {
 
     return dur;
 }
-
+/**
+ * Function to get Continuation Token
+ * @param data html data of playlist url
+ * @returns token
+ */
 export function getContinuationToken(data: any): string {
     const continuationToken = data.find((x: any) => Object.keys(x)[0] === 'continuationItemRenderer')
         ?.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token;

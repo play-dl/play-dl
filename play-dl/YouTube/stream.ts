@@ -26,7 +26,11 @@ export interface InfoData {
     format: any[];
     video_details: any;
 }
-
+/**
+ * Command to find audio formats from given format array
+ * @param formats Formats to search from
+ * @returns Audio Formats array
+ */
 export function parseAudioFormats(formats: any[]) {
     const result: any[] = [];
     formats.forEach((format) => {
@@ -39,9 +43,16 @@ export function parseAudioFormats(formats: any[]) {
     });
     return result;
 }
-
+/**
+ * Type for YouTube Stream
+ */
 export type YouTubeStream = Stream | LiveStreaming;
-
+/**
+ * Stream command for YouTube
+ * @param url YouTube URL
+ * @param options lets you add quality, cookie, proxy support for stream
+ * @returns Stream class with type and stream for playing.
+ */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
     const info = await video_info(url, { cookie: options.cookie, proxy: options.proxy });
     const final: any[] = [];
@@ -73,10 +84,15 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
         Number(final[0].contentLength),
         info.video_details.url,
         options.cookie as string,
-        options.quality
+        options
     );
 }
-
+/**
+ * Stream command for YouTube using info from video_info function.
+ * @param info video_info data
+ * @param options lets you add quality, cookie, proxy support for stream
+ * @returns Stream class with type and stream for playing.
+ */
 export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<YouTubeStream> {
     const final: any[] = [];
     if (
@@ -107,6 +123,6 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
         Number(final[0].contentLength),
         info.video_details.url,
         options.cookie as string,
-        options.quality
+        options
     );
 }

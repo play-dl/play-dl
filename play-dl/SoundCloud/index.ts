@@ -13,8 +13,12 @@ interface SoundDataOptions {
 }
 
 const pattern = /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(soundcloud\.com|snd\.sc)\/(.*)$/;
-
-export async function soundcloud(url: string): Promise<SoundCloudTrack | SoundCloudPlaylist> {
+/**
+ * Function to get info from a soundcloud url
+ * @param url soundcloud url
+ * @returns SoundCloud Track or SoundCloud Playlist
+ */
+export async function soundcloud(url: string): Promise<SoundCloud> {
     if (!soundData) throw new Error('SoundCloud Data is missing\nDid you forgot to do authorization ?');
     if (!url.match(pattern)) throw new Error('This is not a SoundCloud URL');
 
@@ -32,8 +36,17 @@ export async function soundcloud(url: string): Promise<SoundCloudTrack | SoundCl
     if (json_data.kind === 'track') return new SoundCloudTrack(json_data);
     else return new SoundCloudPlaylist(json_data, soundData.client_id);
 }
-
+/**
+ * Type of SoundCloud
+ */
 export type SoundCloud = SoundCloudTrack | SoundCloudPlaylist;
+/**
+ * Function for searching in SoundCloud
+ * @param query query to search
+ * @param type 'tracks' | 'playlists' | 'albums'
+ * @param limit max no. of results
+ * @returns Array of SoundCloud type.
+ */
 export async function so_search(
     query: string,
     type: 'tracks' | 'playlists' | 'albums',
@@ -50,7 +63,12 @@ export async function so_search(
     });
     return results;
 }
-
+/**
+ * Main Function for creating a Stream of soundcloud
+ * @param url soundcloud url
+ * @param quality Quality to select from
+ * @returns SoundCloud Stream
+ */
 export async function stream(url: string, quality?: number): Promise<Stream> {
     const data = await soundcloud(url);
 
@@ -67,7 +85,16 @@ export async function stream(url: string, quality?: number): Promise<Stream> {
         : StreamType.Arbitrary;
     return new Stream(s_data.url, type);
 }
+/**
+ * Type for SoundCloud Stream
+ */
 export type SoundCloudStream = Stream;
+/**
+ * Function for creating a Stream of soundcloud using a SoundCloud Track Class
+ * @param data SoundCloud Track Class
+ * @param quality Quality to select from
+ * @returns SoundCloud Stream
+ */
 export async function stream_from_info(data: SoundCloudTrack, quality?: number): Promise<SoundCloudStream> {
     const HLSformats = parseHlsFormats(data.formats);
     if (typeof quality !== 'number') quality = HLSformats.length - 1;
@@ -80,7 +107,11 @@ export async function stream_from_info(data: SoundCloudTrack, quality?: number):
         : StreamType.Arbitrary;
     return new Stream(s_data.url, type);
 }
-
+/**
+ * Function to check client ID
+ * @param id Client ID
+ * @returns boolean
+ */
 export async function check_id(id: string): Promise<boolean> {
     const response = await request(`https://api-v2.soundcloud.com/search?client_id=${id}&q=Rick+Roll&limit=0`).catch(
         (err: Error) => {
@@ -90,7 +121,11 @@ export async function check_id(id: string): Promise<boolean> {
     if (response instanceof Error) return false;
     else return true;
 }
-
+/**
+ * Function to validate for a soundcloud url
+ * @param url soundcloud url
+ * @returns "false" | 'track' | 'playlist'
+ */
 export async function so_validate(url: string): Promise<false | 'track' | 'playlist'> {
     const data = await request(
         `https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${soundData.client_id}`
@@ -103,7 +138,11 @@ export async function so_validate(url: string): Promise<false | 'track' | 'playl
     else if (json_data.kind === 'playlist') return 'playlist';
     else return false;
 }
-
+/**
+ * Function to select only hls streams from SoundCloud format array
+ * @param data SoundCloud Track Format data
+ * @returns a new array containing hls formats
+ */
 function parseHlsFormats(data: SoundCloudTrackFormat[]) {
     const result: SoundCloudTrackFormat[] = [];
     data.forEach((format) => {

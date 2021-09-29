@@ -29,7 +29,9 @@ interface VideoOptions {
     private: boolean;
     tags: string[];
 }
-
+/**
+ * Class for YouTube Video url
+ */
 export class YouTubeVideo {
     id?: string;
     url: string;
