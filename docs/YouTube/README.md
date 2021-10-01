@@ -62,7 +62,7 @@ const video = await video_basic_info(url. {proxy : [{
 }) // Or add a json containing hostname and port.
 ```
 
-### video_basic_info(url : `string`, options? : [`InfoOptions`]())
+### video_basic_info(url : `string`, options? : [`InfoOptions`](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#infooptions))
 
 _The basic video details `play-dl` fetches at first from url or videoID._
 
@@ -70,7 +70,7 @@ _The basic video details `play-dl` fetches at first from url or videoID._
 const video = await video_basic_info(url)
 ```
 
-### video_info(url : `string`, , options? : [`InfoOptions`]())
+### video_info(url : `string`, , options? : [`InfoOptions`](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#infooptions))
 
 _This contains everything with deciphered formats along with `video_details`. It can fetech data from url or videoID._
 
