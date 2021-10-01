@@ -1,8 +1,8 @@
 import { request } from './utils/request';
 import { ParseSearchInterface, ParseSearchResult } from './utils/parser';
-import { Video } from './classes/Video';
-import { Channel } from './classes/Channel';
-import { PlayList } from './classes/Playlist';
+import { YouTubeVideo } from './classes/Video';
+import { YouTubeChannel } from './classes/Channel';
+import { YouTubePlayList } from './classes/Playlist';
 
 enum SearchType {
     Video = 'EgIQAQ%253D%253D',
@@ -10,10 +10,17 @@ enum SearchType {
     Channel = 'EgIQAg%253D%253D'
 }
 
-export async function yt_search(
-    search: string,
-    options: ParseSearchInterface = {}
-): Promise<(Video | Channel | PlayList)[]> {
+/**
+ * Type for YouTube returns
+ */
+export type YouTube = YouTubeVideo | YouTubeChannel | YouTubePlayList;
+/**
+ * Command to search from YouTube
+ * @param search The query to search
+ * @param options limit & type of YouTube search you want.
+ * @returns YouTube type.
+ */
+export async function yt_search(search: string, options: ParseSearchInterface = {}): Promise<YouTube[]> {
     let url = 'https://www.youtube.com/results?search_query=' + search.replaceAll(' ', '+');
     options.type ??= 'video';
     if (!url.match('&sp=')) {

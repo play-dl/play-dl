@@ -1,5 +1,6 @@
 import { video_info } from '.';
 import { LiveStreaming, Stream } from './classes/LiveStream';
+import { Proxy } from './utils/request';
 
 export enum StreamType {
     Arbitrary = 'arbitrary',
@@ -12,6 +13,7 @@ export enum StreamType {
 export interface StreamOptions {
     quality?: number;
     cookie?: string;
+    proxy?: Proxy[];
 }
 
 export interface InfoData {
@@ -24,8 +26,12 @@ export interface InfoData {
     format: any[];
     video_details: any;
 }
-
-function parseAudioFormats(formats: any[]) {
+/**
+ * Command to find audio formats from given format array
+ * @param formats Formats to search from
+ * @returns Audio Formats array
+ */
+export function parseAudioFormats(formats: any[]) {
     const result: any[] = [];
     formats.forEach((format) => {
         const type = format.mimeType as string;
@@ -37,14 +43,23 @@ function parseAudioFormats(formats: any[]) {
     });
     return result;
 }
-
-export async function stream(url: string, options: StreamOptions = {}): Promise<Stream | LiveStreaming> {
-    const info = await video_info(url, options.cookie);
+/**
+ * Type for YouTube Stream
+ */
+export type YouTubeStream = Stream | LiveStreaming;
+/**
+ * Stream command for YouTube
+ * @param url YouTube URL
+ * @param options lets you add quality, cookie, proxy support for stream
+ * @returns Stream class with type and stream for playing.
+ */
+export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
+    const info = await video_info(url, { cookie: options.cookie, proxy: options.proxy });
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
         info.LiveStreamData.hlsManifestUrl !== null &&
-        info.video_details.durationInSec === '0'
+        info.video_details.durationInSec === 0
     ) {
         return new LiveStreaming(
             info.LiveStreamData.dashManifestUrl,
@@ -68,11 +83,17 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
         info.video_details.durationInSec,
         Number(final[0].contentLength),
         info.video_details.url,
-        options.cookie as string
+        options.cookie as string,
+        options
     );
 }
-
-export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<Stream | LiveStreaming> {
+/**
+ * Stream command for YouTube using info from video_info function.
+ * @param info video_info data
+ * @param options lets you add quality, cookie, proxy support for stream
+ * @returns Stream class with type and stream for playing.
+ */
+export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<YouTubeStream> {
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
@@ -101,6 +122,7 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
         info.video_details.durationInSec,
         Number(final[0].contentLength),
         info.video_details.url,
-        options.cookie as string
+        options.cookie as string,
+        options
     );
 }

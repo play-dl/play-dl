@@ -9,6 +9,7 @@ interface formatOptions {
     cipher?: string;
     s?: string;
 }
+// RegExp for various js functions
 const var_js = '[a-zA-Z_\\$][a-zA-Z_0-9]*';
 const singlequote_js = `'[^'\\\\]*(:?\\\\[\\s\\S][^'\\\\]*)*'`;
 const duoblequote_js = `"[^"\\\\]*(:?\\\\[\\s\\S][^"\\\\]*)*"`;
@@ -37,7 +38,11 @@ const reverse_regexp = new RegExp(`(?:^|,)(${key_js})${reverse_function}`, 'm');
 const slice_regexp = new RegExp(`(?:^|,)(${key_js})${slice_function}`, 'm');
 const splice_regexp = new RegExp(`(?:^|,)(${key_js})${splice_function}`, 'm');
 const swap_regexp = new RegExp(`(?:^|,)(${key_js})${swap_function}`, 'm');
-
+/**
+ * Function to get tokens from html5player body data.
+ * @param body body data of html5player.
+ * @returns Array of tokens.
+ */
 export function js_tokens(body: string) {
     const function_action = function_regexp.exec(body);
     const object_action = obj_regexp.exec(body);
@@ -82,7 +87,12 @@ export function js_tokens(body: string) {
     }
     return tokens;
 }
-
+/**
+ * Function to decipher signature
+ * @param tokens Tokens from js_tokens function
+ * @param signature Signatured format url
+ * @returns deciphered signature
+ */
 function deciper_signature(tokens: string[], signature: string) {
     let sig = signature.split('');
     const len = tokens.length;
@@ -109,14 +119,24 @@ function deciper_signature(tokens: string[], signature: string) {
     }
     return sig.join('');
 }
-
+/**
+ * Function to swap positions in a array
+ * @param array array
+ * @param position position to switch with first element
+ * @returns new array with swapped positions.
+ */
 function swappositions(array: string[], position: number) {
     const first = array[0];
     array[0] = array[position];
     array[position] = first;
     return array;
 }
-
+/**
+ * Sets Download url with some extra parameter
+ * @param format video fomat
+ * @param sig deciphered signature
+ * @returns void
+ */
 function download_url(format: formatOptions, sig: string) {
     let decoded_url;
     if (!format.url) return;
@@ -132,8 +152,13 @@ function download_url(format: formatOptions, sig: string) {
     }
     format.url = parsed_url.toString();
 }
-
-export async function format_decipher(formats: formatOptions[], html5player: string) {
+/**
+ * Main function which handles all queries related to video format deciphering
+ * @param formats video formats
+ * @param html5player url of html5player
+ * @returns array of format.
+ */
+export async function format_decipher(formats: formatOptions[], html5player: string): Promise<formatOptions[]> {
     const body = await request(html5player);
     const tokens = js_tokens(body);
     formats.forEach((format) => {

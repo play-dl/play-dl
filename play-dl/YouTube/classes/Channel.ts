@@ -3,18 +3,21 @@ export interface ChannelIconInterface {
     width: number;
     height: number;
 }
-
-export class Channel {
+/**
+ * Class for YouTube Channel url
+ */
+export class YouTubeChannel {
     name?: string;
     verified?: boolean;
     id?: string;
+    type: 'video' | 'playlist' | 'channel';
     url?: string;
     icon?: ChannelIconInterface;
     subscribers?: string;
 
     constructor(data: any) {
         if (!data) throw new Error(`Cannot instantiate the ${this.constructor.name} class without data!`);
-
+        this.type = 'channel';
         this._patch(data);
     }
 
@@ -39,10 +42,6 @@ export class Channel {
         if (!this.icon?.url) return undefined;
         const def = this.icon.url.split('=s')[1].split('-c')[0];
         return this.icon.url.replace(`=s${def}-c`, `=s${options.size}-c`);
-    }
-
-    get type(): 'channel' {
-        return 'channel';
     }
 
     toString(): string {

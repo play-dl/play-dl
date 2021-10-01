@@ -1,22 +1,29 @@
 import { getPlaylistVideos, getContinuationToken } from '../utils/extractor';
 import { request } from '../utils/request';
-import { Thumbnail } from './Thumbnail';
-import { Channel } from './Channel';
-import { Video } from './Video';
+import { YouTubeChannel } from './Channel';
+import { YouTubeVideo } from './Video';
 const BASE_API = 'https://www.youtube.com/youtubei/v1/browse?key=';
-
-export class PlayList {
+/**
+ * Class for YouTube Playlist url
+ */
+export class YouTubePlayList {
     id?: string;
     title?: string;
+    type: 'video' | 'playlist' | 'channel';
     videoCount?: number;
     lastUpdate?: string;
     views?: number;
     url?: string;
     link?: string;
-    channel?: Channel;
-    thumbnail?: Thumbnail;
+    channel?: YouTubeChannel;
+    thumbnail?: {
+        id: string | undefined;
+        width: number | undefined;
+        height: number | undefined;
+        url: string | undefined;
+    };
     private videos?: [];
-    private fetched_videos: Map<string, Video[]>;
+    private fetched_videos: Map<string, YouTubeVideo[]>;
     private _continuation: {
         api?: string;
         token?: string;
@@ -28,6 +35,7 @@ export class PlayList {
         if (!data) throw new Error(`Cannot instantiate the ${this.constructor.name} class without data!`);
         this.__count = 0;
         this.fetched_videos = new Map();
+        this.type = 'playlist';
         if (searchResult) this.__patchSearch(data);
         else this.__patch(data);
     }
@@ -44,7 +52,7 @@ export class PlayList {
         this.thumbnail = data.thumbnail || undefined;
         this.videos = data.videos || [];
         this.__count++;
-        this.fetched_videos.set(`${this.__count}`, this.videos as Video[]);
+        this.fetched_videos.set(`${this.__count}`, this.videos as YouTubeVideo[]);
         this._continuation.api = data.continuation?.api ?? undefined;
         this._continuation.token = data.continuation?.token ?? undefined;
         this._continuation.clientVersion = data.continuation?.clientVersion ?? '<important data>';
@@ -63,7 +71,7 @@ export class PlayList {
         this.views = 0;
     }
 
-    async next(limit = Infinity): Promise<Video[]> {
+    async next(limit = Infinity): Promise<YouTubeVideo[]> {
         if (!this._continuation || !this._continuation.token) return [];
 
         const nextPage = await request(`${BASE_API}${this._continuation.api}`, {
@@ -109,14 +117,10 @@ export class PlayList {
         return this;
     }
 
-    get type(): 'playlist' {
-        return 'playlist';
-    }
-
-    page(number: number): Video[] {
+    page(number: number): YouTubeVideo[] {
         if (!number) throw new Error('Page number is not provided');
         if (!this.fetched_videos.has(`${number}`)) throw new Error('Given Page number is invalid');
-        return this.fetched_videos.get(`${number}`) as Video[];
+        return this.fetched_videos.get(`${number}`) as YouTubeVideo[];
     }
 
     get total_pages() {
@@ -125,7 +129,7 @@ export class PlayList {
 
     get total_videos() {
         const page_number: number = this.total_pages;
-        return (page_number - 1) * 100 + (this.fetched_videos.get(`${page_number}`) as Video[]).length;
+        return (page_number - 1) * 100 + (this.fetched_videos.get(`${page_number}`) as YouTubeVideo[]).length;
     }
 
     toJSON() {

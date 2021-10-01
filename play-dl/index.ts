@@ -1,6 +1,6 @@
-export { playlist_info, video_basic_info, video_info, yt_validate, extractID } from './YouTube';
-export { spotify, sp_validate, refreshToken, is_expired } from './Spotify';
-export { soundcloud, so_validate } from './SoundCloud';
+export { playlist_info, video_basic_info, video_info, yt_validate, extractID, YouTube, YouTubeStream } from './YouTube';
+export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
+export { soundcloud, so_validate, SoundCloud, SoundCloudStream } from './SoundCloud';
 
 interface SearchOptions {
     limit?: number;
@@ -13,36 +13,72 @@ interface SearchOptions {
 
 import readline from 'readline';
 import fs from 'fs';
-import { sp_validate, yt_validate, so_validate } from '.';
+import {
+    sp_validate,
+    yt_validate,
+    so_validate,
+    YouTubeStream,
+    SoundCloudStream,
+    YouTube,
+    SoundCloud,
+    Spotify
+} from '.';
 import { SpotifyAuthorize, sp_search } from './Spotify';
 import { check_id, so_search, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
 import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
-import { SoundCloudTrack, Stream as SoStream } from './SoundCloud/classes';
-import { LiveStreaming, Stream as YTStream } from './YouTube/classes/LiveStream';
+import { SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
 
-export async function stream(url: string, options: StreamOptions = {}): Promise<YTStream | LiveStreaming | SoStream> {
+/**
+ * Main stream Command for streaming through various sources
+ * @param url The video / track url to make stream of
+ * @param options contains quality, cookie and proxy to set for stream
+ * @returns YouTube / SoundCloud Stream to play
+ */
+
+export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
     if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
     if (url.indexOf('soundcloud') !== -1) return await so_stream(url, options.quality);
-    else return await yt_stream(url, { cookie: options.cookie });
+    else return await yt_stream(url, options);
 }
 
-export async function search(query: string, options: SearchOptions = {}) {
+/**
+ *  Main Search Command for searching through various sources
+ * @param query string to search.
+ * @param options contains limit and source to choose.
+ * @returns Array of YouTube or Spotify or SoundCloud
+ */
+export async function search(
+    query: string,
+    options: SearchOptions = {}
+): Promise<YouTube[] | Spotify[] | SoundCloud[]> {
     if (!options.source) options.source = { youtube: 'video' };
 
     if (options.source.youtube) return await yt_search(query, { limit: options.limit, type: options.source.youtube });
     else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
     else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
+    else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
 }
 
+/**
+ *  stream Command for streaming through various sources using data from video_info or soundcloud
+ *  SoundCloud Track is only supported
+ * @param info video_info data or SoundCloud Track data.
+ * @param options contains quality, cookie and proxy to set for stream
+ * @returns YouTube / SoundCloud Stream to play
+ */
 export async function stream_from_info(
     info: InfoData | SoundCloudTrack,
     options: StreamOptions = {}
-): Promise<YTStream | LiveStreaming | SoStream> {
-    if (info instanceof SoundCloudTrack) return await so_stream_info(info);
-    else return await yt_stream_info(info, { cookie: options.cookie });
+): Promise<YouTubeStream | SoundCloudStream> {
+    if (info instanceof SoundCloudTrack) return await so_stream_info(info, options.quality);
+    else return await yt_stream_info(info, options);
 }
-
+/**
+ * Command to validate the provided url. It checks whether it supports play-dl or not.
+ * @param url url to validate
+ * @returns On failure, returns false else type of url.
+ */
 export async function validate(
     url: string
 ): Promise<'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | false> {
@@ -58,7 +94,9 @@ export async function validate(
         return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
     }
 }
-
+/**
+ * Authorization interface for Spotify and SoundCloud.
+ */
 export function authorization(): void {
     const ask = readline.createInterface({
         input: process.stdin,

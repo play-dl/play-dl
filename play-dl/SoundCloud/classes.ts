@@ -32,7 +32,9 @@ export interface SoundCloudTrackFormat {
     };
     quality: string;
 }
-
+/**
+ * SoundCloud Track
+ */
 export class SoundCloudTrack {
     name: string;
     id: number;
@@ -100,7 +102,9 @@ export class SoundCloudTrack {
         };
     }
 }
-
+/**
+ * SoundCloud Playlist
+ */
 export class SoundCloudPlaylist {
     name: string;
     id: number;
@@ -193,7 +197,9 @@ export class SoundCloudPlaylist {
         };
     }
 }
-
+/**
+ * SoundCloud Stream class
+ */
 export class Stream {
     stream: PassThrough;
     type: StreamType;

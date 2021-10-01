@@ -1,6 +1,7 @@
-import { Video } from '../classes/Video';
-import { PlayList } from '../classes/Playlist';
-import { Channel } from '../classes/Channel';
+import { YouTubeVideo } from '../classes/Video';
+import { YouTubePlayList } from '../classes/Playlist';
+import { YouTubeChannel } from '../classes/Channel';
+import { YouTube } from '..';
 
 export interface ParseSearchInterface {
     type?: 'video' | 'playlist' | 'channel';
@@ -12,8 +13,13 @@ export interface thumbnail {
     height: string;
     url: string;
 }
-
-export function ParseSearchResult(html: string, options?: ParseSearchInterface): (Video | PlayList | Channel)[] {
+/**
+ * Main command which converts html body data and returns the type of data requested.
+ * @param html body of that request
+ * @param options limit & type of YouTube search you want.
+ * @returns Array of one of YouTube type.
+ */
+export function ParseSearchResult(html: string, options?: ParseSearchInterface): YouTube[] {
     if (!html) throw new Error("Can't parse Search result without data");
     if (!options) options = { type: 'video', limit: 0 };
     if (!options.type) options.type = 'video';
@@ -42,7 +48,11 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     }
     return results;
 }
-
+/**
+ * Function to convert [hour : minutes : seconds] format to seconds
+ * @param duration hour : minutes : seconds format
+ * @returns seconds
+ */
 function parseDuration(duration: string): number {
     duration ??= '0:00';
     const args = duration.split(':');
@@ -61,15 +71,19 @@ function parseDuration(duration: string): number {
 
     return dur;
 }
-
-export function parseChannel(data?: any): Channel | void {
-    if (!data || !data.channelRenderer) return;
+/**
+ * Function to parse Channel searches
+ * @param data body of that channel request.
+ * @returns YouTubeChannel class
+ */
+export function parseChannel(data?: any): YouTubeChannel {
+    if (!data || !data.channelRenderer) throw new Error('Failed to Parse YouTube Channel');
     const badge = data.channelRenderer.ownerBadges && data.channelRenderer.ownerBadges[0];
     const url = `https://www.youtube.com${
         data.channelRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl ||
         data.channelRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url
     }`;
-    const res = new Channel({
+    const res = new YouTubeChannel({
         id: data.channelRenderer.channelId,
         name: data.channelRenderer.title.simpleText,
         icon: {
@@ -90,12 +104,16 @@ export function parseChannel(data?: any): Channel | void {
 
     return res;
 }
-
-export function parseVideo(data?: any): Video | void {
-    if (!data || !data.videoRenderer) return;
+/**
+ * Function to parse Video searches
+ * @param data body of that video request.
+ * @returns YouTubeVideo class
+ */
+export function parseVideo(data?: any): YouTubeVideo {
+    if (!data || !data.videoRenderer) throw new Error('Failed to Parse YouTube Video');
 
     const badge = data.videoRenderer.ownerBadges && data.videoRenderer.ownerBadges[0];
-    const res = new Video({
+    const res = new YouTubeVideo({
         id: data.videoRenderer.videoId,
         url: `https://www.youtube.com/watch?v=${data.videoRenderer.videoId}`,
         title: data.videoRenderer.title.runs[0].text,
@@ -130,11 +148,15 @@ export function parseVideo(data?: any): Video | void {
 
     return res;
 }
+/**
+ * Function to parse Playlist searches
+ * @param data body of that playlist request.
+ * @returns YouTubePlaylist class
+ */
+export function parsePlaylist(data?: any): YouTubePlayList {
+    if (!data.playlistRenderer) throw new Error('Failed to Parse YouTube Playlist');
 
-export function parsePlaylist(data?: any): PlayList | void {
-    if (!data.playlistRenderer) return;
-
-    const res = new PlayList(
+    const res = new YouTubePlayList(
         {
             id: data.playlistRenderer.playlistId,
             title: data.playlistRenderer.title.simpleText,
@@ -151,9 +173,9 @@ export function parsePlaylist(data?: any): PlayList | void {
                 ].width
             },
             channel: {
-                id: data.playlistRenderer.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
-                name: data.playlistRenderer.shortBylineText.runs[0].text,
-                url: `https://www.youtube.com${data.playlistRenderer.shortBylineText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`
+                id: data.playlistRenderer.shortBylineText.runs?.[0].navigationEndpoint.browseEndpoint.browseId,
+                name: data.playlistRenderer.shortBylineText.runs?.[0].text,
+                url: `https://www.youtube.com${data.playlistRenderer.shortBylineText.runs?.[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`
             },
             videos: parseInt(data.playlistRenderer.videoCount.replace(/[^0-9]/g, ''))
         },

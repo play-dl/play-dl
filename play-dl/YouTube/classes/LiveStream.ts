@@ -1,7 +1,7 @@
 import { PassThrough } from 'stream';
 import { IncomingMessage } from 'http';
-import { StreamType } from '../stream';
-import { request, request_stream } from '../utils/request';
+import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
+import { Proxy, request, request_stream } from '../utils/request';
 import { video_info } from '..';
 
 export interface FormatInterface {
@@ -47,7 +47,7 @@ export class LiveStreaming {
         if (
             info.LiveStreamData.isLive === true &&
             info.LiveStreamData.hlsManifestUrl !== null &&
-            info.video_details.durationInSec === '0'
+            info.video_details.durationInSec === 0
         ) {
             this.url = info.LiveStreamData.dashManifestUrl;
         }
@@ -119,7 +119,9 @@ export class LiveStreaming {
         }, this.interval);
     }
 }
-
+/**
+ * Class for YouTube Stream
+ */
 export class Stream {
     stream: PassThrough;
     type: StreamType;
@@ -128,10 +130,11 @@ export class Stream {
     private per_sec_bytes: number;
     private content_length: number;
     private video_url: string;
-    private timer: NodeJS.Timer | null;
     private cookie: string;
     private data_ended: boolean;
     private playing_count: number;
+    private quality: number;
+    private proxy: Proxy[];
     private request: IncomingMessage | null;
     constructor(
         url: string,
@@ -139,17 +142,17 @@ export class Stream {
         duration: number,
         contentLength: number,
         video_url: string,
-        cookie: string
+        cookie: string,
+        options: StreamOptions
     ) {
         this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.url = url;
+        this.quality = options.quality as number;
+        this.proxy = options.proxy || [];
         this.type = type;
         this.bytes_count = 0;
         this.video_url = video_url;
         this.cookie = cookie;
-        this.timer = setInterval(() => {
-            this.retry();
-        }, 7200 * 1000);
         this.per_sec_bytes = Math.ceil(contentLength / duration);
         this.content_length = contentLength;
         this.request = null;
@@ -174,15 +177,14 @@ export class Stream {
     }
 
     private async retry() {
-        const info = await video_info(this.video_url, this.cookie);
-        this.url = info.format[info.format.length - 1].url;
+        const info = await video_info(this.video_url, { cookie: this.cookie, proxy: this.proxy });
+        const audioFormat = parseAudioFormats(info.format);
+        this.url = audioFormat[this.quality].url;
     }
 
     private cleanup() {
-        clearInterval(this.timer as NodeJS.Timer);
         this.request?.unpipe(this.stream);
         this.request?.destroy();
-        this.timer = null;
         this.request = null;
         this.url = '';
     }
@@ -210,18 +212,15 @@ export class Stream {
             this.cleanup();
             await this.retry();
             this.loop();
-            if (!this.timer) {
-                this.timer = setInterval(() => {
-                    this.retry();
-                }, 7200 * 1000);
-            }
             return;
         }
         this.request = stream;
         stream.pipe(this.stream, { end: false });
 
-        stream.once('error', (err) => {
-            this.stream.emit('error', err);
+        stream.once('error', async (err) => {
+            this.cleanup();
+            await this.retry();
+            this.loop();
         });
 
         stream.on('data', (chunk: any) => {
