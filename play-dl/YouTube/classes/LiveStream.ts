@@ -130,7 +130,6 @@ export class Stream {
     private per_sec_bytes: number;
     private content_length: number;
     private video_url: string;
-    private timer: NodeJS.Timer | null;
     private cookie: string;
     private data_ended: boolean;
     private playing_count: number;
@@ -154,9 +153,6 @@ export class Stream {
         this.bytes_count = 0;
         this.video_url = video_url;
         this.cookie = cookie;
-        this.timer = setInterval(() => {
-            this.retry();
-        }, 7200 * 1000);
         this.per_sec_bytes = Math.ceil(contentLength / duration);
         this.content_length = contentLength;
         this.request = null;
@@ -187,10 +183,8 @@ export class Stream {
     }
 
     private cleanup() {
-        clearInterval(this.timer as NodeJS.Timer);
         this.request?.unpipe(this.stream);
         this.request?.destroy();
-        this.timer = null;
         this.request = null;
         this.url = '';
     }
@@ -218,11 +212,6 @@ export class Stream {
             this.cleanup();
             await this.retry();
             this.loop();
-            if (!this.timer) {
-                this.timer = setInterval(() => {
-                    this.retry();
-                }, 7200 * 1000);
-            }
             return;
         }
         this.request = stream;
@@ -232,11 +221,6 @@ export class Stream {
             this.cleanup();
             await this.retry();
             this.loop();
-            if (!this.timer) {
-                this.timer = setInterval(() => {
-                    this.retry();
-                }, 7200 * 1000);
-            }
         });
 
         stream.on('data', (chunk: any) => {
