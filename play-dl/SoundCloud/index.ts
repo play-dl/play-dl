@@ -12,7 +12,7 @@ interface SoundDataOptions {
     client_id: string;
 }
 
-const pattern = /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(soundcloud\.com|snd\.sc)\/(.*)$/;
+const pattern = /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(api\.soundcloud\.com|soundcloud\.com|snd\.sc)\/(.*)$/;
 /**
  * Function to get info from a soundcloud url
  * @param url soundcloud url
