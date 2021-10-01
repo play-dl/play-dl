@@ -65,7 +65,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
         if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
         video_id = extractID(url);
     } else video_id = url;
-    const new_url = `https://www.youtube.com/watch?v=${video_id}`;
+    const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
     const body = await request(new_url, {
         proxies: options.proxy ?? [],
         headers: options.cookie

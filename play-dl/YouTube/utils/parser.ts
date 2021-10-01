@@ -173,9 +173,9 @@ export function parsePlaylist(data?: any): YouTubePlayList {
                 ].width
             },
             channel: {
-                id: data.playlistRenderer.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
-                name: data.playlistRenderer.shortBylineText.runs[0].text,
-                url: `https://www.youtube.com${data.playlistRenderer.shortBylineText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`
+                id: data.playlistRenderer.shortBylineText.runs?.[0].navigationEndpoint.browseEndpoint.browseId,
+                name: data.playlistRenderer.shortBylineText.runs?.[0].text,
+                url: `https://www.youtube.com${data.playlistRenderer.shortBylineText.runs?.[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`
             },
             videos: parseInt(data.playlistRenderer.videoCount.replace(/[^0-9]/g, ''))
         },
