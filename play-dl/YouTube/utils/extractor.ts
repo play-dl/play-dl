@@ -67,7 +67,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
     } else video_id = url;
     const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
     const body = await request(new_url, {
-        proxies: options.proxy ?? [],
+        proxies: options.proxy ?? undefined,
         headers: options.cookie
             ? {
                   'cookie': options.cookie,
@@ -185,7 +185,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
     const new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`;
 
     const body = await request(new_url, {
-        proxies: options.proxy ?? [],
+        proxies: options.proxy ?? undefined,
         headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
     });
     const response = JSON.parse(body.split('var ytInitialData = ')[1].split(';</script>')[0]);

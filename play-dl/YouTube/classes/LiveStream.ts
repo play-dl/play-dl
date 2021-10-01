@@ -134,7 +134,7 @@ export class Stream {
     private data_ended: boolean;
     private playing_count: number;
     private quality: number;
-    private proxy: Proxy[];
+    private proxy: Proxy[] | undefined ;
     private request: IncomingMessage | null;
     constructor(
         url: string,
@@ -148,7 +148,7 @@ export class Stream {
         this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.url = url;
         this.quality = options.quality as number;
-        this.proxy = options.proxy || [];
+        this.proxy = options.proxy || undefined;
         this.type = type;
         this.bytes_count = 0;
         this.video_url = video_url;
