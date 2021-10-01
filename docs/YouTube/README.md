@@ -55,7 +55,7 @@ const video = await video_basic_info(url, { cookie : "cookies" }) // Gives cooki
 
 const video = await video_basic_info(url, { proxy : ['url'] }) // Accepts a url which has port in in it.
 
-const video = await video_basic_info(url. {proxy : [{
+const video = await video_basic_info(url, {proxy : [{
         host : "IP or hostname",
         port : 8080
     }]
