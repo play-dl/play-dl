@@ -53,7 +53,7 @@ _This are the info options that can be passed as a parameter in `video_info` and
 ```js
 const video = await video_basic_info(url, { cookie : "cookies" }) // Gives cookies support
 
-const video = await video_basic_info(url, { proxy : ['url'] }) // Accepts a url which has port in in it.
+const video = await video_basic_info(url, { proxy : ['url'] }) // Accepts a url which has port in it.
 
 const video = await video_basic_info(url, {proxy : [{
         host : "IP or hostname",
