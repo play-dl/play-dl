@@ -92,7 +92,7 @@ let source = await stream("url", { quality : 1 }) // Next to Lowest quality.
 
 let source = await stream("url", { cookie: COOKIE }) //This will create a stream Class and also give cookies.
 
-let source = await stream(url, { proxy : ['url'] }) // Accepts a url which has port in in it.
+let source = await stream(url, { proxy : ['url'] }) // Accepts a url which has port in it.
 
 let source = await stream(url. {proxy : [{
         host : "IP or hostname",
@@ -121,7 +121,7 @@ let source = await stream_from_info(info, { quality : 1 }) // Next to Lowest qua
 let source = await stream_from_info(info, { cookie: COOKIE }) //This will create a stream Class and also give cookies if retrying.
 
 
-let source = await stream_from_info(info, { proxy : ['url'] }) // Accepts a url which has port in in it.
+let source = await stream_from_info(info, { proxy : ['url'] }) // Accepts a url which has port in it.
 
 let source = await stream_from_info(info, {proxy : [{
         host : "IP or hostname",
