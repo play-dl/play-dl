@@ -134,7 +134,7 @@ export class Stream {
     private data_ended: boolean;
     private playing_count: number;
     private quality: number;
-    private proxy: Proxy[] | undefined ;
+    private proxy: Proxy[] | undefined;
     private request: IncomingMessage | null;
     constructor(
         url: string,

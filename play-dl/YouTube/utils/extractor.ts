@@ -13,10 +13,13 @@ interface PlaylistOptions {
     proxy?: Proxy[];
 }
 
+const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
+const playlist_id_pattern = /^PL[a-zA-Z\d_-]{32}$/;
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
-const playlist_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)/;
+const playlist_pattern =
+    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)PL[a-zA-Z\d_-]{32}(.*)?$/;
 /**
  * Command to validate a YouTube url
  * @param url Url for validation
@@ -24,8 +27,14 @@ const playlist_pattern = /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?
  */
 export function yt_validate(url: string): 'playlist' | 'video' | false {
     if (url.indexOf('list=') === -1) {
-        if (!url.match(video_pattern)) return false;
-        else return 'video';
+        if (url.startsWith('https')) {
+            if (url.match(video_pattern)) return 'video';
+            else return false;
+        } else {
+            if (url.match(video_id_pattern)) return 'video';
+            else if (url.match(playlist_id_pattern)) return 'playlist';
+            else return false;
+        }
     } else {
         if (!url.match(playlist_pattern)) return false;
         const Playlist_id = url.split('list=')[1].split('&')[0];
@@ -41,6 +50,7 @@ export function yt_validate(url: string): 'playlist' | 'video' | false {
  * @returns ID of video or playlist.
  */
 export function extractID(url: string): string {
+    if (!yt_validate(url)) throw new Error('This is not a YouTube url or videoId or PlaylistID');
     if (url.startsWith('https')) {
         if (url.indexOf('list=') === -1) {
             let video_id: string;
@@ -105,8 +115,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
         url: `https://www.youtube.com/watch?v=${vid.videoId}`,
         title: vid.title,
         description: vid.shortDescription,
-        durationInSec: vid.lengthSeconds,
-        durationRaw: parseSeconds(vid.lengthSeconds),
+        duration: vid.lengthSeconds,
+        duration_raw: parseSeconds(vid.lengthSeconds),
         uploadedDate: microformat.publishDate,
         thumbnail: vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1],
         channel: {
