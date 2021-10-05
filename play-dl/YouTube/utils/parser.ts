@@ -32,7 +32,7 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
             .itemSectionRenderer.contents;
     for (let i = 0; i < details.length; i++) {
         if (typeof options.limit === 'number' && options.limit > 0 && results.length === options.limit) break;
-        if(!details[i].videoRenderer && !details[i].channelRenderer && !details[i].playlistRenderer) continue;
+        if (!details[i].videoRenderer && !details[i].channelRenderer && !details[i].playlistRenderer) continue;
         if (options.type === 'video') {
             const parsed = parseVideo(details[i]);
             if (!parsed) continue;

@@ -152,7 +152,7 @@ async function proxy_getter(req_url: string, req_proxy: Proxy[]): Promise<ProxyO
  */
 export async function request(url: string, options?: RequestOpts): Promise<string> {
     return new Promise(async (resolve, reject) => {
-        if (!options?.proxies) {
+        if (!options?.proxies || options.proxies.length === 0) {
             let data = '';
             let res = await https_getter(url, options).catch((err: Error) => err);
             if (res instanceof Error) {

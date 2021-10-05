@@ -117,7 +117,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
         description: vid.shortDescription,
         duration: vid.lengthSeconds,
         duration_raw: parseSeconds(vid.lengthSeconds),
-        uploadedDate: microformat.publishDate,
+        uploadedAt: microformat.publishDate,
         thumbnail: vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1],
         channel: {
             name: vid.author,
