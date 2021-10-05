@@ -17,9 +17,9 @@ export class LiveStreaming {
     private url: string;
     private interval: number;
     private packet_count: number;
-    private timer: NodeJS.Timer | null;
+    private timer: Timer;
     private video_url: string;
-    private dash_timer: NodeJS.Timer | null;
+    private dash_timer: Timer;
     private segments_urls: string[];
     private request: IncomingMessage | null;
     constructor(dash_url: string, target_interval: number, video_url: string) {
@@ -30,12 +30,15 @@ export class LiveStreaming {
         this.segments_urls = [];
         this.packet_count = 0;
         this.request = null;
-        this.timer = null;
         this.video_url = video_url;
-        this.interval = target_interval * 1000 || 0;
-        this.dash_timer = setTimeout(() => {
+        this.interval = target_interval || 0;
+        this.timer = new Timer(() => {
+            this.start();
+        }, this.interval);
+        this.dash_timer = new Timer(() => {
+            this.dash_timer.reuse();
             this.dash_updater();
-        }, 1800000);
+        }, 1800);
         this.stream.on('close', () => {
             this.cleanup();
         });
@@ -51,9 +54,6 @@ export class LiveStreaming {
         ) {
             this.url = info.LiveStreamData.dashManifestUrl;
         }
-        this.dash_timer = setTimeout(() => {
-            this.dash_updater();
-        }, 1800000);
     }
 
     private async dash_getter() {
@@ -70,14 +70,12 @@ export class LiveStreaming {
     }
 
     private cleanup() {
-        clearTimeout(this.timer as NodeJS.Timer);
-        clearTimeout(this.dash_timer as NodeJS.Timer);
+        this.timer.destroy();
+        this.dash_timer.destroy();
         this.request?.unpipe(this.stream);
         this.request?.destroy();
-        this.dash_timer = null;
         this.video_url = '';
         this.request = null;
-        this.timer = null;
         this.url = '';
         this.base_url = '';
         this.segments_urls = [];
@@ -114,10 +112,12 @@ export class LiveStreaming {
                 });
             });
         }
-        this.timer = setTimeout(() => {
-            this.start();
-        }, this.interval);
+        
+        this.timer.reuse();
     }
+
+    pause() {}
+    resume() {}
 }
 /**
  * Class for YouTube Stream
@@ -131,8 +131,7 @@ export class Stream {
     private content_length: number;
     private video_url: string;
     private cookie: string;
-    private data_ended: boolean;
-    private playing_count: number;
+    private timer: Timer;
     private quality: number;
     private proxy: Proxy[] | undefined;
     private request: IncomingMessage | null;
@@ -156,22 +155,12 @@ export class Stream {
         this.per_sec_bytes = Math.ceil(contentLength / duration);
         this.content_length = contentLength;
         this.request = null;
-        this.data_ended = false;
-        this.playing_count = 0;
+        this.timer = new Timer(() => {
+            this.timer.reuse();
+            this.loop();
+        }, 280);
         this.stream.on('close', () => {
             this.cleanup();
-        });
-        this.stream.on('pause', () => {
-            this.playing_count++;
-            if (this.data_ended) {
-                this.bytes_count = 0;
-                this.per_sec_bytes = 0;
-                this.cleanup();
-                this.stream.removeAllListeners('pause');
-            } else if (this.playing_count === 280) {
-                this.playing_count = 0;
-                this.loop();
-            }
         });
         this.loop();
     }
@@ -202,7 +191,6 @@ export class Stream {
         }).catch((err: Error) => err);
         if (stream instanceof Error) {
             this.stream.emit('error', stream);
-            this.data_ended = true;
             this.bytes_count = 0;
             this.per_sec_bytes = 0;
             this.cleanup();
@@ -228,7 +216,75 @@ export class Stream {
         });
 
         stream.on('end', () => {
-            if (end >= this.content_length) this.data_ended = true;
+            if (end >= this.content_length) {
+                this.timer.destroy();
+            }
         });
+    }
+
+    pause() {
+        this.timer.pause();
+    }
+
+    resume() {
+        this.timer.resume();
+    }
+}
+
+export class Timer {
+    private destroyed: boolean;
+    private paused: boolean;
+    private timer: NodeJS.Timer;
+    private callback: () => void;
+    private time_start: number;
+    private time_left: number;
+    private time_total: number;
+    constructor(callback: () => void, time: number) {
+        this.callback = callback;
+        this.time_total = time;
+        this.time_left = time;
+        this.paused = false;
+        this.destroyed = false;
+        this.time_start = process.hrtime()[0];
+        this.timer = setTimeout(this.callback, this.time_total * 1000);
+    }
+
+    pause() {
+        if (!this.paused && !this.destroyed) {
+            this.paused = true;
+            clearTimeout(this.timer);
+            this.time_left = this.time_left - (process.hrtime()[0] - this.time_start);
+            return true;
+        } else return false;
+    }
+
+    resume() {
+        if (this.paused && !this.destroyed) {
+            this.paused = false;
+            this.time_start = process.hrtime()[0];
+            this.timer = setTimeout(this.callback, this.time_left * 1000);
+            return true;
+        } else return false;
+    }
+
+    reuse() {
+        if (!this.destroyed) {
+            clearTimeout(this.timer);
+            this.time_left = this.time_total;
+            this.paused = false;
+            this.time_start = process.hrtime()[0];
+            this.timer = setTimeout(this.callback, this.time_total * 1000);
+            return true;
+        } else return false;
+    }
+
+    destroy() {
+        clearTimeout(this.timer);
+        this.destroyed = true;
+        this.callback = () => {};
+        this.time_total = 0;
+        this.time_left = 0;
+        this.paused = false;
+        this.time_start = 0;
     }
 }

@@ -41,7 +41,7 @@ export function yt_validate(url: string): 'playlist' | 'video' | false {
         if (Playlist_id.length !== 34 || !Playlist_id.startsWith('PL')) {
             return false;
         }
-        return 'playlist';
+        else return 'playlist';
     }
 }
 /**
@@ -115,8 +115,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
         url: `https://www.youtube.com/watch?v=${vid.videoId}`,
         title: vid.title,
         description: vid.shortDescription,
-        duration: vid.lengthSeconds,
-        duration_raw: parseSeconds(vid.lengthSeconds),
+        duration: Number(vid.lengthSeconds),
+        duration_raw: parseSeconds(Number(vid.lengthSeconds)),
         uploadedAt: microformat.publishDate,
         thumbnail: vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1],
         channel: {

@@ -2,6 +2,14 @@ export { playlist_info, video_basic_info, video_info, yt_validate, extractID, Yo
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream } from './SoundCloud';
 
+enum AudioPlayerStatus {
+    Idle = 'idle',
+    Buffering = 'buffering',
+    Paused = 'paused',
+    Playing = 'playing',
+    AutoPaused = 'autopaused'
+}
+
 interface SearchOptions {
     limit?: number;
     source?: {
@@ -28,6 +36,7 @@ import { check_id, so_search, stream as so_stream, stream_from_info as so_stream
 import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
+import { EventEmitter } from 'stream';
 
 /**
  * Main stream Command for streaming through various sources
@@ -168,5 +177,16 @@ export function authorization(): void {
             console.log("That option doesn't exist. Try again...");
             ask.close();
         }
+    });
+}
+
+export function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
+    player.on(AudioPlayerStatus.Paused, () => resource.pause());
+    player.on(AudioPlayerStatus.AutoPaused, () => resource.pause());
+    player.on(AudioPlayerStatus.Playing, () => resource.resume());
+    player.once(AudioPlayerStatus.Idle, () => {
+        player.removeListener(AudioPlayerStatus.Paused, () => resource.pause());
+        player.removeListener(AudioPlayerStatus.AutoPaused, () => resource.pause());
+        player.removeListener(AudioPlayerStatus.Playing, () => resource.resume());
     });
 }
