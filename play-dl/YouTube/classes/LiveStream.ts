@@ -177,6 +177,7 @@ export class Stream {
 
     private async loop() {
         if (this.stream.destroyed) {
+            this.timer.destroy()
             this.cleanup();
             return;
         }
