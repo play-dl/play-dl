@@ -2,6 +2,7 @@ import https, { RequestOptions } from 'https';
 import tls from 'tls';
 import http, { ClientRequest, IncomingMessage } from 'http';
 import { URL } from 'url';
+import { getCookies, setCookie, uploadCookie } from './cookie';
 /**
  * Types for Proxy
  */
@@ -18,7 +19,7 @@ interface ProxyOpts {
 
 interface ProxyOutput {
     statusCode: number;
-    head: string;
+    head: string[];
     body: string;
 }
 
@@ -26,6 +27,7 @@ interface RequestOpts extends RequestOptions {
     body?: string;
     method?: 'GET' | 'POST';
     proxies?: Proxy[];
+    cookies? : boolean
 }
 /**
  * Main module that play-dl uses for making a https request
@@ -135,7 +137,7 @@ async function proxy_getter(req_url: string, req_proxy: Proxy[]): Promise<ProxyO
                 const head = y.shift() as string;
                 resolve({
                     statusCode: Number(head.split('\n')[0].split(' ')[1]),
-                    head: head,
+                    head: head.split('\r\n'),
                     body: y.join('\n')
                 });
             });
@@ -150,14 +152,28 @@ async function proxy_getter(req_url: string, req_proxy: Proxy[]): Promise<ProxyO
  * @param options Request options for https request
  * @returns body of that request
  */
-export async function request(url: string, options?: RequestOpts): Promise<string> {
+export async function request(url: string, options: RequestOpts = {}): Promise<string> {
     return new Promise(async (resolve, reject) => {
         if (!options?.proxies || options.proxies.length === 0) {
             let data = '';
+            let cook = getCookies()
+            if (typeof cook === 'string' && options.headers) {
+                Object.assign(options.headers, { cookie : cook });
+            }
             let res = await https_getter(url, options).catch((err: Error) => err);
             if (res instanceof Error) {
                 reject(res);
                 return;
+            }
+            if(res.headers && res.headers['set-cookie'] && cook){
+                res.headers['set-cookie'].forEach((x) => {
+                    x.split(';').forEach((x) => {
+                        const [key, value] = x.split('=');
+                        if (!value) return;
+                        setCookie(key, value);
+                    });
+                })
+                uploadCookie()
             }
             if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
                 res = await https_getter(res.headers.location as string, options);
@@ -168,13 +184,30 @@ export async function request(url: string, options?: RequestOpts): Promise<strin
             res.on('data', (c) => (data += c));
             res.on('end', () => resolve(data));
         } else {
+            let cook = getCookies()
+            if (typeof cook === 'string' && options.headers) {
+                Object.assign(options.headers, { cookie : cook });
+            }
             let res = await proxy_getter(url, options.proxies).catch((e: Error) => e);
             if (res instanceof Error) {
                 reject(res);
                 return;
             }
+            if(res.head && cook){
+                let cookies = res.head.filter((x) => x.toLocaleLowerCase().startsWith('set-cookie: '));
+                cookies.forEach((x) => {
+                    x.toLocaleLowerCase().split('set-cookie: ')[1].split(';').forEach((y) => {
+                        let [key, value] = y.split('=');
+                        if (!value)
+                            return;
+                        setCookie(key, value);
+                    });
+                });
+                uploadCookie()
+            }
             if (res.statusCode >= 300 && res.statusCode < 400) {
-                res = await proxy_getter(res.head.split('Location: ')[1].split('\n')[0], options.proxies);
+                let url = res.head.filter((x) => x.startsWith('Location: '));
+                res = await proxy_getter(url[0].split('\n')[0], options.proxies);
             } else if (res.statusCode > 400) {
                 reject(new Error(`GOT ${res.statusCode} from proxy request`));
             }

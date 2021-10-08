@@ -130,7 +130,6 @@ export class Stream {
     private per_sec_bytes: number;
     private content_length: number;
     private video_url: string;
-    private cookie: string;
     private timer: Timer;
     private quality: number;
     private proxy: Proxy[] | undefined;
@@ -141,7 +140,6 @@ export class Stream {
         duration: number,
         contentLength: number,
         video_url: string,
-        cookie: string,
         options: StreamOptions
     ) {
         this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
@@ -151,7 +149,6 @@ export class Stream {
         this.type = type;
         this.bytes_count = 0;
         this.video_url = video_url;
-        this.cookie = cookie;
         this.per_sec_bytes = Math.ceil(contentLength / duration);
         this.content_length = contentLength;
         this.request = null;
@@ -166,7 +163,7 @@ export class Stream {
     }
 
     private async retry() {
-        const info = await video_info(this.video_url, { cookie: this.cookie, proxy: this.proxy });
+        const info = await video_info(this.video_url, { proxy: this.proxy });
         const audioFormat = parseAudioFormats(info.format);
         this.url = audioFormat[this.quality].url;
     }

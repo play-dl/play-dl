@@ -111,7 +111,7 @@ export function authorization(): void {
         input: process.stdin,
         output: process.stdout
     });
-    ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify) : ', (msg) => {
+    ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify)  / yo (for YouTube): ', (msg) => {
         if (msg.toLowerCase().startsWith('sp')) {
             let client_id: string, client_secret: string, redirect_url: string, market: string;
             ask.question('Start by entering your Client ID : ', (id) => {
@@ -157,9 +157,8 @@ export function authorization(): void {
                 });
             });
         } else if (msg.toLowerCase().startsWith('sc')) {
-            let client_id: string;
             ask.question('Client ID : ', async (id) => {
-                client_id = id;
+                let client_id = id;
                 if (!client_id) {
                     console.log("You didn't provide a client ID. Try again...");
                     ask.close();
@@ -171,6 +170,25 @@ export function authorization(): void {
                     console.log('Client ID has been validated successfully.');
                     fs.writeFileSync('.data/soundcloud.data', JSON.stringify({ client_id }, undefined, 4));
                 } else console.log("That doesn't look like a valid client ID. Retry with a correct client ID.");
+                ask.close();
+            });
+        } else if (msg.toLowerCase().startsWith('yo')) {
+            ask.question('Cookies : ', (cook: string) => {
+                if (!cook || cook.length === 0) {
+                    console.log("You didn't provide a cookie. Try again...");
+                    ask.close();
+                    return;
+                }
+                if (!fs.existsSync('.data')) fs.mkdirSync('.data');
+                console.log('Cookies has been added successfully.');
+                let cookie: Object = {};
+                cook.split(';').forEach((x) => {
+                    let [ key, value ] = x.split('=')
+                    key = key.trim()
+                    value = value.trim()
+                    Object.assign(cookie, { [key] : value })
+                })
+                fs.writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
                 ask.close();
             });
         } else {
@@ -189,4 +207,4 @@ export function attachListeners(player: EventEmitter, resource: YouTubeStream | 
         player.removeListener(AudioPlayerStatus.AutoPaused, () => resource.pause());
         player.removeListener(AudioPlayerStatus.Playing, () => resource.resume());
     });
-}
+};

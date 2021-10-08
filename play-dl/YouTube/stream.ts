@@ -12,7 +12,6 @@ export enum StreamType {
 
 export interface StreamOptions {
     quality?: number;
-    cookie?: string;
     proxy?: Proxy[];
 }
 
@@ -54,7 +53,7 @@ export type YouTubeStream = Stream | LiveStreaming;
  * @returns Stream class with type and stream for playing.
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
-    const info = await video_info(url, { cookie: options.cookie, proxy: options.proxy });
+    const info = await video_info(url, { proxy: options.proxy });
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
@@ -83,7 +82,6 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
         info.video_details.durationInSec,
         Number(final[0].contentLength),
         info.video_details.url,
-        options.cookie as string,
         options
     );
 }
@@ -122,7 +120,6 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
         info.video_details.durationInSec,
         Number(final[0].contentLength),
         info.video_details.url,
-        options.cookie as string,
         options
     );
 }

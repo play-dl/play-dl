@@ -4,7 +4,6 @@ import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 
 interface InfoOptions {
-    cookie?: string;
     proxy?: Proxy[];
 }
 
@@ -78,12 +77,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
     const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
     const body = await request(new_url, {
         proxies: options.proxy ?? undefined,
-        headers: options.cookie
-            ? {
-                  'cookie': options.cookie,
-                  'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
-              }
-            : { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
+        headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' },
+        cookies : true
     });
     const player_response = JSON.parse(body.split('var ytInitialPlayerResponse = ')[1].split('}};')[0] + '}}');
     const initial_response = JSON.parse(body.split('var ytInitialData = ')[1].split('}};')[0] + '}}');
