@@ -155,16 +155,20 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
     return new Promise(async (resolve, reject) => {
         if (!options?.proxies || options.proxies.length === 0) {
             let data = '';
-            let cook = getCookies()
-            if (typeof cook === 'string' && options.headers) {
-                Object.assign(options.headers, { cookie : cook });
+            let cookies_added = false
+            if(options.cookies){
+                let cook = getCookies()
+                if (typeof cook === 'string' && options.headers) {
+                    Object.assign(options.headers, { cookie : cook });
+                    cookies_added = true
+                }
             }
             let res = await https_getter(url, options).catch((err: Error) => err);
             if (res instanceof Error) {
                 reject(res);
                 return;
             }
-            if(res.headers && res.headers['set-cookie'] && cook){
+            if(res.headers && res.headers['set-cookie'] && cookies_added){
                 res.headers['set-cookie'].forEach((x) => {
                     x.split(';').forEach((x) => {
                         const [key, value] = x.split('=');
@@ -183,16 +187,20 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
             res.on('data', (c) => (data += c));
             res.on('end', () => resolve(data));
         } else {
-            let cook = getCookies()
-            if (typeof cook === 'string' && options.headers) {
-                Object.assign(options.headers, { cookie : cook });
+            let cookies_added = false
+            if(options.cookies){
+                let cook = getCookies()
+                if (typeof cook === 'string' && options.headers) {
+                    Object.assign(options.headers, { cookie : cook });
+                    cookies_added = true
+                }
             }
             let res = await proxy_getter(url, options.proxies).catch((e: Error) => e);
             if (res instanceof Error) {
                 reject(res);
                 return;
             }
-            if(res.head && cook){
+            if(res.head && cookies_added){
                 let cookies = res.head.filter((x) => x.toLocaleLowerCase().startsWith('set-cookie: '));
                 cookies.forEach((x) => {
                     x.toLocaleLowerCase().split('set-cookie: ')[1].split(';').forEach((y) => {

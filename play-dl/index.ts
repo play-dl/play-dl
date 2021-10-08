@@ -184,6 +184,7 @@ export function authorization(): void {
                 let cookie: Object = {};
                 cook.split(';').forEach((x) => {
                     let [ key, value ] = x.split('=')
+                    if(!value) return;
                     key = key.trim()
                     value = value.trim()
                     Object.assign(cookie, { [key] : value })

@@ -155,7 +155,7 @@ export class Stream {
         this.timer = new Timer(() => {
             this.timer.reuse();
             this.loop();
-        }, 280);
+        }, 265);
         this.stream.on('close', () => {
             this.cleanup();
         });
