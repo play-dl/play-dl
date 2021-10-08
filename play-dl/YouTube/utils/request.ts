@@ -110,7 +110,6 @@ async function proxy_getter(req_url: string, req_proxy: Proxy[]): Promise<ProxyO
         }
 
         req.on('connect', function (res, socket, head) {
-            console.log('Connected');
             const tlsConnection = tls.connect(
                 {
                     host: parsed_url.hostname,
