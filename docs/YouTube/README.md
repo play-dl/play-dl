@@ -47,12 +47,9 @@ let id = extractID(url)
 
 _This are the info options that can be passed as a parameter in `video_info` and `video_basic_info`_
 
--   cookie : **[Cookies](https://github.com/play-dl/play-dl/discussions/34) are optional and are required for playing age restricted videos.**
 -   proxy : Optional parameter to add support of proxies. As of now, HTTPS proxies are only supported. So make sure to get HTTPS proxies only.
 
 ```js
-const video = await video_basic_info(url, { cookie : "cookies" }) // Gives cookies support
-
 const video = await video_basic_info(url, { proxy : ['url'] }) // Accepts a url which has port in it.
 
 const video = await video_basic_info(url, {proxy : [{
