@@ -34,7 +34,7 @@ if(check === 'so_track') // SoundCloud Track
 
 ### authorization()
 
-_This creates basic spotify / soundcloud data to be stored locally._
+_This creates basic spotify / soundcloud / youtube data to be stored locally._
 
 ```js
 authorization() //After then you will be asked about type of data you want to create and then follow the steps properly.
@@ -73,10 +73,23 @@ let data = await search('Rick Roll', { limit: 1, source : { soundcloud : "tracks
 
 ### Stream
 
+**Attaching events to player is important for stream to work.**
+
+#### attachListeners(player : `AudioPlayer`, resource : `YouTubeStream | SoundCloudStream`) 
+
+_This is used for attaching pause and playing events to audioPlayer._
+
+```js
+let resource = await stream("url")
+
+let player = createAudioPlayer()
+
+attachListeners(player, resource)
+```
+
 #### StreamOptions :
 
 -   quality : `number` :- Sets quality of stream [ 0 = Lowest, 1 = Medium ]. Leave this empty to get highest audio quality.
--   cookie : `string` :- **[Cookies](https://github.com/play-dl/play-dl/discussions/34)** are optional and are required for playing age restricted videos.
 -   proxy : `Proxy` :- Optional parameter to add support of proxies. As of now, HTTPS proxies are only supported. So make sure to get HTTPS proxies only.
 
 #### stream(url : `string`, options? : [`StreamOptions`](https://github.com/play-dl/play-dl/tree/main/docs#streamoptions-))
@@ -89,8 +102,6 @@ let source = await stream("url") // This will create a stream Class. Highest Qua
 let source = await stream("url", { quality : 0 }) // Lowest quality
 
 let source = await stream("url", { quality : 1 }) // Next to Lowest quality.
-
-let source = await stream("url", { cookie: COOKIE }) //This will create a stream Class and also give cookies.
 
 let source = await stream(url, { proxy : ['url'] }) // Accepts a url which has port in it.
 
@@ -117,9 +128,6 @@ let source = await stream_from_info(info) // This will create a stream Class fro
 let source = await stream_from_info(info, { quality : 0 }) // Lowest quality
 
 let source = await stream_from_info(info, { quality : 1 }) // Next to Lowest quality.
-
-let source = await stream_from_info(info, { cookie: COOKIE }) //This will create a stream Class and also give cookies if retrying.
-
 
 let source = await stream_from_info(info, { proxy : ['url'] }) // Accepts a url which has port in it.
 

@@ -2,6 +2,14 @@ export { playlist_info, video_basic_info, video_info, yt_validate, extractID, Yo
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream } from './SoundCloud';
 
+enum AudioPlayerStatus {
+    Idle = 'idle',
+    Buffering = 'buffering',
+    Paused = 'paused',
+    Playing = 'playing',
+    AutoPaused = 'autopaused'
+}
+
 interface SearchOptions {
     limit?: number;
     source?: {
@@ -28,6 +36,7 @@ import { check_id, so_search, stream as so_stream, stream_from_info as so_stream
 import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
+import { EventEmitter } from 'stream';
 
 /**
  * Main stream Command for streaming through various sources
@@ -102,7 +111,7 @@ export function authorization(): void {
         input: process.stdin,
         output: process.stdout
     });
-    ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify) : ', (msg) => {
+    ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify)  / yo (for YouTube): ', (msg) => {
         if (msg.toLowerCase().startsWith('sp')) {
             let client_id: string, client_secret: string, redirect_url: string, market: string;
             ask.question('Start by entering your Client ID : ', (id) => {
@@ -148,9 +157,8 @@ export function authorization(): void {
                 });
             });
         } else if (msg.toLowerCase().startsWith('sc')) {
-            let client_id: string;
             ask.question('Client ID : ', async (id) => {
-                client_id = id;
+                let client_id = id;
                 if (!client_id) {
                     console.log("You didn't provide a client ID. Try again...");
                     ask.close();
@@ -164,9 +172,39 @@ export function authorization(): void {
                 } else console.log("That doesn't look like a valid client ID. Retry with a correct client ID.");
                 ask.close();
             });
+        } else if (msg.toLowerCase().startsWith('yo')) {
+            ask.question('Cookies : ', (cook: string) => {
+                if (!cook || cook.length === 0) {
+                    console.log("You didn't provide a cookie. Try again...");
+                    ask.close();
+                    return;
+                }
+                if (!fs.existsSync('.data')) fs.mkdirSync('.data');
+                console.log('Cookies has been added successfully.');
+                let cookie: Object = {};
+                cook.split(';').forEach((x) => {
+                    let [ key, value ] = x.split('=')
+                    key = key.trim()
+                    value = value.trim()
+                    Object.assign(cookie, { [key] : value })
+                })
+                fs.writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
+                ask.close();
+            });
         } else {
             console.log("That option doesn't exist. Try again...");
             ask.close();
         }
     });
 }
+
+export function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
+    player.on(AudioPlayerStatus.Paused, () => resource.pause());
+    player.on(AudioPlayerStatus.AutoPaused, () => resource.pause());
+    player.on(AudioPlayerStatus.Playing, () => resource.resume());
+    player.once(AudioPlayerStatus.Idle, () => {
+        player.removeListener(AudioPlayerStatus.Paused, () => resource.pause());
+        player.removeListener(AudioPlayerStatus.AutoPaused, () => resource.pause());
+        player.removeListener(AudioPlayerStatus.Playing, () => resource.resume());
+    });
+};

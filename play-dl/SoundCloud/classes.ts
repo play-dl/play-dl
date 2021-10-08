@@ -2,6 +2,7 @@ import { request, request_stream } from '../YouTube/utils/request';
 import { PassThrough } from 'stream';
 import { IncomingMessage } from 'http';
 import { StreamType } from '../YouTube/stream';
+import { Timer } from '../YouTube/classes/LiveStream';
 
 interface SoundCloudUser {
     name: string;
@@ -204,36 +205,27 @@ export class Stream {
     stream: PassThrough;
     type: StreamType;
     private url: string;
-    private playing_count: number;
     private downloaded_time: number;
+    private timer: Timer;
     private downloaded_segments: number;
     private request: IncomingMessage | null;
-    private data_ended: boolean;
     private time: number[];
     private segment_urls: string[];
     constructor(url: string, type: StreamType = StreamType.Arbitrary) {
         this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
         this.type = type;
         this.url = url;
-        this.playing_count = 0;
         this.downloaded_time = 0;
         this.request = null;
         this.downloaded_segments = 0;
-        this.data_ended = false;
         this.time = [];
+        this.timer = new Timer(() => {
+            this.timer.reuse();
+            this.start();
+        }, 280);
         this.segment_urls = [];
         this.stream.on('close', () => {
             this.cleanup();
-        });
-        this.stream.on('pause', () => {
-            this.playing_count++;
-            if (this.data_ended) {
-                this.cleanup();
-                this.stream.removeAllListeners('pause');
-            } else if (this.playing_count === 110) {
-                this.playing_count = 0;
-                this.start();
-            }
         });
         this.start();
     }
@@ -268,19 +260,20 @@ export class Stream {
     }
 
     private async loop() {
-        if (this.stream.destroyed) {
+        if (this.stream.destroyed ||this.time.length === 0 || this.segment_urls.length === 0) {
             this.cleanup();
-            return;
-        }
-        if (this.time.length === 0 || this.segment_urls.length === 0) {
-            this.data_ended = true;
             return;
         }
         this.downloaded_time += this.time.shift() as number;
         this.downloaded_segments++;
         const stream = await request_stream(this.segment_urls.shift() as string).catch((err: Error) => err);
-        if (stream instanceof Error) throw stream;
+        if (stream instanceof Error) {
+            this.stream.emit('error', stream);
+            this.cleanup();
+            return;
+        }
 
+        this.request = stream
         stream.pipe(this.stream, { end: false });
         stream.on('end', () => {
             if (this.downloaded_time >= 300) return;
@@ -292,14 +285,22 @@ export class Stream {
     }
 
     private cleanup() {
+        this.timer.destroy();
         this.request?.unpipe(this.stream);
         this.request?.destroy();
         this.url = '';
-        this.playing_count = 0;
         this.downloaded_time = 0;
         this.downloaded_segments = 0;
         this.request = null;
         this.time = [];
         this.segment_urls = [];
+    }
+
+    pause() {
+        this.timer.pause();
+    }
+
+    resume() {
+        this.timer.resume();
     }
 }
