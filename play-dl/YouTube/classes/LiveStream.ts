@@ -157,6 +157,7 @@ export class Stream {
             this.loop();
         }, 265);
         this.stream.on('close', () => {
+            this.timer.destroy()
             this.cleanup();
         });
         this.loop();
@@ -177,6 +178,7 @@ export class Stream {
 
     private async loop() {
         if (this.stream.destroyed) {
+            this.timer.destroy()
             this.cleanup();
             return;
         }
@@ -196,6 +198,7 @@ export class Stream {
         if (Number(stream.statusCode) >= 400) {
             this.cleanup();
             await this.retry();
+            this.timer.reuse()
             this.loop();
             return;
         }
@@ -205,6 +208,7 @@ export class Stream {
         stream.once('error', async (err) => {
             this.cleanup();
             await this.retry();
+            this.timer.reuse()
             this.loop();
         });
 
@@ -215,6 +219,7 @@ export class Stream {
         stream.on('end', () => {
             if (end >= this.content_length) {
                 this.timer.destroy();
+                this.cleanup()
             }
         });
     }

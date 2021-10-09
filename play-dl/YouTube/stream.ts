@@ -71,9 +71,10 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     if (typeof options.quality !== 'number') options.quality = audioFormat.length - 1;
     else if (options.quality <= 0) options.quality = 0;
     else if (options.quality >= audioFormat.length) options.quality = audioFormat.length - 1;
-    final.push(audioFormat[options.quality]);
+    if(audioFormat.length !== 0) final.push(audioFormat[options.quality]);
+    else final.push(info.format[info.format.length - 1])
     let type: StreamType =
-        audioFormat[options.quality].codec === 'opus' && audioFormat[options.quality].container === 'webm'
+        final[0].codec === 'opus' && final[0].container === 'webm'
             ? StreamType.WebmOpus
             : StreamType.Arbitrary;
     return new Stream(
@@ -109,9 +110,10 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
     if (typeof options.quality !== 'number') options.quality = audioFormat.length - 1;
     else if (options.quality <= 0) options.quality = 0;
     else if (options.quality >= audioFormat.length) options.quality = audioFormat.length - 1;
-    final.push(audioFormat[options.quality]);
+    if(audioFormat.length !== 0) final.push(audioFormat[options.quality]);
+    else final.push(info.format[info.format.length - 1])
     let type: StreamType =
-        audioFormat[options.quality].codec === 'opus' && audioFormat[options.quality].container === 'webm'
+        final[0].codec === 'opus' && final[0].container === 'webm'
             ? StreamType.WebmOpus
             : StreamType.Arbitrary;
     return new Stream(

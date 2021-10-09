@@ -171,8 +171,10 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
             if(res.headers && res.headers['set-cookie'] && cookies_added){
                 res.headers['set-cookie'].forEach((x) => {
                     x.split(';').forEach((x) => {
-                        const [key, value] = x.split('=');
-                        if (!value) return;
+                        const arr = x.split('=')
+                        if(arr.length <= 1 ) return; 
+                        const key = arr.shift()?.trim() as string
+                        const value = arr.join('=').trim()
                         setCookie(key, value);
                     });
                 })
@@ -204,9 +206,10 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
                 let cookies = res.head.filter((x) => x.toLocaleLowerCase().startsWith('set-cookie: '));
                 cookies.forEach((x) => {
                     x.toLocaleLowerCase().split('set-cookie: ')[1].split(';').forEach((y) => {
-                        let [key, value] = y.split('=');
-                        if (!value)
-                            return;
+                        const arr = y.split('=')
+                        if(arr.length <= 1 ) return; 
+                        const key = arr.shift()?.trim() as string
+                        const value = arr.join('=').trim()
                         setCookie(key, value);
                     });
                 });

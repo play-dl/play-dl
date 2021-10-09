@@ -183,10 +183,10 @@ export function authorization(): void {
                 console.log('Cookies has been added successfully.');
                 let cookie: Object = {};
                 cook.split(';').forEach((x) => {
-                    let [ key, value ] = x.split('=')
-                    if(!value) return;
-                    key = key.trim()
-                    value = value.trim()
+                    const arr = x.split('=')
+                    if(arr.length <= 1 ) return; 
+                    const key = arr.shift()?.trim() as string
+                    const value = arr.join('=').trim()
                     Object.assign(cookie, { [key] : value })
                 })
                 fs.writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
