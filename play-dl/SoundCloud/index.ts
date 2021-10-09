@@ -126,8 +126,8 @@ export async function check_id(id: string): Promise<boolean> {
  * @param url soundcloud url
  * @returns "false" | 'track' | 'playlist'
  */
-export async function so_validate(url: string): Promise<false | 'track' | 'playlist'> {
-    if (!url.match(pattern)) return false;
+export async function so_validate(url: string): Promise<false | 'track' | 'playlist' | 'search'> {
+    if (!url.match(pattern)) return 'search';
     const data = await request(
         `https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${soundData.client_id}`
     ).catch((err: Error) => err);

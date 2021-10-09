@@ -260,7 +260,7 @@ export class Stream {
     }
 
     private async loop() {
-        if (this.stream.destroyed ||this.time.length === 0 || this.segment_urls.length === 0) {
+        if (this.stream.destroyed || this.time.length === 0 || this.segment_urls.length === 0) {
             this.cleanup();
             return;
         }
@@ -273,7 +273,7 @@ export class Stream {
             return;
         }
 
-        this.request = stream
+        this.request = stream;
         stream.pipe(this.stream, { end: false });
         stream.on('end', () => {
             if (this.downloaded_time >= 300) return;

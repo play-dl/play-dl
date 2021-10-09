@@ -12,7 +12,7 @@ For source specific commands :-
 
 _This checks all type of urls that are supported by play-dl._
 
-**Returns :** `so_playlist` | `so_track` | `sp_track` | `sp_album` | `sp_playlist` | `yt_video` | `yt_playlist` | `false`
+**Returns :** `so_playlist` | `so_track` | `sp_track` | `sp_album` | `sp_playlist` | `yt_video` | `yt_playlist` | `search` | `false`
 
 `so` = **SoundCloud**
 
@@ -30,6 +30,8 @@ if(check === 'yt_video') // YouTube Video
 if(check === 'sp_track') // Spotify Track
 
 if(check === 'so_track') // SoundCloud Track
+
+if(check === "search") // Given term is not a url. Search this term somewhere.
 ```
 
 ### authorization()

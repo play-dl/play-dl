@@ -90,8 +90,11 @@ export async function stream_from_info(
  */
 export async function validate(
     url: string
-): Promise<'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | false> {
+): Promise<
+    'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | 'search' | false
+> {
     let check;
+    if (!url.startsWith('https')) return 'search';
     if (url.indexOf('spotify') !== -1) {
         check = sp_validate(url);
         return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
@@ -183,12 +186,12 @@ export function authorization(): void {
                 console.log('Cookies has been added successfully.');
                 let cookie: Object = {};
                 cook.split(';').forEach((x) => {
-                    const arr = x.split('=')
-                    if(arr.length <= 1 ) return; 
-                    const key = arr.shift()?.trim() as string
-                    const value = arr.join('=').trim()
-                    Object.assign(cookie, { [key] : value })
-                })
+                    const arr = x.split('=');
+                    if (arr.length <= 1) return;
+                    const key = arr.shift()?.trim() as string;
+                    const value = arr.join('=').trim();
+                    Object.assign(cookie, { [key]: value });
+                });
                 fs.writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
                 ask.close();
             });
@@ -200,12 +203,14 @@ export function authorization(): void {
 }
 
 export function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
-    player.on(AudioPlayerStatus.Paused, () => resource.pause());
-    player.on(AudioPlayerStatus.AutoPaused, () => resource.pause());
-    player.on(AudioPlayerStatus.Playing, () => resource.resume());
+    const pauseListener = () => resource.pause()
+    const resumeListener = () => resource.resume()
+    player.on(AudioPlayerStatus.Paused, pauseListener);
+    player.on(AudioPlayerStatus.AutoPaused, pauseListener);
+    player.on(AudioPlayerStatus.Playing, resumeListener);
     player.once(AudioPlayerStatus.Idle, () => {
-        player.removeListener(AudioPlayerStatus.Paused, () => resource.pause());
-        player.removeListener(AudioPlayerStatus.AutoPaused, () => resource.pause());
-        player.removeListener(AudioPlayerStatus.Playing, () => resource.resume());
+        player.removeListener(AudioPlayerStatus.Paused, pauseListener);
+        player.removeListener(AudioPlayerStatus.AutoPaused, pauseListener);
+        player.removeListener(AudioPlayerStatus.Playing, resumeListener);
     });
-};
+}
