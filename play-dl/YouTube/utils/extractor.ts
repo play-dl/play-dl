@@ -28,11 +28,10 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
     if (url.indexOf('list=') === -1) {
         if (url.startsWith('https')) {
             if (url.match(video_pattern)) {
-                const id = url.split('v=')[1].split('&')[0]
-                if(id.match(video_id_pattern)) return "video"
-                else return false
-            }
-            else return false;
+                const id = url.split('v=')[1].split('&')[0];
+                if (id.match(video_id_pattern)) return 'video';
+                else return false;
+            } else return false;
         } else {
             if (url.match(video_id_pattern)) return 'video';
             else if (url.match(playlist_id_pattern)) return 'playlist';

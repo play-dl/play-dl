@@ -12,6 +12,25 @@ let data = await spotify(url) //Gets the data
 console.log(data.type) // Console logs the type of data that you got.
 ```
 
+
+## Validate
+
+### sp_validate(url : `string`)
+
+_This checks that given url is spotify url or not._
+
+**Returns :** `track` | `album` | `playlist` | `search` | `false`
+
+```js
+let check = sp_validate(url)
+
+if(!check) // Invalid Spotify URL
+
+if(check === 'track') // Spotify Track URL
+
+if(check === "search") // Given term is a spotify url. Search it somewhere.
+```
+
 ### is_expired()
 
 _This tells that whether the access token is expired or not_
@@ -183,19 +202,3 @@ _This will always return as "album" for this class._
 ##### toJSON() `function`
 
 _converts class into a json format_
-
-## Validate
-
-### sp_validate(url : `string`)
-
-_This checks that given url is spotify url or not._
-
-**Returns :** `track` | `album` | `playlist` | `false`
-
-```js
-let check = sp_validate(url)
-
-if(!check) // Invalid Spotify URL
-
-if(check === 'track') // Spotify Track URL
-```

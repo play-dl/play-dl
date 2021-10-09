@@ -18,7 +18,7 @@ console.log(data.type) // Console logs the type of data that you got.
 
 _This checks that given url is soundcloud url or not._
 
-**Returns :** `track` | `playlist` | `false`
+**Returns :** `track` | `playlist` | `search` | `false`
 
 ```js
 let check = await so_validate(url)
@@ -26,6 +26,8 @@ let check = await so_validate(url)
 if(!check) // Invalid SoundCloud URL
 
 if(check === 'track') // SoundCloud Track URL
+
+if(check === "search") // Given term is not a SoundCloud URL. Search this somewhere.
 ```
 
 ## Classes [ Returned by `soundcloud(url)` function ]

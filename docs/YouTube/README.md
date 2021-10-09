@@ -17,7 +17,7 @@ const results = await youtube.search('post malone sunflower', options);
 
 _This will validate url and return type or boolean_
 
-**Returns :** `video` | `playlist` | `false`
+**Returns :** `video` | `playlist` | `search` | `false`
 
 ```js
 let check = yt_validate(url)
@@ -27,6 +27,8 @@ if(!check) // Invalid URL
 if(check === "video") //URL is video url
 
 if(check === "playlist") //URL is a playlist url
+
+if(check === "search") // Given term is not a video ID and PlayList ID.
 ```
 
 ## Extract ID
