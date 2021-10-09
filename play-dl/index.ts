@@ -203,12 +203,14 @@ export function authorization(): void {
 }
 
 export function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
-    player.on(AudioPlayerStatus.Paused, () => resource.pause());
-    player.on(AudioPlayerStatus.AutoPaused, () => resource.pause());
-    player.on(AudioPlayerStatus.Playing, () => resource.resume());
+    const pauseListener = () => resource.pause()
+    const resumeListener = () => resource.resume()
+    player.on(AudioPlayerStatus.Paused, pauseListener);
+    player.on(AudioPlayerStatus.AutoPaused, pauseListener);
+    player.on(AudioPlayerStatus.Playing, resumeListener);
     player.once(AudioPlayerStatus.Idle, () => {
-        player.removeListener(AudioPlayerStatus.Paused, () => resource.pause());
-        player.removeListener(AudioPlayerStatus.AutoPaused, () => resource.pause());
-        player.removeListener(AudioPlayerStatus.Playing, () => resource.resume());
+        player.removeListener(AudioPlayerStatus.Paused, pauseListener);
+        player.removeListener(AudioPlayerStatus.AutoPaused, pauseListener);
+        player.removeListener(AudioPlayerStatus.Playing, resumeListener);
     });
 }
