@@ -24,23 +24,26 @@ const playlist_pattern =
  * @param url Url for validation
  * @returns type of url or false.
  */
-export function yt_validate(url: string): 'playlist' | 'video' | false {
+export function yt_validate(url: string): 'playlist' | 'video' | 'search' | false {
     if (url.indexOf('list=') === -1) {
         if (url.startsWith('https')) {
-            if (url.match(video_pattern)) return 'video';
+            if (url.match(video_pattern)) {
+                const id = url.split('v=')[1].split('&')[0]
+                if(id.match(video_id_pattern)) return "video"
+                else return false
+            }
             else return false;
         } else {
             if (url.match(video_id_pattern)) return 'video';
             else if (url.match(playlist_id_pattern)) return 'playlist';
-            else return false;
+            else return 'search';
         }
     } else {
         if (!url.match(playlist_pattern)) return false;
         const Playlist_id = url.split('list=')[1].split('&')[0];
         if (Playlist_id.length !== 34 || !Playlist_id.startsWith('PL')) {
             return false;
-        }
-        else return 'playlist';
+        } else return 'playlist';
     }
 }
 /**
@@ -49,7 +52,8 @@ export function yt_validate(url: string): 'playlist' | 'video' | false {
  * @returns ID of video or playlist.
  */
 export function extractID(url: string): string {
-    if (!yt_validate(url)) throw new Error('This is not a YouTube url or videoId or PlaylistID');
+    const check = yt_validate(url);
+    if (!check || check === 'search') throw new Error('This is not a YouTube url or videoId or PlaylistID');
     if (url.startsWith('https')) {
         if (url.indexOf('list=') === -1) {
             let video_id: string;
@@ -69,16 +73,13 @@ export function extractID(url: string): string {
  * @returns Data containing video_details, LiveStreamData and formats of video url.
  */
 export async function video_basic_info(url: string, options: InfoOptions = {}) {
-    let video_id: string;
-    if (url.startsWith('https')) {
-        if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
-        video_id = extractID(url);
-    } else video_id = url;
+    if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
+    let video_id: string = extractID(url);
     const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
     const body = await request(new_url, {
         proxies: options.proxy ?? undefined,
         headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' },
-        cookies : true
+        cookies: true
     });
     const player_response = JSON.parse(body.split('var ytInitialPlayerResponse = ')[1].split('}};')[0] + '}}');
     const initial_response = JSON.parse(body.split('var ytInitialData = ')[1].split('}};')[0] + '}}');

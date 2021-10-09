@@ -27,7 +27,7 @@ interface RequestOpts extends RequestOptions {
     body?: string;
     method?: 'GET' | 'POST';
     proxies?: Proxy[];
-    cookies? : boolean
+    cookies?: boolean;
 }
 /**
  * Main module that play-dl uses for making a https request
@@ -155,12 +155,12 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
     return new Promise(async (resolve, reject) => {
         if (!options?.proxies || options.proxies.length === 0) {
             let data = '';
-            let cookies_added = false
-            if(options.cookies){
-                let cook = getCookies()
+            let cookies_added = false;
+            if (options.cookies) {
+                let cook = getCookies();
                 if (typeof cook === 'string' && options.headers) {
-                    Object.assign(options.headers, { cookie : cook });
-                    cookies_added = true
+                    Object.assign(options.headers, { cookie: cook });
+                    cookies_added = true;
                 }
             }
             let res = await https_getter(url, options).catch((err: Error) => err);
@@ -168,17 +168,17 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
                 reject(res);
                 return;
             }
-            if(res.headers && res.headers['set-cookie'] && cookies_added){
+            if (res.headers && res.headers['set-cookie'] && cookies_added) {
                 res.headers['set-cookie'].forEach((x) => {
                     x.split(';').forEach((x) => {
-                        const arr = x.split('=')
-                        if(arr.length <= 1 ) return; 
-                        const key = arr.shift()?.trim() as string
-                        const value = arr.join('=').trim()
+                        const arr = x.split('=');
+                        if (arr.length <= 1) return;
+                        const key = arr.shift()?.trim() as string;
+                        const value = arr.join('=').trim();
                         setCookie(key, value);
                     });
-                })
-                uploadCookie()
+                });
+                uploadCookie();
             }
             if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
                 res = await https_getter(res.headers.location as string, options);
@@ -189,12 +189,12 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
             res.on('data', (c) => (data += c));
             res.on('end', () => resolve(data));
         } else {
-            let cookies_added = false
-            if(options.cookies){
-                let cook = getCookies()
+            let cookies_added = false;
+            if (options.cookies) {
+                let cook = getCookies();
                 if (typeof cook === 'string' && options.headers) {
-                    Object.assign(options.headers, { cookie : cook });
-                    cookies_added = true
+                    Object.assign(options.headers, { cookie: cook });
+                    cookies_added = true;
                 }
             }
             let res = await proxy_getter(url, options.proxies).catch((e: Error) => e);
@@ -202,18 +202,21 @@ export async function request(url: string, options: RequestOpts = {}): Promise<s
                 reject(res);
                 return;
             }
-            if(res.head && cookies_added){
+            if (res.head && cookies_added) {
                 let cookies = res.head.filter((x) => x.toLocaleLowerCase().startsWith('set-cookie: '));
                 cookies.forEach((x) => {
-                    x.toLocaleLowerCase().split('set-cookie: ')[1].split(';').forEach((y) => {
-                        const arr = y.split('=')
-                        if(arr.length <= 1 ) return; 
-                        const key = arr.shift()?.trim() as string
-                        const value = arr.join('=').trim()
-                        setCookie(key, value);
-                    });
+                    x.toLocaleLowerCase()
+                        .split('set-cookie: ')[1]
+                        .split(';')
+                        .forEach((y) => {
+                            const arr = y.split('=');
+                            if (arr.length <= 1) return;
+                            const key = arr.shift()?.trim() as string;
+                            const value = arr.join('=').trim();
+                            setCookie(key, value);
+                        });
                 });
-                uploadCookie()
+                uploadCookie();
             }
             if (res.statusCode >= 300 && res.statusCode < 400) {
                 let url = res.head.filter((x) => x.startsWith('Location: '));

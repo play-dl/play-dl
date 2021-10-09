@@ -74,8 +74,8 @@ export async function spotify(url: string): Promise<Spotify> {
  * @param url url for validation
  * @returns type of url or false.
  */
-export function sp_validate(url: string): 'track' | 'playlist' | 'album' | false {
-    if (!url.match(pattern)) return false;
+export function sp_validate(url: string): 'track' | 'playlist' | 'album' | 'search' | false {
+    if (!url.match(pattern)) return 'search';
     if (url.indexOf('track/') !== -1) {
         return 'track';
     } else if (url.indexOf('album/') !== -1) {

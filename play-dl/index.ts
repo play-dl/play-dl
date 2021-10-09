@@ -90,17 +90,29 @@ export async function stream_from_info(
  */
 export async function validate(
     url: string
-): Promise<'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | false> {
+): Promise<
+    | 'so_playlist'
+    | 'so_track'
+    | 'so_search'
+    | 'sp_track'
+    | 'sp_album'
+    | 'sp_playlist'
+    | 'sp_search'
+    | 'yt_video'
+    | 'yt_playlist'
+    | 'yt_search'
+    | false
+> {
     let check;
     if (url.indexOf('spotify') !== -1) {
         check = sp_validate(url);
-        return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
+        return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist' | 'sp_search') : false;
     } else if (url.indexOf('soundcloud') !== -1) {
         check = await so_validate(url);
-        return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
+        return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track' | 'so_search') : false;
     } else {
         check = yt_validate(url);
-        return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
+        return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist' | 'yt_search') : false;
     }
 }
 /**
@@ -183,12 +195,12 @@ export function authorization(): void {
                 console.log('Cookies has been added successfully.');
                 let cookie: Object = {};
                 cook.split(';').forEach((x) => {
-                    const arr = x.split('=')
-                    if(arr.length <= 1 ) return; 
-                    const key = arr.shift()?.trim() as string
-                    const value = arr.join('=').trim()
-                    Object.assign(cookie, { [key] : value })
-                })
+                    const arr = x.split('=');
+                    if (arr.length <= 1) return;
+                    const key = arr.shift()?.trim() as string;
+                    const value = arr.join('=').trim();
+                    Object.assign(cookie, { [key]: value });
+                });
                 fs.writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
                 ask.close();
             });
@@ -208,4 +220,4 @@ export function attachListeners(player: EventEmitter, resource: YouTubeStream | 
         player.removeListener(AudioPlayerStatus.AutoPaused, () => resource.pause());
         player.removeListener(AudioPlayerStatus.Playing, () => resource.resume());
     });
-};
+}
