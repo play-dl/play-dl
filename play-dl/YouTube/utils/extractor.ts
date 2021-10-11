@@ -13,12 +13,12 @@ interface PlaylistOptions {
 }
 
 const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
-const playlist_id_pattern = /^PL[a-zA-Z\d_-]{32}$/;
+const playlist_id_pattern = /^PL[a-zA-Z\d_-]{16,41}$/;
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern =
-    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)PL[a-zA-Z\d_-]{32}(.*)?$/;
+    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)PL[a-zA-Z\d_-]{16,41}(.*)?$/;
 /**
  * Command to validate a YouTube url
  * @param url Url for validation
@@ -28,7 +28,10 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
     if (url.indexOf('list=') === -1) {
         if (url.startsWith('https')) {
             if (url.match(video_pattern)) {
-                const id = url.split('v=')[1].split('&')[0];
+                let id: string;
+                if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
+                else if (url.includes('youtube.com/embed/')) id = url.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
+                else id = url.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
                 if (id.match(video_id_pattern)) return 'video';
                 else return false;
             } else return false;
@@ -56,9 +59,9 @@ export function extractID(url: string): string {
     if (url.startsWith('https')) {
         if (url.indexOf('list=') === -1) {
             let video_id: string;
-            if (url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split('/')[0];
-            else if (url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1].split('/')[0];
-            else video_id = url.split('watch?v=')[1].split('&')[0];
+            if (url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
+            else if (url.includes('youtube.com/embed/')) video_id = url.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
+            else video_id = url.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
             return video_id;
         } else {
             return url.split('list=')[1].split('&')[0];
