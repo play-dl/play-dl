@@ -1,4 +1,4 @@
-import { PassThrough } from 'stream';
+import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
 import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
 import { Proxy, request, request_stream } from '../utils/request';
@@ -11,7 +11,7 @@ export interface FormatInterface {
 }
 
 export class LiveStreaming {
-    stream: PassThrough;
+    stream: Readable;
     type: StreamType;
     private base_url: string;
     private url: string;
@@ -23,7 +23,7 @@ export class LiveStreaming {
     private segments_urls: string[];
     private request: IncomingMessage | null;
     constructor(dash_url: string, target_interval: number, video_url: string) {
-        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
+        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read(){} });
         this.type = StreamType.Arbitrary;
         this.url = dash_url;
         this.base_url = '';
@@ -72,7 +72,6 @@ export class LiveStreaming {
     private cleanup() {
         this.timer.destroy();
         this.dash_timer.destroy();
-        this.request?.unpipe(this.stream);
         this.request?.destroy();
         this.video_url = '';
         this.request = null;
@@ -102,7 +101,9 @@ export class LiveStreaming {
                     return;
                 }
                 this.request = stream;
-                stream.pipe(this.stream, { end: false });
+                stream.on('data', (c) => {
+                    this.stream.push(c)
+                })
                 stream.on('end', () => {
                     this.packet_count++;
                     resolve('');
@@ -123,7 +124,7 @@ export class LiveStreaming {
  * Class for YouTube Stream
  */
 export class Stream {
-    stream: PassThrough;
+    stream: Readable;
     type: StreamType;
     private url: string;
     private bytes_count: number;
@@ -142,7 +143,7 @@ export class Stream {
         video_url: string,
         options: StreamOptions
     ) {
-        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
+        this.stream = new Readable({ highWaterMark : 10 * 1000 * 1000, read(){} });
         this.url = url;
         this.quality = options.quality as number;
         this.proxy = options.proxy || undefined;
@@ -170,7 +171,6 @@ export class Stream {
     }
 
     private cleanup() {
-        this.request?.unpipe(this.stream);
         this.request?.destroy();
         this.request = null;
         this.url = '';
@@ -203,7 +203,9 @@ export class Stream {
             return;
         }
         this.request = stream;
-        stream.pipe(this.stream, { end: false });
+        stream.on('data', (c) => {
+            this.stream.push(c)
+        })
 
         stream.once('error', async (err) => {
             this.cleanup();

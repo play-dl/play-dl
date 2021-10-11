@@ -1,5 +1,5 @@
 import { request, request_stream } from '../YouTube/utils/request';
-import { PassThrough } from 'stream';
+import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
 import { StreamType } from '../YouTube/stream';
 import { Timer } from '../YouTube/classes/LiveStream';
@@ -202,7 +202,7 @@ export class SoundCloudPlaylist {
  * SoundCloud Stream class
  */
 export class Stream {
-    stream: PassThrough;
+    stream: Readable;
     type: StreamType;
     private url: string;
     private downloaded_time: number;
@@ -212,7 +212,7 @@ export class Stream {
     private time: number[];
     private segment_urls: string[];
     constructor(url: string, type: StreamType = StreamType.Arbitrary) {
-        this.stream = new PassThrough({ highWaterMark: 10 * 1000 * 1000 });
+        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read(){} });
         this.type = type;
         this.url = url;
         this.downloaded_time = 0;
@@ -274,7 +274,9 @@ export class Stream {
         }
 
         this.request = stream;
-        stream.pipe(this.stream, { end: false });
+        stream.on('data', (c) => {
+            this.stream.push(c)
+        })
         stream.on('end', () => {
             if (this.downloaded_time >= 300) return;
             else this.loop();
@@ -286,7 +288,6 @@ export class Stream {
 
     private cleanup() {
         this.timer.destroy();
-        this.request?.unpipe(this.stream);
         this.request?.destroy();
         this.url = '';
         this.downloaded_time = 0;
