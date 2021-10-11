@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { StreamType } from '../YouTube/stream';
-import { request } from '../YouTube/utils/request';
+import { request } from '../Request';
 import { SoundCloudPlaylist, SoundCloudTrack, SoundCloudTrackFormat, Stream } from './classes';
 
 let soundData: SoundDataOptions;

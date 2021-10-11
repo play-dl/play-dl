@@ -1,4 +1,4 @@
-import { request, request_stream } from '../YouTube/utils/request';
+import { request, request_stream } from '../Request';
 import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
 import { StreamType } from '../YouTube/stream';

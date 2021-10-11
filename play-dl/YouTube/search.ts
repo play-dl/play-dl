@@ -1,4 +1,4 @@
-import { request } from './utils/request';
+import { request } from './../Request';
 import { ParseSearchInterface, ParseSearchResult } from './utils/parser';
 import { YouTubeVideo } from './classes/Video';
 import { YouTubeChannel } from './classes/Channel';

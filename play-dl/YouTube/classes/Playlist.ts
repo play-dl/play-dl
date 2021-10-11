@@ -1,5 +1,5 @@
 import { getPlaylistVideos, getContinuationToken } from '../utils/extractor';
-import { request } from '../utils/request';
+import { request } from '../../Request';
 import { YouTubeChannel } from './Channel';
 import { YouTubeVideo } from './Video';
 const BASE_API = 'https://www.youtube.com/youtubei/v1/browse?key=';

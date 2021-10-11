@@ -1,4 +1,4 @@
-import { request } from '../YouTube/utils/request';
+import { request } from '../Request';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './classes';
 import fs from 'fs';
 

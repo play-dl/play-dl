@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
 import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
-import { Proxy, request, request_stream } from '../utils/request';
+import { ProxyOptions as Proxy, request, request_stream } from '../../Request';
 import { video_info } from '..';
 
 export interface FormatInterface {

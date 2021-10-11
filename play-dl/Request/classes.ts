@@ -1,16 +1,12 @@
 import tls, { TLSSocket } from 'tls';
 import { URL } from 'url';
-import { Timer } from '../YouTube/classes/LiveStream';
 
-interface ResponseOptions extends tls.ConnectionOptions {
-    body?: string;
-    method: 'GET' | 'POST';
-    cookies?: boolean;
+interface ProxyOptions extends tls.ConnectionOptions {
+    method: 'GET';
     headers?: Object;
-    timeout?: number;
 }
 
-export class Response {
+export class Proxy {
     parsed_url: URL;
     statusCode: number;
     rawHeaders: string;
@@ -18,18 +14,14 @@ export class Response {
     body: string;
     socket: TLSSocket;
     sentHeaders: string;
-    sentBody: string;
-    private options: ResponseOptions;
-    private timer: Timer | null;
-    constructor(req_url: string, options: ResponseOptions) {
-        this.parsed_url = new URL(req_url);
+    private options: ProxyOptions;
+    constructor(parsed_url: URL, options: ProxyOptions){
+        this.parsed_url = parsed_url;
         this.sentHeaders = '';
         this.statusCode = 0;
-        this.sentBody = '';
         this.rawHeaders = '';
         this.body = '';
         this.headers = {};
-        this.timer = null;
         this.options = options;
         this.socket = tls.connect(
             {
@@ -45,17 +37,15 @@ export class Response {
                 this.sentHeaders += `${key}: ${value}\r\n`;
             }
         }
-        if (options.body) this.sentBody = options.body;
     }
 
     private onConnect() {
         this.socket.write(
             `${this.options.method} ${this.parsed_url.pathname}${this.parsed_url.search} HTTP/1.1\r\n` +
-                `Host : ${this.parsed_url.hostname}\r\n` +
-                this.sentHeaders +
-                `Connection: close\r\n` +
-                `\r\n` +
-                this.sentBody
+            `Host : ${this.parsed_url.hostname}\r\n` +
+            this.sentHeaders +
+            `Connection: close\r\n` +
+            `\r\n` 
         );
     }
 
@@ -75,21 +65,7 @@ export class Response {
         }
     }
 
-    stream(): Promise<TLSSocket> {
-        return new Promise((resolve, reject) => {
-            this.timer = new Timer(() => this.socket.end(), this.options.timeout || 1);
-            this.socket.once('error', (err) => reject(err));
-            this.socket.once('data', (chunk) => {
-                this.rawHeaders = chunk.toString('utf-8');
-                this.parseHeaders();
-                resolve(this.socket);
-            });
-            this.socket.on('data', () => this.timer?.reuse());
-            this.socket.once('end', () => this.timer?.destroy());
-        });
-    }
-
-    fetch(): Promise<Response> {
+    fetch(): Promise<Proxy> {
         return new Promise((resolve, reject) => {
             this.socket.setEncoding('utf-8');
             this.socket.once('error', (err) => reject(err));
