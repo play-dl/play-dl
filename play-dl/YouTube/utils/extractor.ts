@@ -42,10 +42,7 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
         }
     } else {
         if (!url.match(playlist_pattern)) return false;
-        const Playlist_id = url.split('list=')[1].split('&')[0];
-        if (Playlist_id.length !== 34 || !Playlist_id.startsWith('PL')) {
-            return false;
-        } else return 'playlist';
+        else return 'playlist';
     }
 }
 /**
