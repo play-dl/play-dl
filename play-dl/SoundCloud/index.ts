@@ -151,3 +151,7 @@ function parseHlsFormats(data: SoundCloudTrackFormat[]) {
     });
     return result;
 }
+
+export function setSoundCloudToken(options : SoundDataOptions){
+    soundData = options
+}
