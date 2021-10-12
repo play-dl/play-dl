@@ -1,10 +1,11 @@
-import { request } from '../YouTube/utils/request';
+import { request } from '../Request';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './classes';
 import fs from 'fs';
 
 let spotifyData: SpotifyDataOptions;
 if (fs.existsSync('.data/spotify.data')) {
     spotifyData = JSON.parse(fs.readFileSync('.data/spotify.data').toString());
+    spotifyData.file = true;
 }
 /**
  * Spotify Data options that are stored in spotify.data file.
@@ -12,7 +13,7 @@ if (fs.existsSync('.data/spotify.data')) {
 export interface SpotifyDataOptions {
     client_id: string;
     client_secret: string;
-    redirect_url: string;
+    redirect_url?: string;
     authorization_code?: string;
     access_token?: string;
     refresh_token?: string;
@@ -20,6 +21,7 @@ export interface SpotifyDataOptions {
     expires_in?: number;
     expiry?: number;
     market?: string;
+    file?: boolean;
 }
 
 const pattern = /^((https:)?\/\/)?open.spotify.com\/(track|album|playlist)\//;
@@ -89,14 +91,14 @@ export function sp_validate(url: string): 'track' | 'playlist' | 'album' | 'sear
  * @param data Sportify Data options to validate
  * @returns boolean.
  */
-export async function SpotifyAuthorize(data: SpotifyDataOptions): Promise<boolean> {
+export async function SpotifyAuthorize(data: SpotifyDataOptions, file: boolean): Promise<boolean> {
     const response = await request(`https://accounts.spotify.com/api/token`, {
         headers: {
             'Authorization': `Basic ${Buffer.from(`${data.client_id}:${data.client_secret}`).toString('base64')}`,
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: `grant_type=authorization_code&code=${data.authorization_code}&redirect_uri=${encodeURI(
-            data.redirect_url
+            data.redirect_url as string
         )}`,
         method: 'POST'
     }).catch((err: Error) => {
@@ -115,7 +117,14 @@ export async function SpotifyAuthorize(data: SpotifyDataOptions): Promise<boolea
         token_type: resp_json.token_type,
         market: data.market
     };
-    fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
+    if (file) fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
+    else {
+        console.log(`Client ID : ${spotifyData.client_id}`);
+        console.log(`Client Secret : ${spotifyData.client_secret}`);
+        console.log(`Refresh Token : ${spotifyData.refresh_token}`);
+        console.log(`Market : ${spotifyData.market}`);
+        console.log(`\nPaste above info in setToken function.`);
+    }
     return true;
 }
 /**
@@ -198,6 +207,12 @@ export async function refreshToken(): Promise<boolean> {
     spotifyData.expires_in = Number(resp_json.expires_in);
     spotifyData.expiry = Date.now() + (resp_json.expires_in - 1) * 1000;
     spotifyData.token_type = resp_json.token_type;
-    fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
+    if (spotifyData.file) fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
     return true;
+}
+
+export function setSpotifyToken(options: SpotifyDataOptions) {
+    spotifyData = options;
+    spotifyData.file = false;
+    refreshToken();
 }

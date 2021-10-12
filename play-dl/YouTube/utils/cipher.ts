@@ -1,5 +1,5 @@
 import { URL } from 'url';
-import { request } from './request';
+import { request } from './../../Request';
 import querystring from 'querystring';
 
 interface formatOptions {

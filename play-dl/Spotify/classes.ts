@@ -1,4 +1,4 @@
-import { request } from '../YouTube/utils/request';
+import { request } from '../Request';
 import { SpotifyDataOptions } from '.';
 
 interface SpotifyTrackAlbum {

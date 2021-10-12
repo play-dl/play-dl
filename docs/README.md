@@ -42,6 +42,33 @@ _This creates basic spotify / soundcloud / youtube data to be stored locally._
 authorization() //After then you will be asked about type of data you want to create and then follow the steps properly.
 ```
 
+### setToken(options : `TokenOptions`)
+
+_This sets token without using file._
+
+```js
+setToken({
+    spotify : {
+        client_id : "ID"
+        client_secret : "Secret"
+        refresh_token : "Token"
+        market : "Country Code"
+    }
+}) // Setting Spotify Token [ To get refresh_token, just run through authorization, and set file save to No ]
+
+setToken({
+    soundcloud : {
+        client_id : "ID"
+    }
+}) // Setting SoundCloud Token
+
+setToken({
+    youtube : {
+        cookie : "Cookies"
+    }
+}) // Warning : Using setToken for youtube cookies will only update cookies present in memory only.
+```
+
 ### Search
 
 #### SearchOptions :

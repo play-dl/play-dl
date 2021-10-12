@@ -1,6 +1,6 @@
 import { video_info } from '.';
 import { LiveStreaming, Stream } from './classes/LiveStream';
-import { Proxy } from './utils/request';
+import { ProxyOptions as Proxy } from './../Request';
 
 export enum StreamType {
     Arbitrary = 'arbitrary',
