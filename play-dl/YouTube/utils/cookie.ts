@@ -3,12 +3,12 @@ import fs from 'fs';
 let youtubeData: youtubeDataOptions;
 if (fs.existsSync('.data/youtube.data')) {
     youtubeData = JSON.parse(fs.readFileSync('.data/youtube.data').toString());
-    youtubeData.file = true
+    youtubeData.file = true;
 }
 
 interface youtubeDataOptions {
     cookie?: Object;
-    file? : boolean;
+    file?: boolean;
 }
 
 export function getCookies(): undefined | string {
@@ -29,11 +29,12 @@ export function setCookie(key: string, value: string): boolean {
 }
 
 export function uploadCookie() {
-    if (youtubeData.cookie && youtubeData.file) fs.writeFileSync('.data/youtube.data', JSON.stringify(youtubeData, undefined, 4));
+    if (youtubeData.cookie && youtubeData.file)
+        fs.writeFileSync('.data/youtube.data', JSON.stringify(youtubeData, undefined, 4));
 }
 
-export function setCookieToken(options : { cookie : string }){
-    let cook = options.cookie
+export function setCookieToken(options: { cookie: string }) {
+    let cook = options.cookie;
     let cookie: Object = {};
     cook.split(';').forEach((x) => {
         const arr = x.split('=');
@@ -42,6 +43,6 @@ export function setCookieToken(options : { cookie : string }){
         const value = arr.join('=').trim();
         Object.assign(cookie, { [key]: value });
     });
-    youtubeData = { cookie }
-    youtubeData.file = false
+    youtubeData = { cookie };
+    youtubeData.file = false;
 }

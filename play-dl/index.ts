@@ -1,7 +1,7 @@
 export { playlist_info, video_basic_info, video_info, yt_validate, extractID, YouTube, YouTubeStream } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream } from './SoundCloud';
-export { setToken } from './token'
+export { setToken } from './token';
 
 enum AudioPlayerStatus {
     Idle = 'idle',
@@ -116,9 +116,9 @@ export function authorization(): void {
         output: process.stdout
     });
     ask.question('Do you want to save data in a file ? (Yes / No): ', (msg) => {
-        let file : boolean;
-        if(msg.toLowerCase() === 'yes') file = true
-        else if(msg.toLowerCase() === 'no') file = false
+        let file: boolean;
+        if (msg.toLowerCase() === 'yes') file = true;
+        else if (msg.toLowerCase() === 'no') file = false;
         else {
             console.log("That option doesn't exist. Try again...");
             ask.close();
@@ -170,8 +170,8 @@ export function authorization(): void {
                     });
                 });
             } else if (msg.toLowerCase().startsWith('sc')) {
-                if(!file){
-                    console.log("You already had a client ID, just paste that in setToken function.");
+                if (!file) {
+                    console.log('You already had a client ID, just paste that in setToken function.');
                     ask.close();
                     return;
                 }
@@ -191,8 +191,8 @@ export function authorization(): void {
                     ask.close();
                 });
             } else if (msg.toLowerCase().startsWith('yo')) {
-                if(!file){
-                    console.log("You already had cookie, just paste that in setToken function.");
+                if (!file) {
+                    console.log('You already had cookie, just paste that in setToken function.');
                     ask.close();
                     return;
                 }
@@ -220,12 +220,12 @@ export function authorization(): void {
                 ask.close();
             }
         });
-    })
+    });
 }
 
 export function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
-    const pauseListener = () => resource.pause()
-    const resumeListener = () => resource.resume()
+    const pauseListener = () => resource.pause();
+    const resumeListener = () => resource.resume();
     player.on(AudioPlayerStatus.Paused, pauseListener);
     player.on(AudioPlayerStatus.AutoPaused, pauseListener);
     player.on(AudioPlayerStatus.Playing, resumeListener);

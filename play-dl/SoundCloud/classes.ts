@@ -212,7 +212,7 @@ export class Stream {
     private time: number[];
     private segment_urls: string[];
     constructor(url: string, type: StreamType = StreamType.Arbitrary) {
-        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read(){} });
+        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read() {} });
         this.type = type;
         this.url = url;
         this.downloaded_time = 0;
@@ -275,8 +275,8 @@ export class Stream {
 
         this.request = stream;
         stream.on('data', (c) => {
-            this.stream.push(c)
-        })
+            this.stream.push(c);
+        });
         stream.on('end', () => {
             if (this.downloaded_time >= 300) return;
             else this.loop();

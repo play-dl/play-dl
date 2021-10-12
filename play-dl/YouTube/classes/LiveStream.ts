@@ -23,7 +23,7 @@ export class LiveStreaming {
     private segments_urls: string[];
     private request: IncomingMessage | null;
     constructor(dash_url: string, target_interval: number, video_url: string) {
-        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read(){} });
+        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read() {} });
         this.type = StreamType.Arbitrary;
         this.url = dash_url;
         this.base_url = '';
@@ -102,8 +102,8 @@ export class LiveStreaming {
                 }
                 this.request = stream;
                 stream.on('data', (c) => {
-                    this.stream.push(c)
-                })
+                    this.stream.push(c);
+                });
                 stream.on('end', () => {
                     this.packet_count++;
                     resolve('');
@@ -143,7 +143,7 @@ export class Stream {
         video_url: string,
         options: StreamOptions
     ) {
-        this.stream = new Readable({ highWaterMark : 10 * 1000 * 1000, read(){} });
+        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read() {} });
         this.url = url;
         this.quality = options.quality as number;
         this.proxy = options.proxy || undefined;
@@ -204,8 +204,8 @@ export class Stream {
         }
         this.request = stream;
         stream.on('data', (c) => {
-            this.stream.push(c)
-        })
+            this.stream.push(c);
+        });
 
         stream.once('error', async (err) => {
             this.cleanup();

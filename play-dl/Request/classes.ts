@@ -15,7 +15,7 @@ export class Proxy {
     socket: TLSSocket;
     sentHeaders: string;
     private options: ProxyOptions;
-    constructor(parsed_url: URL, options: ProxyOptions){
+    constructor(parsed_url: URL, options: ProxyOptions) {
         this.parsed_url = parsed_url;
         this.sentHeaders = '';
         this.statusCode = 0;
@@ -42,10 +42,10 @@ export class Proxy {
     private onConnect() {
         this.socket.write(
             `${this.options.method} ${this.parsed_url.pathname}${this.parsed_url.search} HTTP/1.1\r\n` +
-            `Host : ${this.parsed_url.hostname}\r\n` +
-            this.sentHeaders +
-            `Connection: close\r\n` +
-            `\r\n` 
+                `Host : ${this.parsed_url.hostname}\r\n` +
+                this.sentHeaders +
+                `Connection: close\r\n` +
+                `\r\n`
         );
     }
 

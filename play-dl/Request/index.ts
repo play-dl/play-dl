@@ -1,12 +1,12 @@
 import http, { ClientRequest, IncomingMessage } from 'http';
-import https ,{ RequestOptions } from 'https';
+import https, { RequestOptions } from 'https';
 import { URL } from 'url';
 import { getCookies, setCookie, uploadCookie } from '../YouTube/utils/cookie';
 import { Proxy } from './classes';
 
 export type ProxyOptions = ProxyOpts | string;
 
-interface RequestOpts extends RequestOptions{
+interface RequestOpts extends RequestOptions {
     body?: string;
     method?: 'GET' | 'POST';
     proxies?: ProxyOptions[];
@@ -83,8 +83,7 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
             res.setEncoding('utf-8');
             res.on('data', (c) => (data += c));
             res.on('end', () => resolve(data));
-        }
-        else {
+        } else {
             let cookies_added = false;
             if (options.cookies) {
                 let cook = getCookies();
@@ -115,7 +114,7 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
             } else if (res.statusCode > 400) {
                 reject(new Error(`GOT ${res.statusCode} from proxy request`));
             }
-            resolve(res.body)
+            resolve(res.body);
         }
     });
 }
@@ -126,7 +125,7 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
  * @param max Maximum number
  * @returns Random Number
  */
- function randomIntFromInterval(min: number, max: number): number {
+function randomIntFromInterval(min: number, max: number): number {
     let x = Math.floor(Math.random() * (max - min + 1) + min);
     if (x === 0) return 0;
     else return x - 1;
@@ -137,10 +136,10 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
  * @param req_proxy Proxies array
  * @returns Object with statusCode, head and body
  */
-function proxy_getter(req_url : string, req_proxy : ProxyOptions[], headers? : Object): Promise<Proxy>{
+function proxy_getter(req_url: string, req_proxy: ProxyOptions[], headers?: Object): Promise<Proxy> {
     return new Promise((resolve, reject) => {
         const proxy: string | ProxyOpts = req_proxy[randomIntFromInterval(0, req_proxy.length)];
-        const parsed_url = new URL(req_url)
+        const parsed_url = new URL(req_url);
         let opts: ProxyOpts;
         if (typeof proxy === 'string') {
             const parsed = new URL(proxy);
@@ -175,14 +174,14 @@ function proxy_getter(req_url : string, req_proxy : ProxyOptions[], headers? : O
             });
         }
         req.on('connect', async function (res, socket) {
-            const conn_proxy = new Proxy(parsed_url, { method : "GET", socket : socket, headers : headers })
-            await conn_proxy.fetch()
-            socket.end()
-            resolve(conn_proxy)
-        })
+            const conn_proxy = new Proxy(parsed_url, { method: 'GET', socket: socket, headers: headers });
+            await conn_proxy.fetch();
+            socket.end();
+            resolve(conn_proxy);
+        });
         req.on('error', (e: Error) => reject(e));
         req.end();
-    })
+    });
 }
 
 /**
@@ -191,7 +190,7 @@ function proxy_getter(req_url : string, req_proxy : ProxyOptions[], headers? : O
  * @param options Request options for https request
  * @returns Incoming Message from the https request
  */
- function https_getter(req_url: string, options: RequestOpts = {}): Promise<IncomingMessage> {
+function https_getter(req_url: string, options: RequestOpts = {}): Promise<IncomingMessage> {
     return new Promise((resolve, reject) => {
         const s = new URL(req_url);
         options.method ??= 'GET';
