@@ -60,7 +60,7 @@ export class SoundCloudTrack {
         this.url = data.uri;
         this.fetched = true;
         this.type = 'track';
-        this.durationInSec = Number(data.duration) / 1000;
+        this.durationInSec = Math.round(Number(data.duration) / 1000);
         this.durationInMs = Number(data.duration);
         if (data.publisher_metadata)
             this.publisher = {
@@ -125,7 +125,7 @@ export class SoundCloudPlaylist {
         this.client_id = client_id;
         this.type = 'playlist';
         this.sub_type = data.set_type;
-        this.durationInSec = Number(data.duration) / 1000;
+        this.durationInSec = Math.round(Number(data.duration) / 1000);
         this.durationInMs = Number(data.duration);
         this.user = {
             name: data.user.username,
