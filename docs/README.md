@@ -49,9 +49,9 @@ _This sets token without using file._
 ```js
 setToken({
     spotify : {
-        client_id : "ID"
-        client_secret : "Secret"
-        refresh_token : "Token"
+        client_id : "ID",
+        client_secret : "Secret",
+        refresh_token : "Token",
         market : "Country Code"
     }
 }) // Setting Spotify Token [ To get refresh_token, just run through authorization, and set file save to No ]
