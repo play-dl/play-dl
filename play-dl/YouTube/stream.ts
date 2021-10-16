@@ -85,7 +85,7 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     );
 }
 /**
- * Stream command for YouTube using info from video_info function.
+ * Stream command for YouTube using info from video_info or video_info_from_basic_info function.
  * @param info video_info data
  * @param options lets you add quality, cookie, proxy support for stream
  * @returns Stream class with type and stream for playing.
