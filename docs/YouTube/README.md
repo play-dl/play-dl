@@ -86,14 +86,14 @@ const video = await video_info(url)
     console.log(video.format)
     ```
 
-### video_info_from_basic_info(data : `InfoData`)
+### decipher_info(data : `InfoData`)
 
 _This contains everything with deciphered formats along with `video_details`. It uses data returned by [`video_basic_info`](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#video_basic_infourl--string-options--infooptions). This function is useful if you use [`video_basic_info`](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#video_basic_infourl--string-options--infooptions) earlier in your code and want to convert the output for use with [`stream_from_info`](https://github.com/play-dl/play-dl/tree/main/docs#stream_from_infoinfo--infodata-options--streamoptions)_
 
 ```js
 const basic_video = await video_basic_info(url);
 
-const video = await video_info_from_basic_info(basic_video);
+const video = await decipher_info(basic_video);
 ```
 
 ## Playlist

@@ -182,7 +182,7 @@ export async function video_info(url: string, options: InfoOptions = {}) {
  * @param data basic_video_info data
  * @returns Data containing video_details, LiveStreamData and formats of video url.
  */
-export async function video_info_from_basic_info(data: InfoData) {
+export async function decipher_info(data: InfoData) {
     if (data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null) {
         return data;
     } else if (data.format[0].signatureCipher || data.format[0].cipher) {
