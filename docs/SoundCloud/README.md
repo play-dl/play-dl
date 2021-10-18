@@ -12,6 +12,20 @@ let data = await soundcloud(url) //Gets the data
 console.log(data.type) // Console logs the type of data that you got.
 ```
 
+### getFreeClientID()
+
+_This returns free client ID._
+
+```js 
+const client_id = await getFreeClientID()
+
+setToken({
+    soundcloud : {
+        client_id : client_id
+    }
+}) // This will set client ID for use in play-dl.
+```
+
 ## Validate
 
 ### so_validate(url : `string`)
