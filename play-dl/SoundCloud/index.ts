@@ -86,6 +86,23 @@ export async function stream(url: string, quality?: number): Promise<Stream> {
     return new Stream(s_data.url, type);
 }
 /**
+ * Function to get Free Client ID of soundcloud.
+ * @returns client ID
+ */
+export async function getFreeClientID(): Promise<string>{
+    const data = await request('https://soundcloud.com/')
+    const splitted = data.split('<script crossorigin src="')
+    const urls: string[] = []
+    splitted.forEach((r) => {
+        if(r.startsWith('https')) {
+            urls.push(r.split('"')[0])
+        }
+    })
+    const data2 = await request(urls[urls.length - 1])
+    return data2.split(',client_id:"')[1].split('"')[0]
+}
+
+/**
  * Type for SoundCloud Stream
  */
 export type SoundCloudStream = Stream;

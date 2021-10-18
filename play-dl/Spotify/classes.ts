@@ -200,7 +200,7 @@ export class SpotifyAlbum {
     copyrights: SpotifyCopyright[];
     release_date: string;
     release_date_precision: string;
-    trackCount: number;
+    tracksCount: number;
     private spotifyData: SpotifyDataOptions;
     private fetched_tracks: Map<string, SpotifyTrack[]>;
     constructor(data: any, spotifyData: SpotifyDataOptions) {
@@ -221,7 +221,7 @@ export class SpotifyAlbum {
         this.copyrights = data.copyrights;
         this.release_date = data.release_date;
         this.release_date_precision = data.release_date_precision;
-        this.trackCount = data.total_tracks;
+        this.tracksCount = data.total_tracks;
         const videos: SpotifyTrack[] = [];
         data.tracks.items.forEach((v: any) => {
             videos.push(new SpotifyTrack(v));
@@ -233,8 +233,8 @@ export class SpotifyAlbum {
 
     async fetch() {
         let fetching: number;
-        if (this.trackCount > 500) fetching = 500;
-        else fetching = this.trackCount;
+        if (this.tracksCount > 500) fetching = 500;
+        else fetching = this.tracksCount;
         if (fetching <= 50) return;
         const work = [];
         for (let i = 2; i <= Math.ceil(fetching / 50); i++) {

@@ -9,7 +9,7 @@ export {
     YouTubeStream
 } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
-export { soundcloud, so_validate, SoundCloud, SoundCloudStream } from './SoundCloud';
+export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID } from './SoundCloud';
 export { setToken } from './token';
 
 enum AudioPlayerStatus {
