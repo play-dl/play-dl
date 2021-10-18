@@ -1,4 +1,13 @@
-export { playlist_info, video_basic_info, video_info, yt_validate, extractID, YouTube, YouTubeStream } from './YouTube';
+export {
+    playlist_info,
+    video_basic_info,
+    video_info,
+    decipher_info,
+    yt_validate,
+    extractID,
+    YouTube,
+    YouTubeStream
+} from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream } from './SoundCloud';
 export { setToken } from './token';
