@@ -148,7 +148,7 @@ export class SpotifyPlaylist {
                     if (typeof response !== 'string') return;
                     const json_data = JSON.parse(response);
                     json_data.items.forEach((v: any) => {
-                        if(v.track) videos.push(new SpotifyTrack(v.track));
+                        if (v.track) videos.push(new SpotifyTrack(v.track));
                     });
                     this.fetched_tracks.set(`${i}`, videos);
                     resolve('Success');
@@ -254,7 +254,7 @@ export class SpotifyAlbum {
                     if (typeof response !== 'string') return;
                     const json_data = JSON.parse(response);
                     json_data.items.forEach((v: any) => {
-                        if(v) videos.push(new SpotifyTrack(v));
+                        if (v) videos.push(new SpotifyTrack(v));
                     });
                     this.fetched_tracks.set(`${i}`, videos);
                     resolve('Success');
