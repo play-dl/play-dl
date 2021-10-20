@@ -35,7 +35,7 @@ export function request_stream(req_url: string, options: RequestOpts = { method:
             return;
         }
         if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
-            res = await https_getter(res.headers.location as string, options);
+            res = await request_stream(res.headers.location as string, options);
         }
         resolve(res);
     });
