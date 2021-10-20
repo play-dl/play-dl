@@ -119,8 +119,9 @@ export function parseVideo(data?: any): YouTubeVideo {
         url: `https://www.youtube.com/watch?v=${data.videoRenderer.videoId}`,
         title: data.videoRenderer.title.runs[0].text,
         description:
-            data.videoRenderer.descriptionSnippet && data.videoRenderer.descriptionSnippet.runs[0]
-                ? data.videoRenderer.descriptionSnippet.runs[0].text
+            data.videoRenderer.detailedMetadataSnippets &&
+            data.videoRenderer.detailedMetadataSnippets[0].snippetText.runs[0]
+                ? data.videoRenderer.detailedMetadataSnippets[0].snippetText.runs.map((run: any) => run.text).join('')
                 : '',
         duration: data.videoRenderer.lengthText ? parseDuration(data.videoRenderer.lengthText.simpleText) : 0,
         duration_raw: data.videoRenderer.lengthText ? data.videoRenderer.lengthText.simpleText : null,
