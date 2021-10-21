@@ -21,7 +21,7 @@ export type YouTube = YouTubeVideo | YouTubeChannel | YouTubePlayList;
  * @returns YouTube type.
  */
 export async function yt_search(search: string, options: ParseSearchInterface = {}): Promise<YouTube[]> {
-    let url = 'https://www.youtube.com/results?search_query=' + search.replaceAll(' ', '+');
+    let url = 'https://www.youtube.com/results?search_query=' + search;
     options.type ??= 'video';
     if (!url.match('&sp=')) {
         url += '&sp=';
