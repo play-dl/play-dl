@@ -33,6 +33,8 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
                 if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
                 else if (url.includes('youtube.com/embed/'))
                     id = url.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
+                else if (url.includes('youtube.com/shorts/'))
+                    id = url.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
                 else id = url.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
                 if (id.match(video_id_pattern)) return 'video';
                 else return false;
