@@ -156,9 +156,7 @@ export async function sp_search(
     if (query.length === 0) throw new Error('Pass some query to search.');
     if (limit > 50 || limit < 0) throw new Error(`You crossed limit range of Spotify [ 0 - 50 ]`);
     const response = await request(
-        `https://api.spotify.com/v1/search?type=${type}&q=${query}&limit=${limit}&market=${
-            spotifyData.market
-        }`,
+        `https://api.spotify.com/v1/search?type=${type}&q=${query}&limit=${limit}&market=${spotifyData.market}`,
         {
             headers: {
                 Authorization: `${spotifyData.token_type} ${spotifyData.access_token}`
