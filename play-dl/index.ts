@@ -77,7 +77,7 @@ export async function search(
     options: SearchOptions = {}
 ): Promise<YouTube[] | Spotify[] | SoundCloud[]> {
     if (!options.source) options.source = { youtube: 'video' };
-    query = encodeURIComponent(query)
+    query = encodeURIComponent(query);
     if (options.source.youtube) return await yt_search(query, { limit: options.limit, type: options.source.youtube });
     else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
     else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);

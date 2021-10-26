@@ -61,6 +61,8 @@ export function extractID(url: string): string {
             if (url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
             else if (url.includes('youtube.com/embed/'))
                 video_id = url.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
+            else if (url.includes('youtube.com/shorts/'))
+                video_id = url.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
             else video_id = url.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
             return video_id;
         } else {
@@ -76,15 +78,25 @@ export function extractID(url: string): string {
  */
 export async function video_basic_info(url: string, options: InfoOptions = {}) {
     if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
-    let video_id: string = extractID(url);
+    const video_id: string = extractID(url);
     const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
     const body = await request(new_url, {
         proxies: options.proxy ?? [],
         headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' },
         cookies: true
     });
-    const player_response = JSON.parse(body.split('var ytInitialPlayerResponse = ')[1].split('}};')[0] + '}}');
-    const initial_response = JSON.parse(body.split('var ytInitialData = ')[1].split('}};')[0] + '}}');
+    const player_data = body
+        .split('var ytInitialPlayerResponse = ')?.[1]
+        ?.split(';</script>')[0]
+        .split(/; (var|const|let)/)[0];
+    if (!player_data) throw new Error('Initial Player Response Data is undefined.');
+    const initial_data = body
+        .split('var ytInitialData = ')?.[1]
+        ?.split(';</script>')[0]
+        .split(/; (var|const|let)/)[0];
+    if (!initial_data) throw new Error('Initial Response Data is undefined.');
+    const player_response = JSON.parse(player_data);
+    const initial_response = JSON.parse(initial_data);
     if (player_response.playabilityStatus.status !== 'OK')
         throw new Error(
             `While getting info from url\n${

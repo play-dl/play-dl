@@ -11,7 +11,8 @@
   "scripts": {
     "build": "tsc",
     "build:check": "tsc --noEmit --incremental false",
-    "pretty": "prettier --config .prettierrc \"play-dl/*.ts\" \"play-dl/*/*.ts\" \"play-dl/*/*/*.ts\" --write "
+    "pretty": "prettier --config .prettierrc \"play-dl/*.ts\" \"play-dl/*/*.ts\" \"play-dl/*/*/*.ts\" --write ",
+    "prepublishOnly": "tsc --build --clean;tsc --build --verbose"
   },
   "repository": {
     "type": "git",
