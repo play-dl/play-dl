@@ -83,8 +83,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
         headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' },
         cookies: true
     });
-    const player_response = JSON.parse(body.split('var ytInitialPlayerResponse = ')[1].split('}};')[0] + '}}');
-    const initial_response = JSON.parse(body.split('var ytInitialData = ')[1].split('}};')[0] + '}}');
+    const player_response = JSON.parse(body.split('var ytInitialPlayerResponse = ')[1].split(';</script>')[0].split(/; (var|const|let)/)[0]);
+    const initial_response = JSON.parse(body.split('var ytInitialData = ')[1].split(';</script>')[0].split(/; (var|const|let)/)[0]);
     if (player_response.playabilityStatus.status !== 'OK')
         throw new Error(
             `While getting info from url\n${
