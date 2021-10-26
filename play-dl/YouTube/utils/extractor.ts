@@ -90,13 +90,13 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
         ?.split(';</script>')[0]
         .split(/; (var|const|let)/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
+    const initial_data = body
+        .split('var ytInitialData = ')?.[1]
+        ?.split(';</script>')[0]
+        .split(/; (var|const|let)/)[0];
+    if (!initial_data) throw new Error('Initial Response Data is undefined.');
     const player_response = JSON.parse(player_data);
-    const initial_response = JSON.parse(
-        body
-            .split('var ytInitialData = ')[1]
-            .split(';</script>')[0]
-            .split(/; (var|const|let)/)[0]
-    );
+    const initial_response = JSON.parse(initial_data);
     if (player_response.playabilityStatus.status !== 'OK')
         throw new Error(
             `While getting info from url\n${
