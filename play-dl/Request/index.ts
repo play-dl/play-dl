@@ -8,7 +8,7 @@ export type ProxyOptions = ProxyOpts | string;
 
 interface RequestOpts extends RequestOptions {
     body?: string;
-    method?: 'GET' | 'POST';
+    method?: 'GET' | 'POST' | 'HEAD';
     proxies?: ProxyOptions[];
     cookies?: boolean;
 }
@@ -115,6 +115,23 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 reject(new Error(`GOT ${res.statusCode} from proxy request`));
             }
             resolve(res.body);
+        }
+    });
+}
+
+export function request_resolve_redirect(url: string): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+        let res = await https_getter(url, { method: 'HEAD' }).catch((err: Error) => err);
+        if (res instanceof Error) {
+            reject(res);
+            return;
+        }
+        const statusCode = Number(res.statusCode);
+        if (statusCode >= 300 && statusCode < 400) {
+            const resolved = await request_resolve_redirect(res.headers.location as string);
+            resolve(resolved);
+        } else {
+            resolve(url);
         }
     });
 }
