@@ -151,9 +151,13 @@ function proxy_getter(req_url: string, req_proxy: ProxyOptions[], headers?: Obje
                     password: parsed.password
                 }
             };
-        } else opts = proxy;
+        } else
+            opts = {
+                host: proxy.host,
+                port: Number(proxy.port)
+            };
         let req: ClientRequest;
-        if (opts.authentication?.username.length === 0) {
+        if (!opts.authentication) {
             req = http.request({
                 host: opts.host,
                 port: opts.port,
