@@ -49,7 +49,6 @@ export function request_stream(req_url: string, options: RequestOpts = { method:
 export function request(req_url: string, options: RequestOpts = { method: 'GET' }): Promise<string> {
     return new Promise(async (resolve, reject) => {
         if (!options?.proxies || options.proxies.length === 0) {
-            let data = '';
             let cookies_added = false;
             if (options.cookies) {
                 let cook = getCookies();
@@ -80,9 +79,10 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
             } else if (Number(res.statusCode) > 400) {
                 reject(new Error(`Got ${res.statusCode} from the request`));
             }
+            const data: string[] = [];
             res.setEncoding('utf-8');
-            res.on('data', (c) => (data += c));
-            res.on('end', () => resolve(data));
+            res.on('data', (c) => data.push(c));
+            res.on('end', () => resolve(data.join('')));
         } else {
             let cookies_added = false;
             if (options.cookies) {
