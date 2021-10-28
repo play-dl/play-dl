@@ -29,8 +29,8 @@ interface SearchOptions {
     };
 }
 
-import readline from 'readline';
-import fs from 'fs';
+import readline from 'node:readline';
+import fs from 'node:fs';
 import {
     sp_validate,
     yt_validate,
@@ -46,7 +46,7 @@ import { check_id, so_search, stream as so_stream, stream_from_info as so_stream
 import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
-import { EventEmitter } from 'stream';
+import { EventEmitter } from 'node:stream';
 
 /**
  * Main stream Command for streaming through various sources

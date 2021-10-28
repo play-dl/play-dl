@@ -1,5 +1,5 @@
-import tls, { TLSSocket } from 'tls';
-import { URL } from 'url';
+import tls, { TLSSocket } from 'node:tls';
+import { URL } from 'node:url';
 
 interface ProxyOptions extends tls.ConnectionOptions {
     method: 'GET';

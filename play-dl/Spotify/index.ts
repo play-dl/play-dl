@@ -1,6 +1,6 @@
 import { request } from '../Request';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './classes';
-import fs from 'fs';
+import fs from 'node:fs';
 
 let spotifyData: SpotifyDataOptions;
 if (fs.existsSync('.data/spotify.data')) {

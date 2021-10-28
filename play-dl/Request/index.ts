@@ -1,6 +1,6 @@
-import http, { ClientRequest, IncomingMessage } from 'http';
-import https, { RequestOptions } from 'https';
-import { URL } from 'url';
+import http, { ClientRequest, IncomingMessage } from 'node:http';
+import https, { RequestOptions } from 'node:https';
+import { URL } from 'node:url';
 import { getCookies, setCookie, uploadCookie } from '../YouTube/utils/cookie';
 import { Proxy } from './classes';
 

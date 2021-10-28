@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import { StreamType } from '../YouTube/stream';
 import { request } from '../Request';
 import { SoundCloudPlaylist, SoundCloudTrack, SoundCloudTrackFormat, Stream } from './classes';

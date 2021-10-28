@@ -1,6 +1,6 @@
 import { request, request_stream } from '../Request';
-import { Readable } from 'stream';
-import { IncomingMessage } from 'http';
+import { Readable } from 'node:stream';
+import { IncomingMessage } from 'node:http';
 import { StreamType } from '../YouTube/stream';
 import { Timer } from '../YouTube/classes/LiveStream';
 
