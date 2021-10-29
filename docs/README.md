@@ -12,13 +12,15 @@ For source specific commands :-
 
 _This checks all type of urls that are supported by play-dl._
 
-**Returns :** `so_playlist` | `so_track` | `sp_track` | `sp_album` | `sp_playlist` | `yt_video` | `yt_playlist` | `search` | `false`
+**Returns :** `so_playlist` | `so_track` | `sp_track` | `sp_album` | `sp_playlist` | `dz_track` | `dz_playlist` | `dz_album` | `dz_share` | `yt_video` | `yt_playlist` | `search` | `false`
 
 `so` = **SoundCloud**
 
 `sp` = **Spotify**
 
 `yt` = **YouTube**
+
+`dz` = **Deezer**
 
 ```js
 let check = await validate(url)
@@ -30,6 +32,8 @@ if(check === 'yt_video') // YouTube Video
 if(check === 'sp_track') // Spotify Track
 
 if(check === 'so_track') // SoundCloud Track
+
+if(check === 'dz_track') // Deezer Track
 
 if(check === "search") // Given term is not a url. Search this term somewhere.
 ```
@@ -82,6 +86,8 @@ setToken({
 
     soundcloud: `tracks` | `playlists` | `albums` ;
 
+    deezer: `track` | `playlist` | `album` ;
+
     }
 
 #### search(query : `string`, options? : [`SearchOptions`](https://github.com/play-dl/play-dl/tree/main/docs#searchoptions-))
@@ -98,13 +104,15 @@ let data = await search('Rick Roll', { limit : 1, source : { youtube : "video" }
 let data = await search('Rick Roll', { limit: 1, source : { spotify : "track" } }) // Searches for spotify track.
 
 let data = await search('Rick Roll', { limit: 1, source : { soundcloud : "tracks" } }) // Searches for soundcloud track.
+
+let data = await search('Rick Roll', { limit: 1, source : { deezer : "track" } }) // Searches for a Deezer track.
 ```
 
 ### Stream
 
 **Attaching events to player is important for stream to work.**
 
-#### attachListeners(player : `AudioPlayer`, resource : `YouTubeStream | SoundCloudStream`) 
+#### attachListeners(player : `AudioPlayer`, resource : `YouTubeStream | SoundCloudStream`)
 
 _This is used for attaching pause and playing events to audioPlayer._
 
