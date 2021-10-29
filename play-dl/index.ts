@@ -31,8 +31,8 @@ interface SearchOptions {
     };
 }
 
-import readline from 'readline';
-import fs from 'fs';
+import readline from 'node:readline';
+import fs from 'node:fs';
 import {
     sp_validate,
     yt_validate,
@@ -50,7 +50,6 @@ import { SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
 import { EventEmitter } from 'stream';
 import { Deezer, dz_search, dz_validate } from './Deezer';
-
 /**
  * Main stream Command for streaming through various sources
  * @param url The video / track url to make stream of

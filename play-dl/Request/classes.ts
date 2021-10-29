@@ -1,5 +1,5 @@
-import tls, { TLSSocket } from 'tls';
-import { URL } from 'url';
+import tls, { TLSSocket } from 'node:tls';
+import { URL } from 'node:url';
 
 interface ProxyOptions extends tls.ConnectionOptions {
     method: 'GET';
@@ -69,6 +69,7 @@ export class Proxy {
         return new Promise((resolve, reject) => {
             this.socket.setEncoding('utf-8');
             this.socket.once('error', (err) => reject(err));
+            const parts: string[] = [];
             this.socket.on('data', (chunk: string) => {
                 if (this.rawHeaders.length === 0) {
                     this.rawHeaders = chunk;
@@ -76,10 +77,11 @@ export class Proxy {
                 } else {
                     const arr = chunk.split('\r\n');
                     if (arr.length > 1 && arr[0].length < 5) arr.shift();
-                    this.body += arr.join('');
+                    parts.push(...arr);
                 }
             });
             this.socket.on('end', () => {
+                this.body = parts.join('');
                 resolve(this);
             });
         });

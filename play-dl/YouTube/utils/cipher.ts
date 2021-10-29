@@ -1,6 +1,5 @@
-import { URL } from 'url';
+import { URL, URLSearchParams } from 'node:url';
 import { request } from './../../Request';
-import querystring from 'querystring';
 
 interface formatOptions {
     url?: string;
@@ -164,7 +163,8 @@ export async function format_decipher(formats: formatOptions[], html5player: str
     formats.forEach((format) => {
         const cipher = format.signatureCipher || format.cipher;
         if (cipher) {
-            Object.assign(format, querystring.parse(cipher));
+            const params = Object.fromEntries(new URLSearchParams(cipher));
+            Object.assign(format, params);
             delete format.signatureCipher;
             delete format.cipher;
         }

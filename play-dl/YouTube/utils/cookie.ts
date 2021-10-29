@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 
 let youtubeData: youtubeDataOptions;
 if (fs.existsSync('.data/youtube.data')) {
