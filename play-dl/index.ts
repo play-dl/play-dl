@@ -10,6 +10,7 @@ export {
 } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID } from './SoundCloud';
+export { deezer, dz_validate, dz_search, dz_resolve_share_url, Deezer } from './Deezer';
 export { setToken } from './token';
 
 enum AudioPlayerStatus {
@@ -26,6 +27,7 @@ interface SearchOptions {
         youtube?: 'video' | 'playlist' | 'channel';
         spotify?: 'album' | 'playlist' | 'track';
         soundcloud?: 'tracks' | 'playlists' | 'albums';
+        deezer?: 'track' | 'playlist' | 'album';
     };
 }
 
@@ -46,8 +48,8 @@ import { check_id, so_search, stream as so_stream, stream_from_info as so_stream
 import { InfoData, stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
-import { EventEmitter } from 'node:stream';
-
+import { EventEmitter } from 'stream';
+import { Deezer, dz_search, dz_validate } from './Deezer';
 /**
  * Main stream Command for streaming through various sources
  * @param url The video / track url to make stream of
@@ -62,6 +64,11 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
             'Streaming from Spotify is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
         );
     }
+    if (url.indexOf('deezer') !== -1) {
+        throw new Error(
+            'Streaming from Deezer is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
+        );
+    }
     if (url.indexOf('soundcloud') !== -1) return await so_stream(url, options.quality);
     else return await yt_stream(url, options);
 }
@@ -70,17 +77,19 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
  *  Main Search Command for searching through various sources
  * @param query string to search.
  * @param options contains limit and source to choose.
- * @returns Array of YouTube or Spotify or SoundCloud
+ * @returns Array of YouTube or Spotify or SoundCloud or Deezer
  */
 export async function search(
     query: string,
     options: SearchOptions = {}
-): Promise<YouTube[] | Spotify[] | SoundCloud[]> {
+): Promise<YouTube[] | Spotify[] | SoundCloud[] | Deezer[]> {
     if (!options.source) options.source = { youtube: 'video' };
     query = encodeURIComponent(query);
     if (options.source.youtube) return await yt_search(query, { limit: options.limit, type: options.source.youtube });
     else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
     else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
+    else if (options.source.deezer)
+        return await dz_search(query, { limit: options.limit, type: options.source.deezer });
     else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
 }
 
@@ -106,7 +115,19 @@ export async function stream_from_info(
 export async function validate(
     url: string
 ): Promise<
-    'so_playlist' | 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'yt_video' | 'yt_playlist' | 'search' | false
+    | 'so_playlist'
+    | 'so_track'
+    | 'sp_track'
+    | 'sp_album'
+    | 'sp_playlist'
+    | 'dz_track'
+    | 'dz_playlist'
+    | 'dz_album'
+    | 'dz_share'
+    | 'yt_video'
+    | 'yt_playlist'
+    | 'search'
+    | false
 > {
     let check;
     if (!url.startsWith('https')) return 'search';
@@ -116,6 +137,9 @@ export async function validate(
     } else if (url.indexOf('soundcloud') !== -1) {
         check = await so_validate(url);
         return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
+    } else if (url.indexOf('deezer') !== -1) {
+        check = dz_validate(url);
+        return check !== false ? (('dz_' + check) as 'dz_track' | 'dz_playlist' | 'dz_album' | 'dz_share') : false;
     } else {
         check = yt_validate(url);
         return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
