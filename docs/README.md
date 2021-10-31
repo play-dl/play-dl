@@ -12,7 +12,7 @@ For source specific commands :-
 
 _This checks all type of urls that are supported by play-dl._
 
-**Returns :** `so_playlist` | `so_track` | `sp_track` | `sp_album` | `sp_playlist` | `dz_track` | `dz_playlist` | `dz_album` | `dz_share` | `yt_video` | `yt_playlist` | `search` | `false`
+**Returns :** `so_playlist` | `so_track` | `sp_track` | `sp_album` | `sp_playlist` | `dz_track` | `dz_playlist` | `dz_album` | `yt_video` | `yt_playlist` | `search` | `false`
 
 `so` = **SoundCloud**
 
