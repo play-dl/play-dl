@@ -98,6 +98,7 @@ export function parseChannel(data?: any): YouTubeChannel {
         },
         url: url,
         verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
+        artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist')),
         subscribers: data.channelRenderer.subscriberCountText?.simpleText
             ? data.channelRenderer.subscriberCountText.simpleText
             : '0 subscribers'
@@ -141,7 +142,8 @@ export function parseVideo(data?: any): YouTubeVideo {
                 height: data.videoRenderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail
                     .thumbnails[0].height
             },
-            verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified'))
+            verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
+            artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist'))
         },
         uploadedAt: data.videoRenderer.publishedTimeText?.simpleText ?? null,
         views: data.videoRenderer.viewCountText?.simpleText?.replace(/[^0-9]/g, '') ?? 0,

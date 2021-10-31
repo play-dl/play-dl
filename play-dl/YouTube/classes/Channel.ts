@@ -9,6 +9,7 @@ export interface ChannelIconInterface {
 export class YouTubeChannel {
     name?: string;
     verified?: boolean;
+    artist?: boolean;
     id?: string;
     type: 'video' | 'playlist' | 'channel';
     url?: string;
@@ -26,6 +27,7 @@ export class YouTubeChannel {
 
         this.name = data.name || null;
         this.verified = !!data.verified || false;
+        this.artist = !!data.artist || false;
         this.id = data.id || null;
         this.url = data.url || null;
         this.icon = data.icon || { url: null, width: 0, height: 0 };
@@ -52,6 +54,7 @@ export class YouTubeChannel {
         return {
             name: this.name,
             verified: this.verified,
+            artist: this.artist,
             id: this.id,
             url: this.url,
             iconURL: this.iconURL(),
