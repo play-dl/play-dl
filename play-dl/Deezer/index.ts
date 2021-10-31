@@ -14,6 +14,18 @@ interface DeezerSearchOptions {
     fuzzy?: boolean;
 }
 
+interface DeezerAdvancedSearchOptions {
+    limit?: number;
+    artist?: string;
+    album?: string;
+    title?: string;
+    label?: string;
+    minDurationInSec?: number;
+    maxDurationInSec?: number;
+    minBPM?: number;
+    maxBPM?: number;
+}
+
 async function internalValidate(url: string): Promise<TypeData> {
     let urlObj;
     try {
@@ -140,11 +152,9 @@ export async function dz_validate(url: string): Promise<'track' | 'playlist' | '
  * @param query The search query
  * @param options Extra options to configure the search:
  *
- * type?: The type to search for `'track'`, `'playlist'` or `'album'`. Defaults to `'track'`.
- *
- * limit?: The maximum number of results to return, maximum `100`, defaults to `10`.
- *
- * fuzzy?: Whether the search should be fuzzy or only return exact matches. Defaults to `true`.
+ * * type?: The type to search for `'track'`, `'playlist'` or `'album'`. Defaults to `'track'`.
+ * * limit?: The maximum number of results to return, maximum `100`, defaults to `10`.
+ * * fuzzy?: Whether the search should be fuzzy or only return exact matches. Defaults to `true`.
  * @returns An array of tracks, playlists or albums
  */
 export async function dz_search(query: string, options: DeezerSearchOptions): Promise<Deezer[]> {
@@ -185,6 +195,63 @@ export async function dz_search(query: string, options: DeezerSearchOptions): Pr
             results = jsonData.data.map((album: any) => new DeezerAlbum(album, true));
             break;
     }
+
+    return results;
+}
+
+/**
+ * Searches Deezer for tracks using the specified metadata.
+ * @param options The metadata and limit for the search
+ *
+ * * limit?: The maximum number of results to return, maximum `100`, defaults to `10`.
+ * * artist?: The name of the artist
+ * * album?: The title of the album
+ * * title?: The title of the track
+ * * label?: The label that released the track
+ * * minDurationInSec?: The minimum duration in seconds
+ * * maxDurationInSec?: The maximum duration in seconds
+ * * minBpm?: The minimum BPM
+ * * maxBpm?: The minimum BPM
+ * @returns An array of tracks matching the metadata
+ */
+export async function dz_advanced_track_search(options: DeezerAdvancedSearchOptions): Promise<DeezerTrack[]> {
+    const limit = options.limit ?? 10;
+
+    if (limit > 100) throw new Error('The maximum search limit for Deezer is 100');
+    if (limit < 1) throw new Error('The minimum search limit for Deezer is 1');
+
+    const metadata: string[] = [];
+    if (options.artist) metadata.push(`artist:"${encodeURIComponent(options.artist)}"`);
+
+    if (options.album) metadata.push(`album:"${encodeURIComponent(options.album)}"`);
+
+    if (options.title) metadata.push(`track:"${encodeURIComponent(options.title)}"`);
+
+    if (options.label) metadata.push(`label:"${encodeURIComponent(options.label)}"`);
+
+    if (Number(options.minDurationInSec) !== NaN) metadata.push(`dur_min:${options.minDurationInSec}`);
+
+    if (Number(options.maxDurationInSec) !== NaN) metadata.push(`dur_max:${options.maxDurationInSec}`);
+
+    if (Number(options.minBPM) !== NaN) metadata.push(`bpm_min:${options.minBPM}`);
+
+    if (Number(options.maxBPM) !== NaN) metadata.push(`bpm_max:${options.maxBPM}`);
+
+    if (metadata.length === 0) throw new Error('At least one type of metadata is required.');
+
+    const response = await request(`https://api.deezer.com/search/track/?q=${metadata.join(' ')}&limit=${limit}`).catch(
+        (err: Error) => err
+    );
+
+    if (response instanceof Error) throw response;
+
+    const jsonData = JSON.parse(response);
+
+    if (jsonData.error) {
+        throw new Error(`Deezer API Error: ${jsonData.error.type}: ${jsonData.error.message}`);
+    }
+
+    const results = jsonData.data.map((track: any) => new DeezerTrack(track, true));
 
     return results;
 }

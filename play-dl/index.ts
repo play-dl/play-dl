@@ -10,7 +10,7 @@ export {
 } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID } from './SoundCloud';
-export { deezer, dz_validate, dz_search, Deezer } from './Deezer';
+export { deezer, dz_validate, dz_search, dz_advanced_track_search, Deezer } from './Deezer';
 export { setToken } from './token';
 
 enum AudioPlayerStatus {
