@@ -14,7 +14,7 @@ interface PlaylistOptions {
 }
 
 const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
-const playlist_id_pattern = /^PL[a-zA-Z\d_-]{16,41}$/;
+const playlist_id_pattern = /^(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}$/;
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
