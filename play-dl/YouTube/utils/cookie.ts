@@ -46,3 +46,16 @@ export function setCookieToken(options: { cookie: string }) {
     youtubeData = { cookie };
     youtubeData.file = false;
 }
+
+export function cookieHeaders(headCookie : string[]){
+    headCookie.forEach((x: string) => {
+        x.split(';').forEach((x) => {
+            const arr = x.split('=');
+            if (arr.length <= 1) return;
+            const key = arr.shift()?.trim() as string;
+            const value = arr.join('=').trim();
+            setCookie(key, value);
+        });
+    });
+    uploadCookie();
+}

@@ -6,6 +6,7 @@ import { InfoData } from '../stream';
 
 interface InfoOptions {
     proxy?: Proxy[];
+    htmldata? : boolean
 }
 
 interface PlaylistOptions {
@@ -79,14 +80,20 @@ export function extractID(url: string): string {
  * @returns Data containing video_details, LiveStreamData and formats of video url.
  */
 export async function video_basic_info(url: string, options: InfoOptions = {}) {
-    if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
-    const video_id: string = extractID(url);
-    const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
-    const body = await request(new_url, {
-        proxies: options.proxy ?? [],
-        headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' },
-        cookies: true
-    });
+    let body : string;
+    if(options.htmldata){
+        body = url;
+    }
+    else {
+        if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
+        const video_id: string = extractID(url);
+        const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
+        body = await request(new_url, {
+            proxies: options.proxy ?? [],
+            headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' },
+            cookies: true
+        });
+    }
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
