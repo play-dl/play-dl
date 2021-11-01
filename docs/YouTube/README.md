@@ -50,6 +50,7 @@ let id = extractID(url)
 _This are the info options that can be passed as a parameter in `video_info` and `video_basic_info`_
 
 -   proxy : Optional parameter to add support of proxies. As of now, HTTPS proxies are only supported. So make sure to get HTTPS proxies only.
+- htmldata : `boolean` Set this to true if you are passing a html body as first parameter.
 
 ```js
 const video = await video_basic_info(url, { proxy : ['url'] }) // Accepts a url which has port in it.
@@ -59,6 +60,10 @@ const video = await video_basic_info(url, {proxy : [{
         port : 8080
     }]
 }) // Or add a json containing hostname and port.
+
+// Use any https package to use proxy and then do this
+
+const video = await video_basic_info(body, { htmldata : true }) // You can use video_info function also.
 ```
 
 ### video_basic_info(url : `string`, options? : [`InfoOptions`](https://github.com/play-dl/play-dl/tree/main/docs/YouTube#infooptions))

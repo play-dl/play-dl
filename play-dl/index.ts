@@ -6,7 +6,8 @@ export {
     yt_validate,
     extractID,
     YouTube,
-    YouTubeStream
+    YouTubeStream,
+    cookieHeaders
 } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID } from './SoundCloud';

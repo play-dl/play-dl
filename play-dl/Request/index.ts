@@ -1,7 +1,7 @@
 import http, { ClientRequest, IncomingMessage } from 'node:http';
 import https, { RequestOptions } from 'node:https';
 import { URL } from 'node:url';
-import { getCookies, setCookie, uploadCookie } from '../YouTube/utils/cookie';
+import { cookieHeaders, getCookies } from '../YouTube/utils/cookie';
 import { Proxy } from './classes';
 
 export type ProxyOptions = ProxyOpts | string;
@@ -63,16 +63,7 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 return;
             }
             if (res.headers && res.headers['set-cookie'] && cookies_added) {
-                res.headers['set-cookie'].forEach((x) => {
-                    x.split(';').forEach((x) => {
-                        const arr = x.split('=');
-                        if (arr.length <= 1) return;
-                        const key = arr.shift()?.trim() as string;
-                        const value = arr.join('=').trim();
-                        setCookie(key, value);
-                    });
-                });
-                uploadCookie();
+                cookieHeaders(res.headers['set-cookie']);
             }
             if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
                 res = await https_getter(res.headers.location as string, options);
@@ -98,16 +89,7 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 return;
             }
             if (res.headers && (res.headers as any)['set-cookie'] && cookies_added) {
-                (res.headers as any)['set-cookie'].forEach((x: string) => {
-                    x.split(';').forEach((x) => {
-                        const arr = x.split('=');
-                        if (arr.length <= 1) return;
-                        const key = arr.shift()?.trim() as string;
-                        const value = arr.join('=').trim();
-                        setCookie(key, value);
-                    });
-                });
-                uploadCookie();
+                cookieHeaders((res.headers as any)['set-cookie']);
             }
             if (res.statusCode >= 300 && res.statusCode < 400) {
                 res = await proxy_getter((res.headers as any)['location'], options.proxies, options.headers);
