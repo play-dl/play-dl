@@ -135,7 +135,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
             name: vid.author,
             id: vid.channelId,
             url: `https://www.youtube.com/channel/${vid.channelId}`,
-            verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified'))
+            verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
+            artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist'))
         },
         views: vid.viewCount,
         tags: vid.keywords,
