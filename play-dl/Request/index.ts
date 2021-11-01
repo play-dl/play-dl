@@ -127,11 +127,19 @@ export function request_resolve_redirect(url: string): Promise<string> {
             return;
         }
         const statusCode = Number(res.statusCode);
-        if (statusCode >= 300 && statusCode < 400) {
-            const resolved = await request_resolve_redirect(res.headers.location as string);
+        if (statusCode < 300) {
+            resolve(url);
+        } else if (statusCode < 400) {
+            const resolved = await request_resolve_redirect(res.headers.location as string).catch((err) => err);
+
+            if (res instanceof Error) {
+                reject(res);
+                return;
+            }
+
             resolve(resolved);
         } else {
-            resolve(url);
+            reject(new Error(`${res.statusCode}: ${res.statusMessage}, ${url}`));
         }
     });
 }

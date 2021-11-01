@@ -10,7 +10,7 @@ export {
 } from './YouTube';
 export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
 export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID } from './SoundCloud';
-export { deezer, dz_validate, dz_search, dz_resolve_share_url, Deezer } from './Deezer';
+export { deezer, dz_validate, dz_search, Deezer } from './Deezer';
 export { setToken } from './token';
 
 enum AudioPlayerStatus {
@@ -123,7 +123,6 @@ export async function validate(
     | 'dz_track'
     | 'dz_playlist'
     | 'dz_album'
-    | 'dz_share'
     | 'yt_video'
     | 'yt_playlist'
     | 'search'
@@ -138,8 +137,8 @@ export async function validate(
         check = await so_validate(url);
         return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
     } else if (url.indexOf('deezer') !== -1) {
-        check = dz_validate(url);
-        return check !== false ? (('dz_' + check) as 'dz_track' | 'dz_playlist' | 'dz_album' | 'dz_share') : false;
+        check = await dz_validate(url);
+        return check !== false ? (('dz_' + check) as 'dz_track' | 'dz_playlist' | 'dz_album') : false;
     } else {
         check = yt_validate(url);
         return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;

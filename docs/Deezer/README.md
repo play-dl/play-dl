@@ -18,7 +18,7 @@ console.log(data.type); // Console logs the type of data that you got.
 
 _This checks that given url is Deezer url or not._
 
-**Returns :** `track` | `album` | `playlist` | `search` | `share` | `false`
+**Returns :** `track` | `album` | `playlist` | `search` | `false`
 
 ```js
 let check = dz_validate(url)
@@ -26,8 +26,6 @@ let check = dz_validate(url)
 if(!check) // Invalid Deezer URL
 
 if(check === 'track') // Deezer Track URL
-
-if(check === 'share') // Deezer Share URL
 
 if(check === "search") // Given term is a search query. Search it somewhere.
 ```
@@ -52,18 +50,6 @@ const results = await dz_search(query, {
     type: 'track',
     fuzzy: false
 }); // Returns an array with one track, using exact matching
-```
-
-## Resolving a share URL
-
-### dz_resolve_share_url(url: `string`)
-
-_Resolves a Deezer share link (deezer.page.link) returning the deezer.com URL._
-
-**Returns :** `string` the resolved URL. Warning the returned URL might not be a track, album or playlist URL.
-
-```js
-const resolvedURL = await dz_resolve_share_url(url);
 ```
 
 ## Classes [ Returned by `deezer(url)` function ]

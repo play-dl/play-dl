@@ -3,8 +3,9 @@ import { request, request_resolve_redirect } from '../Request';
 import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './classes';
 
 interface TypeData {
-    type: 'track' | 'playlist' | 'album' | 'search' | 'share' | false;
+    type: 'track' | 'playlist' | 'album' | 'search' | false;
     id?: string;
+    error?: string;
 }
 
 interface DeezerSearchOptions {
@@ -13,7 +14,7 @@ interface DeezerSearchOptions {
     fuzzy?: boolean;
 }
 
-function internalValidate(url: string): TypeData {
+async function internalValidate(url: string): Promise<TypeData> {
     let urlObj;
     try {
         // will throw a TypeError if the input is not a valid URL so we need to catch it
@@ -68,7 +69,13 @@ function internalValidate(url: string): TypeData {
         }
         case 'deezer.page.link': {
             if (path.length === 2 && path[1].match(/^[A-Za-z0-9]+$/)) {
-                return { type: 'share' };
+                const resolved = await request_resolve_redirect(url).catch((err) => err);
+
+                if (resolved instanceof Error) {
+                    return { type: false, error: resolved.message };
+                }
+
+                return await internalValidate(resolved);
             } else {
                 return { type: false };
             }
@@ -90,15 +97,12 @@ export type Deezer = DeezerTrack | DeezerPlaylist | DeezerAlbum;
  * object depending on the provided URL.
  */
 export async function deezer(url: string): Promise<Deezer> {
-    const typeData = internalValidate(url);
+    const typeData = await internalValidate(url);
 
-    if (!typeData.type || typeData.type === 'search')
+    if (typeData.error) {
+        throw new Error(`This is not a Deezer track, playlist or album URL:\n${typeData.error}`);
+    } else if (!typeData.type || typeData.type === 'search')
         throw new Error('This is not a Deezer track, playlist or album URL');
-
-    if (typeData.type === 'share') {
-        const resolvedURL = await internalResolve(url);
-        return await deezer(resolvedURL);
-    }
 
     const response = await request(`https://api.deezer.com/${typeData.type}/${typeData.id}`).catch((err: Error) => err);
 
@@ -123,11 +127,12 @@ export async function deezer(url: string): Promise<Deezer> {
 /**
  * Validates a Deezer URL
  * @param url The URL to validate
- * @returns The type of the URL either 'track', 'playlist', 'album', 'search', 'share' or false.
+ * @returns The type of the URL either 'track', 'playlist', 'album', 'search' or false.
  * false means that the provided URL was a wrongly formatted or unsupported Deezer URL.
  */
-export function dz_validate(url: string): 'track' | 'playlist' | 'album' | 'search' | 'share' | false {
-    return internalValidate(url).type;
+export async function dz_validate(url: string): Promise<'track' | 'playlist' | 'album' | 'search' | false> {
+    const typeData = await internalValidate(url);
+    return typeData.type;
 }
 
 /**
@@ -182,31 +187,4 @@ export async function dz_search(query: string, options: DeezerSearchOptions): Pr
     }
 
     return results;
-}
-
-async function internalResolve(url: string): Promise<string> {
-    const resolved = await request_resolve_redirect(url);
-    const urlObj = new URL(resolved);
-    urlObj.search = ''; // remove tracking parameters, not needed and also make that URL unnecessarily longer
-    return urlObj.toString();
-}
-
-/**
- * Resolves a Deezer share link (deezer.page.link) to the equivalent Deezer link.
- *
- * The {@link deezer} function automatically does this if {@link dz_validate} returns 'share'.
- *
- * @param url The Deezer share link (deezer.page.link) to resolve
- * @returns The resolved URL.
- */
-export async function dz_resolve_share_url(url: string): Promise<string> {
-    const typeData = internalValidate(url);
-
-    if (typeData.type === 'share') {
-        return await internalResolve(url);
-    } else if (typeData.type === 'track' || typeData.type === 'playlist' || typeData.type === 'album') {
-        return url;
-    } else {
-        throw new Error('This is not a valid Deezer URL');
-    }
 }
