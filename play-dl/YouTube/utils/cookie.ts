@@ -47,7 +47,8 @@ export function setCookieToken(options: { cookie: string }) {
     youtubeData.file = false;
 }
 
-export function cookieHeaders(headCookie : string[]){
+export function cookieHeaders(headCookie: string[]) {
+    if (!youtubeData?.cookie) return;
     headCookie.forEach((x: string) => {
         x.split(';').forEach((x) => {
             const arr = x.split('=');

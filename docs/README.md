@@ -178,3 +178,13 @@ let resource = createAudioResource(source.stream, {
             inputType : source.type
         }) // This creates resource for playing
 ```
+
+#### cookieHeaders(headersCookie : `string[]`)
+
+_This is function to update youtube cookies when using external https module._
+
+```js
+const res = ... // You need to get response.
+
+play.cookieHeaders(res.headers['set-cookie']) // Updates YouTube Cookies if cookies exists.
+```

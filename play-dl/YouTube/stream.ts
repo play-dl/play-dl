@@ -13,7 +13,7 @@ export enum StreamType {
 export interface StreamOptions {
     quality?: number;
     proxy?: Proxy[];
-    htmldata? : boolean
+    htmldata?: boolean;
 }
 
 export interface InfoData {
@@ -54,7 +54,7 @@ export type YouTubeStream = Stream | LiveStreaming;
  * @returns Stream class with type and stream for playing.
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
-    const info = await video_info(url, { proxy: options.proxy, htmldata : options.htmldata });
+    const info = await video_info(url, { proxy: options.proxy, htmldata: options.htmldata });
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&

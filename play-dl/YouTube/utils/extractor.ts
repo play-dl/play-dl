@@ -6,7 +6,7 @@ import { InfoData } from '../stream';
 
 interface InfoOptions {
     proxy?: Proxy[];
-    htmldata? : boolean
+    htmldata?: boolean;
 }
 
 interface PlaylistOptions {
@@ -80,11 +80,10 @@ export function extractID(url: string): string {
  * @returns Data containing video_details, LiveStreamData and formats of video url.
  */
 export async function video_basic_info(url: string, options: InfoOptions = {}) {
-    let body : string;
-    if(options.htmldata){
+    let body: string;
+    if (options.htmldata) {
         body = url;
-    }
-    else {
+    } else {
         if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
         const video_id: string = extractID(url);
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;

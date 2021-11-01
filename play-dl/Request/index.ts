@@ -63,7 +63,7 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 return;
             }
             if (res.headers && res.headers['set-cookie'] && cookies_added) {
-                cookieHeaders(res.headers['set-cookie'])
+                cookieHeaders(res.headers['set-cookie']);
             }
             if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
                 res = await https_getter(res.headers.location as string, options);
@@ -89,7 +89,7 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 return;
             }
             if (res.headers && (res.headers as any)['set-cookie'] && cookies_added) {
-                cookieHeaders((res.headers as any)['set-cookie'])
+                cookieHeaders((res.headers as any)['set-cookie']);
             }
             if (res.statusCode >= 300 && res.statusCode < 400) {
                 res = await proxy_getter((res.headers as any)['location'], options.proxies, options.headers);
