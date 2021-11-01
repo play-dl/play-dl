@@ -52,6 +52,32 @@ const results = await dz_search(query, {
 }); // Returns an array with one track, using exact matching
 ```
 
+### dz_advanced_track_search(options: `DeezerAdvancedSearchOptions`)
+
+_Searches Deezer for tracks using the specified metadata._
+
+**Returns :** `DeezerTrack[]` an array of tracks
+
+#### `DeezerAdvancedSearchOptions`
+
+-   **limit?** `number` The maximum number of results to return, maximum `100`, defaults to `10`.
+-   **artist?** `string` The name of the artist
+-   **album?** `string` The title of the album
+-   **title?** `string` The title of the track
+-   **label?** `string` The label that released the track
+-   **minDurationInSec?** `number` The minimum duration in seconds
+-   **maxDurationInSec?** `number` The maximum duration in seconds
+-   **minBpm?** `number` The minimum BPM
+-   **maxBpm?** `number` The minimum BPM
+
+```js
+const results = await dz_advanced_track_search({
+    limit: 1,
+    artist: 'Rick Astley',
+    title: 'Never Gonna Give You Up'
+}); // Returns an array with one track
+```
+
 ## Classes [ Returned by `deezer(url)` function ]
 
 ### DeezerTrack
