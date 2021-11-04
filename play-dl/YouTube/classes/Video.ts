@@ -15,11 +15,7 @@ interface VideoOptions {
         height: number | undefined;
         url: string | undefined;
     };
-    channel?: {
-        name: string;
-        id: string;
-        icon: string;
-    };
+    channel?: any;
     type: string;
     ratings: {
         likes: number;
@@ -68,7 +64,7 @@ export class YouTubeVideo {
         this.uploadedAt = data.uploadedAt || undefined;
         this.views = parseInt(data.views) || 0;
         this.thumbnail = data.thumbnail || {};
-        this.channel = data.channel || {};
+        this.channel = new YouTubeChannel(data.channel) || {};
         this.likes = (data.ratings?.likes as number) || 0;
         this.dislikes = data.ratings?.dislikes || 0;
         this.live = !!data.live;
@@ -90,11 +86,7 @@ export class YouTubeVideo {
             durationRaw: this.durationRaw,
             uploadedAt: this.uploadedAt,
             thumbnail: this.thumbnail,
-            channel: {
-                name: this.channel?.name as string,
-                id: this.channel?.id as string,
-                icon: this.channel?.iconURL() as string
-            },
+            channel: this.channel,
             views: this.views,
             type: this.type,
             tags: this.tags,
