@@ -207,7 +207,7 @@ export class Stream {
             this.stream.push(c);
         });
 
-        stream.once('error', async (err) => {
+        stream.once('error', async () => {
             this.cleanup();
             await this.retry();
             this.timer.reuse();

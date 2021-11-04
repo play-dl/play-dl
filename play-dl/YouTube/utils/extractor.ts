@@ -375,7 +375,6 @@ function parseDuration(duration: string): number {
  * @returns token
  */
 export function getContinuationToken(data: any): string {
-    const continuationToken = data.find((x: any) => Object.keys(x)[0] === 'continuationItemRenderer')
-        ?.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token;
-    return continuationToken;
+    return data.find((x: any) => Object.keys(x)[0] === 'continuationItemRenderer')?.continuationItemRenderer
+        .continuationEndpoint?.continuationCommand?.token;
 }
