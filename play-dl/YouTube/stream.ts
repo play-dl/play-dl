@@ -96,7 +96,7 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
     if (
         info.LiveStreamData.isLive === true &&
         info.LiveStreamData.hlsManifestUrl !== null &&
-        info.video_details.durationInSec === 0
+        info.video_details.durationInSec === '0'
     ) {
         return new LiveStreaming(
             info.LiveStreamData.dashManifestUrl,
