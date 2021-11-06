@@ -42,7 +42,7 @@ const swap_regexp = new RegExp(`(?:^|,)(${key_js})${swap_function}`, 'm');
  * @param body body data of html5player.
  * @returns Array of tokens.
  */
-export function js_tokens(body: string) {
+function js_tokens(body: string) {
     const function_action = function_regexp.exec(body);
     const object_action = obj_regexp.exec(body);
     if (!function_action || !object_action) return null;
@@ -104,7 +104,7 @@ function deciper_signature(tokens: string[], signature: string) {
                 sig = swappositions(sig, pos);
                 break;
             case 'rv':
-                sig = sig.reverse();
+                sig.reverse();
                 break;
             case 'sl':
                 pos = parseInt(token.slice(2));
@@ -137,11 +137,9 @@ function swappositions(array: string[], position: number) {
  * @returns void
  */
 function download_url(format: formatOptions, sig: string) {
-    let decoded_url;
     if (!format.url) return;
-    decoded_url = format.url;
 
-    decoded_url = decodeURIComponent(decoded_url);
+    const decoded_url = decodeURIComponent(format.url);
 
     const parsed_url = new URL(decoded_url);
     parsed_url.searchParams.set('ratebypass', 'yes');
@@ -168,9 +166,8 @@ export async function format_decipher(formats: formatOptions[], html5player: str
             delete format.signatureCipher;
             delete format.cipher;
         }
-        let sig;
         if (tokens && format.s) {
-            sig = deciper_signature(tokens, format.s);
+            const sig = deciper_signature(tokens, format.s);
             download_url(format, sig);
             delete format.s;
             delete format.sp;
