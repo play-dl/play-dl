@@ -260,8 +260,13 @@ export class Stream {
     }
 
     private async loop() {
-        if (this.stream.destroyed || this.time.length === 0 || this.segment_urls.length === 0) {
+        if (this.stream.destroyed) {
             this.cleanup();
+            return;
+        }
+        if(this.time.length === 0 || this.segment_urls.length === 0) {
+            this.cleanup();
+            this.stream.push(null);
             return;
         }
         this.downloaded_time += this.time.shift() as number;
