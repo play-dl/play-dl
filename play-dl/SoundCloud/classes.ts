@@ -264,7 +264,7 @@ export class Stream {
             this.cleanup();
             return;
         }
-        if(this.time.length === 0 || this.segment_urls.length === 0) {
+        if (this.time.length === 0 || this.segment_urls.length === 0) {
             this.cleanup();
             this.stream.push(null);
             return;
