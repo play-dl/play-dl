@@ -221,6 +221,7 @@ export class Stream {
         stream.on('end', () => {
             if (end >= this.content_length) {
                 this.timer.destroy();
+                this.stream.push(null);
                 this.cleanup();
             }
         });
