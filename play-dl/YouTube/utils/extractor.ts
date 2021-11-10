@@ -323,7 +323,7 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
             new YouTubeVideo({
                 id: info.videoId,
                 index: parseInt(info.index?.simpleText) || 0,
-                duration: parseDuration(info.lengthText?.simpleText) || 0,
+                duration: parseInt(info.lengthSeconds) || 0,
                 duration_raw: info.lengthText?.simpleText ?? '0:00',
                 thumbnail: {
                     id: info.videoId,
@@ -345,29 +345,6 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
         );
     }
     return videos;
-}
-/**
- * Function to convert [hour : minutes : seconds] format to seconds
- * @param duration hour : minutes : seconds format
- * @returns seconds
- */
-function parseDuration(duration: string): number {
-    duration ??= '0:00';
-    const args = duration.split(':');
-    let dur = 0;
-
-    switch (args.length) {
-        case 3:
-            dur = parseInt(args[0]) * 60 * 60 + parseInt(args[1]) * 60 + parseInt(args[2]);
-            break;
-        case 2:
-            dur = parseInt(args[0]) * 60 + parseInt(args[1]);
-            break;
-        default:
-            dur = parseInt(args[0]);
-    }
-
-    return dur;
 }
 /**
  * Function to get Continuation Token
