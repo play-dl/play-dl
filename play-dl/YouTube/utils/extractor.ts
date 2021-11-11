@@ -96,12 +96,12 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/; (var|const|let)/)[0];
+        .split(/;\s*(var|const|let)/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const initial_data = body
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/; (var|const|let)/)[0];
+        .split(/;\s*(var|const|let)/)[0];
     if (!initial_data) throw new Error('Initial Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     const initial_response = JSON.parse(initial_data);
