@@ -113,9 +113,9 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) {
             }`
         );
     const badge =
-        initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
+        initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
             ?.owner?.videoOwnerRenderer?.badges &&
-        initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer
+        initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
             ?.owner?.videoOwnerRenderer?.badges[0];
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const related: string[] = [];
