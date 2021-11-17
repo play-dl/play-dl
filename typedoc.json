@@ -1,0 +1,5 @@
+{
+    "entryPoints": ["./play-dl"],
+	"plugin" : "typedoc-plugin-missing-exports",
+    "out": "gh-pages"
+}
