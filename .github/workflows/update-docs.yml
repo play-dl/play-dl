@@ -1,0 +1,40 @@
+name: Update docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Delete the docs directory just in case
+        run: rm -rf ./docs
+
+      - name: Clone docs repository
+        uses: actions/checkout@v2
+        with:
+          repository: play-dl/play-dl.github.io
+          path: ./docs
+          token: "${{ secrets.DOCS_TOKEN }}"
+
+      - name: Generate docs
+        run: typedoc
+
+      - name: Push docs
+        uses: EndBug/add-and-commit@v7
+        with:
+          cwd: ./docs
+          default_author: github_actions
+          message: "Automated docs update"
