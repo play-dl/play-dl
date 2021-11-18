@@ -3,48 +3,130 @@ import { Readable } from 'node:stream';
 import { IncomingMessage } from 'node:http';
 import { StreamType } from '../YouTube/stream';
 import { Timer } from '../YouTube/classes/LiveStream';
+import { SoundTrackJSON } from './constants';
 
-interface SoundCloudUser {
+export interface SoundCloudUser {
+    /**
+     * SoundCloud User Name
+     */
     name: string;
+    /**
+     * SoundCloud User ID
+     */
     id: string;
+    /**
+     * SoundCloud User URL
+     */
     url: string;
+    /**
+     * SoundCloud Class type. == "user"
+     */
     type: 'track' | 'playlist' | 'user';
+    /**
+     * SoundCloud User Verified status
+     */
     verified: boolean;
+    /**
+     * SoundCloud User Description
+     */
     description: string;
+    /**
+     * SoundCloud User First Name
+     */
     first_name: string;
+    /**
+     * SoundCloud User Full Name
+     */
     full_name: string;
+    /**
+     * SoundCloud User Last Name
+     */
     last_name: string;
+    /**
+     * SoundCloud User thumbnail URL
+     */
     thumbnail: string;
 }
 
-interface SoundCloudTrackDeprecated {
+export interface SoundCloudTrackDeprecated {
+    /**
+     * SoundCloud Track fetched status
+     */
     fetched: boolean;
+    /**
+     * SoundCloud Track ID
+     */
     id: number;
+    /**
+     * SoundCloud Class type. == "track"
+     */
     type: 'track';
 }
 
 export interface SoundCloudTrackFormat {
+    /**
+     * SoundCloud Track Format Url
+     */
     url: string;
+    /**
+     * SoundCloud Track Format preset
+     */
     preset: string;
+    /**
+     * SoundCloud Track Format Duration
+     */
     duration: number;
+    /**
+     * SoundCloud Track Format data containing protocol and mime_type
+     */
     format: {
         protocol: string;
         mime_type: string;
     };
+    /**
+     * SoundCloud Track Format quality
+     */
     quality: string;
 }
 /**
- * SoundCloud Track
+ * SoundCloud Track Class
  */
 export class SoundCloudTrack {
+    /**
+     * SoundCloud Track Name
+     */
     name: string;
+    /**
+     * SoundCloud Track ID
+     */
     id: number;
+    /**
+     * SoundCloud Track url
+     */
     url: string;
+    /**
+     * SoundCloud Track fetched status
+     */
     fetched: boolean;
+    /**
+     * SoundCloud Class type. === "track"
+     */
     type: 'track' | 'playlist' | 'user';
+    /**
+     * SoundCloud Track Duration in seconds
+     */
     durationInSec: number;
+    /**
+     * SoundCloud Track Duration in miili seconds
+     */
     durationInMs: number;
+    /**
+     * SoundCloud Track formats data
+     */
     formats: SoundCloudTrackFormat[];
+    /**
+     * SoundCloud Track Publisher Data
+     */
     publisher: {
         name: string;
         id: number;
@@ -52,8 +134,18 @@ export class SoundCloudTrack {
         contains_music: boolean;
         writer_composer: string;
     } | null;
+    /**
+     * SoundCloud Track thumbnail
+     */
     thumbnail: string;
+    /**
+     * SoundCloud Track user data
+     */
     user: SoundCloudUser;
+    /**
+     * Constructor for SoundCloud Track Class
+     * @param data JSON parsed track html data
+     */
     constructor(data: any) {
         this.name = data.title;
         this.id = data.id;
@@ -87,11 +179,10 @@ export class SoundCloudTrack {
         this.thumbnail = data.artwork_url;
     }
 
-    toJSON() {
+    toJSON() : SoundTrackJSON {
         return {
             name: this.name,
             id: this.id,
-            type: this.type,
             url: this.url,
             fetched: this.fetched,
             durationInMs: this.durationInMs,
@@ -104,7 +195,7 @@ export class SoundCloudTrack {
     }
 }
 /**
- * SoundCloud Playlist
+ * SoundCloud Playlist Class
  */
 export class SoundCloudPlaylist {
     name: string;
