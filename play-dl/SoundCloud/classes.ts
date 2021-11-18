@@ -201,7 +201,7 @@ export class SoundCloudPlaylist {
 /**
  * SoundCloud Stream class
  */
-export class Stream {
+export class SoundCloudStream {
     stream: Readable;
     type: StreamType;
     private url: string;

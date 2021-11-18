@@ -2,9 +2,21 @@ import { request } from '../Request';
 import { SpotifyDataOptions } from '.';
 
 interface SpotifyTrackAlbum {
+    /**
+     * Spotify Track Album name
+     */
     name: string;
+    /**
+     * Spotify Track Album url
+     */
     url: string;
+    /**
+     * Spotify Track Album id
+     */
     id: string;
+    /**
+     * Spotify Track Album release date
+     */
     release_date: string;
     release_date_precision: string;
     total_tracks: number;

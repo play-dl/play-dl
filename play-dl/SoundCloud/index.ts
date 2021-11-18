@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import { StreamType } from '../YouTube/stream';
 import { request } from '../Request';
-import { SoundCloudPlaylist, SoundCloudTrack, SoundCloudTrackFormat, Stream } from './classes';
-
+import { SoundCloudPlaylist, SoundCloudTrack, SoundCloudTrackFormat, SoundCloudStream } from './classes';
+export { SoundCloudStream }
 let soundData: SoundDataOptions;
 if (fs.existsSync('.data/soundcloud.data')) {
     soundData = JSON.parse(fs.readFileSync('.data/soundcloud.data').toString());
@@ -69,7 +69,7 @@ export async function so_search(
  * @param quality Quality to select from
  * @returns SoundCloud Stream
  */
-export async function stream(url: string, quality?: number): Promise<Stream> {
+export async function stream(url: string, quality?: number): Promise<SoundCloudStream> {
     const data = await soundcloud(url);
 
     if (data instanceof SoundCloudPlaylist) throw new Error("Streams can't be created from Playlist url");
@@ -83,7 +83,7 @@ export async function stream(url: string, quality?: number): Promise<Stream> {
     const type = HLSformats[quality].format.mime_type.startsWith('audio/ogg')
         ? StreamType.OggOpus
         : StreamType.Arbitrary;
-    return new Stream(s_data.url, type);
+    return new SoundCloudStream(s_data.url, type);
 }
 /**
  * Function to get Free Client ID of soundcloud.
@@ -101,11 +101,6 @@ export async function getFreeClientID(): Promise<string> {
     const data2 = await request(urls[urls.length - 1]);
     return data2.split(',client_id:"')[1].split('"')[0];
 }
-
-/**
- * Type for SoundCloud Stream
- */
-export type SoundCloudStream = Stream;
 /**
  * Function for creating a Stream of soundcloud using a SoundCloud Track Class
  * @param data SoundCloud Track Class
@@ -122,7 +117,7 @@ export async function stream_from_info(data: SoundCloudTrack, quality?: number):
     const type = HLSformats[quality].format.mime_type.startsWith('audio/ogg')
         ? StreamType.OggOpus
         : StreamType.Arbitrary;
-    return new Stream(s_data.url, type);
+    return new SoundCloudStream(s_data.url, type);
 }
 /**
  * Function to check client ID

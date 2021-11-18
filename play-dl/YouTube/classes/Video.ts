@@ -137,7 +137,7 @@ export class YouTubeVideo {
      */
     tags: string[];
     /**
-     * Constructor Class for YouTube Video
+     * Constructor for YouTube Video Class
      * @param data JSON parsed data.
      */
     constructor(data: any) {
