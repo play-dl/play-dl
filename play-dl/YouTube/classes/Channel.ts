@@ -1,30 +1,60 @@
 export interface ChannelIconInterface {
-    url?: string;
+    /**
+     * YouTube Channel Icon URL
+     */
+    url: string;
+    /**
+     * YouTube Channel Icon Width
+     */
     width: number;
+    /**
+     * YouTube Channel Icon Height
+     */
     height: number;
 }
 /**
- * Class for YouTube Channel url
+ * YouTube Channel Class
  */
 export class YouTubeChannel {
+    /**
+     * YouTube Channel Title
+     */
     name?: string;
+    /**
+     * YouTube Channel Verified status.
+     */
     verified?: boolean;
+    /**
+     * YouTube Channel artist if any.
+     */
     artist?: boolean;
+    /**
+     * YouTube Channel ID.
+     */
     id?: string;
+    /**
+     * YouTube Class type. == "channel"
+     */
     type: 'video' | 'playlist' | 'channel';
+    /**
+     * YouTube Channel Url
+     */
     url?: string;
+    /**
+     * YouTube Channel Icon data.
+     */
     icon?: ChannelIconInterface;
+    /**
+     * YouTube Channel subscribers count.
+     */
     subscribers?: string;
-
-    constructor(data: any) {
+    /**
+     * YouTube Channel Constructor
+     * @param data YouTube Channel data that we recieve from basic info or from search
+     */
+    constructor(data: any = {}) {
         if (!data) throw new Error(`Cannot instantiate the ${this.constructor.name} class without data!`);
         this.type = 'channel';
-        this._patch(data);
-    }
-
-    private _patch(data: any): void {
-        if (!data) data = {};
-
         this.name = data.name || null;
         this.verified = !!data.verified || false;
         this.artist = !!data.artist || false;
@@ -45,21 +75,62 @@ export class YouTubeChannel {
         const def = this.icon.url.split('=s')[1].split('-c')[0];
         return this.icon.url.replace(`=s${def}-c`, `=s${options.size}-c`);
     }
-
+    /**
+     * Converts Channel Class to channel name.
+     * @returns name of channel
+     */
     toString(): string {
         return this.name || '';
     }
-
-    toJSON() {
+    /**
+     * Converts Channel Class to JSON format
+     * @returns json data of the channel
+     */
+    toJSON() : ChannelJSON {
         return {
             name: this.name,
             verified: this.verified,
             artist: this.artist,
             id: this.id,
             url: this.url,
-            iconURL: this.iconURL(),
+            icon: this.icon,
             type: this.type,
             subscribers: this.subscribers
         };
     }
+}
+
+interface ChannelJSON{
+    /**
+     * YouTube Channel Title
+     */
+     name?: string;
+     /**
+      * YouTube Channel Verified status.
+      */
+     verified?: boolean;
+     /**
+      * YouTube Channel artist if any.
+      */
+     artist?: boolean;
+     /**
+      * YouTube Channel ID.
+      */
+     id?: string;
+     /**
+      * Type of Class [ Channel ]
+      */
+     type: 'video' | 'playlist' | 'channel';
+     /**
+      * YouTube Channel Url
+      */
+     url?: string;
+     /**
+      * YouTube Channel Icon data.
+      */
+     icon?: ChannelIconInterface;
+     /**
+      * YouTube Channel subscribers count.
+      */
+     subscribers?: string;
 }

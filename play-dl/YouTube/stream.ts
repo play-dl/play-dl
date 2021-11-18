@@ -1,5 +1,5 @@
 import { video_info } from '.';
-import { LiveStreaming, Stream } from './classes/LiveStream';
+import { LiveStream, Stream } from './classes/LiveStream';
 import { ProxyOptions as Proxy } from './../Request';
 
 export enum StreamType {
@@ -46,7 +46,7 @@ export function parseAudioFormats(formats: any[]) {
 /**
  * Type for YouTube Stream
  */
-export type YouTubeStream = Stream | LiveStreaming;
+export type YouTubeStream = Stream | LiveStream;
 /**
  * Stream command for YouTube
  * @param url YouTube URL
@@ -61,7 +61,7 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
         info.LiveStreamData.hlsManifestUrl !== null &&
         info.video_details.durationInSec === 0
     ) {
-        return new LiveStreaming(
+        return new LiveStream(
             info.LiveStreamData.dashManifestUrl,
             info.format[info.format.length - 1].targetDurationSec,
             info.video_details.url
@@ -98,7 +98,7 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
         info.LiveStreamData.hlsManifestUrl !== null &&
         info.video_details.durationInSec === 0
     ) {
-        return new LiveStreaming(
+        return new LiveStream(
             info.LiveStreamData.dashManifestUrl,
             info.format[info.format.length - 1].targetDurationSec,
             info.video_details.url

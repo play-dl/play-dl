@@ -4,33 +4,79 @@ import { YouTubeChannel } from './Channel';
 import { YouTubeVideo } from './Video';
 const BASE_API = 'https://www.youtube.com/youtubei/v1/browse?key=';
 /**
- * Class for YouTube Playlist url
+ * YouTube Playlist Class containing vital informations about playlist.
  */
 export class YouTubePlayList {
+    /**
+     * YouTube Playlist ID
+     */
     id?: string;
+    /**
+     * YouTube Playlist Name
+     */
     title?: string;
+    /**
+     * YouTube Class type. == "playlist"
+     */
     type: 'video' | 'playlist' | 'channel';
+    /**
+     * Total no of videos in that playlist
+     */
     videoCount?: number;
+    /**
+     * Time when playlist was last updated
+     */
     lastUpdate?: string;
+    /**
+     * Total views of that playlist
+     */
     views?: number;
+    /**
+     * YouTube Playlist url
+     */
     url?: string;
+    /**
+     * YouTube Playlist url with starting video url.
+     */
     link?: string;
+    /**
+     * YouTube Playlist channel data
+     */
     channel?: YouTubeChannel;
+    /**
+     * YouTube Playlist thumbnail Data
+     */
     thumbnail?: {
         id: string | undefined;
         width: number | undefined;
         height: number | undefined;
         url: string | undefined;
     };
-    private videos?: [];
+    /**
+     * Videos array containing data of first 100 videos
+     */
+    private videos?: YouTubeVideo[];
+    /**
+     * Map contaning data of all fetched videos
+     */
     private fetched_videos: Map<string, YouTubeVideo[]>;
+    /**
+     * Token containing API key, Token, ClientVersion.
+     */
     private _continuation: {
         api?: string;
         token?: string;
         clientVersion?: string;
     } = {};
+    /**
+     * Total no of pages count.
+     */
     private __count: number;
-
+    /**
+     * Constructor for YouTube Playlist Class
+     * @param data Json Parsed YouTube Playlist data
+     * @param searchResult If the data is from search or not
+     */
     constructor(data: any, searchResult = false) {
         if (!data) throw new Error(`Cannot instantiate the ${this.constructor.name} class without data!`);
         this.__count = 0;
@@ -39,7 +85,10 @@ export class YouTubePlayList {
         if (searchResult) this.__patchSearch(data);
         else this.__patch(data);
     }
-
+    /**
+     * Updates variable according to a normal data.
+     * @param data Json Parsed YouTube Playlist data
+     */
     private __patch(data: any) {
         this.id = data.id || undefined;
         this.url = data.url || undefined;
@@ -57,7 +106,10 @@ export class YouTubePlayList {
         this._continuation.token = data.continuation?.token ?? undefined;
         this._continuation.clientVersion = data.continuation?.clientVersion ?? '<important data>';
     }
-
+    /**
+     * Updates variable according to a searched data.
+     * @param data Json Parsed YouTube Playlist data
+     */
     private __patchSearch(data: any) {
         this.id = data.id || undefined;
         this.url = this.id ? `https://www.youtube.com/playlist?list=${this.id}` : undefined;
@@ -70,7 +122,13 @@ export class YouTubePlayList {
         this.lastUpdate = undefined;
         this.views = 0;
     }
-
+    /**
+     * Parses next segment of videos from playlist and returns parsed data.
+     * @param limit Total no of videos to parse.
+     * 
+     * Default = Infinity
+     * @returns Array of YouTube Video Class
+     */
     async next(limit = Infinity): Promise<YouTubeVideo[]> {
         if (!this._continuation || !this._continuation.token) return [];
 
@@ -101,49 +159,137 @@ export class YouTubePlayList {
         this._continuation.token = getContinuationToken(contents);
         return playlist_videos;
     }
-
-    async fetch(max = Infinity) {
+    /**
+     * Fetches remaining data from playlist
+     * @param max Max no of videos to fetch
+     * 
+     * Default = Infinity
+     * @returns 
+     */
+    async fetch(max = Infinity): Promise<YouTubePlayList> {
         const continuation = this._continuation.token;
         if (!continuation) return this;
         if (max < 1) max = Infinity;
 
         while (typeof this._continuation.token === 'string' && this._continuation.token.length) {
-            if ((this.videos?.length as number) >= max) break;
             this.__count++;
             const res = await this.next();
+            max -= res.length;
+            if(max <= 0) break;
             if (!res.length) break;
         }
 
         return this;
     }
-
+    /**
+     * YouTube Playlist is divided into pages.
+     * 
+     * For example, if you want to get 101 - 200 songs
+     * 
+     * ```ts
+     * const playlist = play.playlist_info('playlist url')
+     * 
+     * await playlist.fetch()
+     * 
+     * const result = playlist.page(2)
+     * ```
+     * @param number Page number
+     * @returns Array of YouTube Video Class
+     */
     page(number: number): YouTubeVideo[] {
         if (!number) throw new Error('Page number is not provided');
         if (!this.fetched_videos.has(`${number}`)) throw new Error('Given Page number is invalid');
         return this.fetched_videos.get(`${number}`) as YouTubeVideo[];
     }
-
+    /**
+     * Gets total no of pages in that playlist class.
+     * 
+     * For getting all songs in a playlist
+     * 
+     * ```ts
+     * const playlist = play.playlist_info('playlist url');
+     * 
+     * await playlist.fetch();
+     * 
+     * let result = [];
+     * 
+     * for (let i = 0; i <= playlist.total_pages;i++) {
+     *      result.push(playlist.page(i));
+     * }
+     * ```
+     */
     get total_pages() {
         return this.fetched_videos.size;
     }
-
+    /**
+     * This tells total no of videos that have been fetched so far.
+     * 
+     * This can be equal to videosCount if all videos in playlist have been fetched and they are not hidden.
+     */
     get total_videos() {
         const page_number: number = this.total_pages;
         return (page_number - 1) * 100 + (this.fetched_videos.get(`${page_number}`) as YouTubeVideo[]).length;
     }
-
-    toJSON() {
+    /**
+     * Converts Playlist Class to a json parsed data.
+     * @returns 
+     */
+    toJSON() : PlaylistJSON {
         return {
             id: this.id,
             title: this.title,
             thumbnail: this.thumbnail,
-            channel: {
-                name: this.channel?.name,
-                id: this.channel?.id,
-                icon: this.channel?.iconURL()
-            },
+            channel: this.channel,
             url: this.url,
             videos: this.videos
         };
     }
+}
+
+interface PlaylistJSON{
+    /**
+     * YouTube Playlist ID
+     */
+     id?: string;
+     /**
+      * YouTube Playlist Name
+      */
+     title?: string;
+     /**
+      * Total no of videos in that playlist
+      */
+     videoCount?: number;
+     /**
+      * Time when playlist was last updated
+      */
+     lastUpdate?: string;
+     /**
+      * Total views of that playlist
+      */
+     views?: number;
+     /**
+      * YouTube Playlist url
+      */
+     url?: string;
+     /**
+      * YouTube Playlist url with starting video url.
+      */
+     link?: string;
+     /**
+      * YouTube Playlist channel data
+      */
+     channel?: YouTubeChannel;
+     /**
+      * YouTube Playlist thumbnail Data
+      */
+     thumbnail?: {
+         id: string | undefined;
+         width: number | undefined;
+         height: number | undefined;
+         url: string | undefined;
+     };
+     /**
+      * first 100 videos in that playlist
+      */
+     videos? : YouTubeVideo[]
 }
