@@ -104,7 +104,7 @@ export class LiveStream {
             info.LiveStreamData.hlsManifestUrl !== null &&
             info.video_details.durationInSec === 0
         ) {
-            this.url = info.LiveStreamData.dashManifestUrl;
+            this.url = info.LiveStreamData.dashManifestUrl as string;
         }
     }
     /**

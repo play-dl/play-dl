@@ -1,56 +1,145 @@
 import { YouTubeChannel } from './Channel';
+import { YouTubeThumbnail } from './Thumbnail';
 
 interface VideoOptions {
-    id?: string;
-    url?: string;
-    title?: string;
-    description?: string;
-    durationRaw: string;
-    durationInSec: number;
-    uploadedAt?: string;
-    views: number;
-    thumbnail?: {
+    /**
+     * YouTube Video ID
+     */
+     id?: string;
+     /**
+      * YouTube video url
+      */
+     url: string;
+     /**
+      * YouTube Video title
+      */
+     title?: string;
+     /**
+      * YouTube Video description.
+      */
+     description?: string;
+     /**
+      * YouTube Video Duration Formatted
+      */
+     durationRaw: string;
+     /**
+      * YouTube Video Duration in seconds
+      */
+     durationInSec: number;
+     /**
+      * YouTube Video Uploaded Date
+      */
+     uploadedAt?: string;
+     /**
+      * YouTube Views
+      */
+     views: number;
+     /**
+      * YouTube Thumbnail Data
+      */
+     thumbnail?: {
         id: string | undefined;
         width: number | undefined;
         height: number | undefined;
         url: string | undefined;
     };
-    channel?: any;
-    type: string;
-    ratings: {
-        likes: number;
-        dislikes: number;
-    };
-    live: boolean;
-    private: boolean;
-    tags: string[];
+     /**
+      * YouTube Video's uploader Channel Data
+      */
+     channel?: YouTubeChannel;
+     /**
+      * YouTube Video's likes
+      */
+     likes: number;
+     /**
+      * YouTube Video's dislikes
+      */
+     dislikes: number;
+     /**
+      * YouTube Video live status
+      */
+     live: boolean;
+     /**
+      * YouTube Video private status
+      */
+     private: boolean;
+     /**
+      * YouTube Video tags
+      */
+     tags: string[];
 }
 /**
  * Class for YouTube Video url
  */
 export class YouTubeVideo {
+    /**
+     * YouTube Video ID
+     */
     id?: string;
+    /**
+     * YouTube video url
+     */
     url: string;
+    /**
+     * YouTube Class type. == "video"
+     */
     type: 'video' | 'playlist' | 'channel';
+    /**
+     * YouTube Video title
+     */
     title?: string;
+    /**
+     * YouTube Video description.
+     */
     description?: string;
+    /**
+     * YouTube Video Duration Formatted
+     */
     durationRaw: string;
+    /**
+     * YouTube Video Duration in seconds
+     */
     durationInSec: number;
+    /**
+     * YouTube Video Uploaded Date
+     */
     uploadedAt?: string;
+    /**
+     * YouTube Views
+     */
     views: number;
-    thumbnail?: {
-        id: string | undefined;
-        width: number | undefined;
-        height: number | undefined;
-        url: string | undefined;
-    };
+    /**
+     * YouTube Thumbnail Data
+     */
+    thumbnail?: YouTubeThumbnail;
+    /**
+     * YouTube Video's uploader Channel Data
+     */
     channel?: YouTubeChannel;
+    /**
+     * YouTube Video's likes
+     */
     likes: number;
+    /**
+     * YouTube Video's dislikes
+     */
     dislikes: number;
+    /**
+     * YouTube Video live status
+     */
     live: boolean;
+    /**
+     * YouTube Video private status
+     */
     private: boolean;
+    /**
+     * YouTube Video tags
+     */
     tags: string[];
-
+    /**
+     * Constructor Class for YouTube Video
+     * @param data JSON parsed data.
+     */
     constructor(data: any) {
         if (!data) throw new Error(`Can not initiate ${this.constructor.name} without data`);
 
@@ -71,12 +160,18 @@ export class YouTubeVideo {
         this.private = !!data.private;
         this.tags = data.tags || [];
     }
-
-    get toString(): string {
+    /**
+     * Converts class to title name of video.
+     * @returns Title name
+     */
+    toString(): string {
         return this.url || '';
     }
-
-    get toJSON(): VideoOptions {
+    /**
+     * Converts class to JSON data
+     * @returns JSON data.
+     */
+    toJSON(): VideoOptions {
         return {
             id: this.id,
             url: this.url,
@@ -85,15 +180,12 @@ export class YouTubeVideo {
             durationInSec: this.durationInSec,
             durationRaw: this.durationRaw,
             uploadedAt: this.uploadedAt,
-            thumbnail: this.thumbnail,
+            thumbnail: this.thumbnail?.toJSON() || this.thumbnail,
             channel: this.channel,
             views: this.views,
-            type: this.type,
             tags: this.tags,
-            ratings: {
-                likes: this.likes,
-                dislikes: this.dislikes
-            },
+            likes: this.likes,
+            dislikes: this.dislikes,
             live: this.live,
             private: this.private
         };

@@ -2,6 +2,7 @@ import { getPlaylistVideos, getContinuationToken } from '../utils/extractor';
 import { request } from '../../Request';
 import { YouTubeChannel } from './Channel';
 import { YouTubeVideo } from './Video';
+import { YouTubeThumbnail } from './Thumbnail';
 const BASE_API = 'https://www.youtube.com/youtubei/v1/browse?key=';
 /**
  * YouTube Playlist Class containing vital informations about playlist.
@@ -46,12 +47,7 @@ export class YouTubePlayList {
     /**
      * YouTube Playlist thumbnail Data
      */
-    thumbnail?: {
-        id: string | undefined;
-        width: number | undefined;
-        height: number | undefined;
-        url: string | undefined;
-    };
+    thumbnail?: YouTubeThumbnail
     /**
      * Videos array containing data of first 100 videos
      */
@@ -238,7 +234,7 @@ export class YouTubePlayList {
         return {
             id: this.id,
             title: this.title,
-            thumbnail: this.thumbnail,
+            thumbnail: this.thumbnail?.toJSON() || this.thumbnail,
             channel: this.channel,
             url: this.url,
             videos: this.videos

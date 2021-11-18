@@ -2,7 +2,7 @@ import { ProxyOptions as Proxy, request } from './../../Request/index';
 import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
-import { InfoData } from '../stream';
+import { InfoData } from './constants';
 
 interface InfoOptions {
     proxy?: Proxy[];
@@ -79,7 +79,7 @@ export function extractID(url: string): string {
  * @param options cookie and proxy parameters to add
  * @returns Data containing video_details, LiveStreamData and formats of video url.
  */
-export async function video_basic_info(url: string, options: InfoOptions = {}) {
+export async function video_basic_info(url: string, options: InfoOptions = {}) : Promise<InfoData> {
     let body: string;
     if (options.htmldata) {
         body = url;
@@ -187,7 +187,7 @@ function parseSeconds(seconds: number): string {
  * @param options cookie and proxy parameters to add
  * @returns Data containing video_details, LiveStreamData and formats of video url.
  */
-export async function video_info(url: string, options: InfoOptions = {}) {
+export async function video_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
     const data = await video_basic_info(url, options);
     if (data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null) {
         return data;
