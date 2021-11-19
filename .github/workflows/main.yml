@@ -1,0 +1,57 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Publish NPM package + Docs
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish_npm:
+     runs-on: ubuntu-latest
+     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Publish NPM package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  
+  publish_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm install
+
+      - name: Delete the docs directory
+        run: rm -rf ./docs
+        
+      - name: Clone docs repository
+        uses: actions/checkout@v2
+        with:
+          repository: play-dl/play-dl.github.io
+          path: ./docs
+          token: "${{ secrets.DOCS_TOKEN }}"
+        
+      - name: Generate docs
+        run: npx typedoc
+        
+      - name: Publish docs
+        uses: EndBug/add-and-commit@v7
+        with:
+          cwd: ./docs
+          default_author: github_actions
+          message: "Automated docs update"
