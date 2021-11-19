@@ -1,6 +1,7 @@
 import { video_info } from '.';
-import { LiveStreaming, Stream } from './classes/LiveStream';
+import { LiveStream, Stream } from './classes/LiveStream';
 import { ProxyOptions as Proxy } from './../Request';
+import { InfoData } from './utils/constants';
 
 export enum StreamType {
     Arbitrary = 'arbitrary',
@@ -16,16 +17,6 @@ export interface StreamOptions {
     htmldata?: boolean;
 }
 
-export interface InfoData {
-    LiveStreamData: {
-        isLive: boolean;
-        dashManifestUrl: string;
-        hlsManifestUrl: string;
-    };
-    html5player: string;
-    format: any[];
-    video_details: any;
-}
 /**
  * Command to find audio formats from given format array
  * @param formats Formats to search from
@@ -46,7 +37,7 @@ export function parseAudioFormats(formats: any[]) {
 /**
  * Type for YouTube Stream
  */
-export type YouTubeStream = Stream | LiveStreaming;
+export type YouTubeStream = Stream | LiveStream;
 /**
  * Stream command for YouTube
  * @param url YouTube URL
@@ -58,12 +49,12 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
-        info.LiveStreamData.hlsManifestUrl !== null &&
+        info.LiveStreamData.dashManifestUrl !== null &&
         info.video_details.durationInSec === 0
     ) {
-        return new LiveStreaming(
+        return new LiveStream(
             info.LiveStreamData.dashManifestUrl,
-            info.format[info.format.length - 1].targetDurationSec,
+            info.format[info.format.length - 1].targetDurationSec as number,
             info.video_details.url
         );
     }
@@ -95,12 +86,12 @@ export async function stream_from_info(info: InfoData, options: StreamOptions = 
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
-        info.LiveStreamData.hlsManifestUrl !== null &&
+        info.LiveStreamData.dashManifestUrl !== null &&
         info.video_details.durationInSec === 0
     ) {
-        return new LiveStreaming(
+        return new LiveStream(
             info.LiveStreamData.dashManifestUrl,
-            info.format[info.format.length - 1].targetDurationSec,
+            info.format[info.format.length - 1].targetDurationSec as number,
             info.video_details.url
         );
     }
