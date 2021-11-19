@@ -30,7 +30,7 @@ jobs:
           token: "${{ secrets.DOCS_TOKEN }}"
 
       - name: Generate docs
-        run: typedoc
+        run: npx typedoc
 
       - name: Push docs
         uses: EndBug/add-and-commit@v7
