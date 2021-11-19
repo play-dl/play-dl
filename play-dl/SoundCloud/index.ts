@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import { StreamType } from '../YouTube/stream';
 import { request } from '../Request';
 import { SoundCloudPlaylist, SoundCloudTrack, SoundCloudTrackFormat, SoundCloudStream } from './classes';
-export { SoundCloudStream }
 let soundData: SoundDataOptions;
 if (fs.existsSync('.data/soundcloud.data')) {
     soundData = JSON.parse(fs.readFileSync('.data/soundcloud.data').toString());
@@ -167,3 +166,5 @@ function parseHlsFormats(data: SoundCloudTrackFormat[]) {
 export function setSoundCloudToken(options: SoundDataOptions) {
     soundData = options;
 }
+
+export { SoundCloudTrack, SoundCloudPlaylist, SoundCloudStream }

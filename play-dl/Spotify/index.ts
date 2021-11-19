@@ -214,3 +214,5 @@ export function setSpotifyToken(options: SpotifyDataOptions) {
     spotifyData.file = false;
     refreshToken();
 }
+
+export { SpotifyTrack, SpotifyAlbum, SpotifyPlaylist }

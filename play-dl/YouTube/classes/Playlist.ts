@@ -157,6 +157,8 @@ export class YouTubePlayList {
     }
     /**
      * Fetches remaining data from playlist
+     * 
+     * For fetching and getting all songs data, see `total_pages` property.
      * @param max Max no of videos to fetch
      * 
      * Default = Infinity
@@ -183,7 +185,7 @@ export class YouTubePlayList {
      * For example, if you want to get 101 - 200 songs
      * 
      * ```ts
-     * const playlist = play.playlist_info('playlist url')
+     * const playlist = await play.playlist_info('playlist url')
      * 
      * await playlist.fetch()
      * 
@@ -203,13 +205,13 @@ export class YouTubePlayList {
      * For getting all songs in a playlist
      * 
      * ```ts
-     * const playlist = play.playlist_info('playlist url');
+     * const playlist = await play.playlist_info('playlist url');
      * 
      * await playlist.fetch();
      * 
      * let result = [];
      * 
-     * for (let i = 0; i <= playlist.total_pages;i++) {
+     * for (let i = 0; i <= playlist.total_pages; i++) {
      *      result.push(playlist.page(i));
      * }
      * ```

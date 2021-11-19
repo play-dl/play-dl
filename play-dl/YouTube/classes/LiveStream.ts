@@ -71,7 +71,7 @@ export class LiveStream {
      * @param video_url Live Stream video url.
      */
     constructor(dash_url: string, target_interval: number, video_url: string) {
-        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read() {} });
+        this.stream = new Readable({ highWaterMark: 5 * 1000 * 1000, read() {} });
         this.type = StreamType.Arbitrary;
         this.url = dash_url;
         this.base_url = '';
@@ -258,7 +258,7 @@ export class Stream {
         video_url: string,
         options: StreamOptions
     ) {
-        this.stream = new Readable({ highWaterMark: 10 * 1000 * 1000, read() {} });
+        this.stream = new Readable({ highWaterMark: 5 * 1000 * 1000, read() {} });
         this.url = url;
         this.quality = options.quality as number;
         this.proxy = options.proxy || undefined;

@@ -7,11 +7,14 @@ export {
     extractID,
     YouTube,
     YouTubeStream,
-    cookieHeaders
+    cookieHeaders,
+    YouTubeChannel,
+    YouTubePlayList,
+    YouTubeVideo
 } from './YouTube';
-export { spotify, sp_validate, refreshToken, is_expired, Spotify } from './Spotify';
-export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID } from './SoundCloud';
-export { deezer, dz_validate, dz_advanced_track_search, Deezer } from './Deezer';
+export { spotify, sp_validate, refreshToken, is_expired, SpotifyAlbum, SpotifyPlaylist, SpotifyTrack, Spotify } from './Spotify';
+export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID, SoundCloudPlaylist, SoundCloudTrack } from './SoundCloud';
+export { deezer, dz_validate, dz_advanced_track_search, Deezer, DeezerTrack, DeezerPlaylist, DeezerAlbum } from './Deezer';
 export { setToken } from './token';
 
 enum AudioPlayerStatus {

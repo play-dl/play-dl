@@ -1,4 +1,4 @@
-import { SoundCloudTrackFormat, SoundCloudUser } from "./classes";
+import { SoundCloudTrack, SoundCloudTrackDeprecated, SoundCloudTrackFormat, SoundCloudUser } from "./classes";
 
 export interface SoundTrackJSON{
     /**
@@ -47,8 +47,47 @@ export interface SoundTrackJSON{
       * SoundCloud Track user data
       */
      user: SoundCloudUser;
+}
+
+export interface PlaylistJSON{
+    /**
+     * SoundCloud Playlist Name
+     */
+     name: string;
      /**
-      * Constructor for SoundCloud Track Class
-      * @param data JSON parsed track html data
+      * SoundCloud Playlist ID
+      */
+     id: number;
+     /**
+      * SoundCloud Playlist URL
+      */
+     url: string;
+     /**
+      * SoundCloud Playlist Sub type. == "album" for soundcloud albums
+      */
+     sub_type: string;
+     /**
+      * SoundCloud Playlist Total Duration in seconds
+      */
+     durationInSec: number;
+     /**
+      * SoundCloud Playlist Total Duration in milli seconds
+      */
+     durationInMs: number;
+     /**
+      * SoundCloud Playlist user data
+      */
+     user: SoundCloudUser;
+     /**
+      * SoundCloud Playlist tracks [ It can be fetched or not fetched ]
+      */
+     tracks: SoundCloudTrack[] | SoundCloudTrackDeprecated[];
+     /**
+      * SoundCloud Playlist tracks number
+      */
+     tracksCount: number;
+     /**
+      * SoundCloud Client ID provided by user
+      * @private
       */
 }
