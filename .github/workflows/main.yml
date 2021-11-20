@@ -23,34 +23,33 @@ jobs:
   publish_docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          token: "${{ secrets.DOCS_TOKEN }}"
-          
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-          
-      - name: Install dependencies
-        run: npm install
-      - name: Delete the docs directory
-        run: rm -rf ./docs
-        
-      - name: Clone docs repository
+      - name: Checkout play dl
+        uses: actions/checkout@v2
+
+      - name: Checkout play dl GitHub page repo
         uses: actions/checkout@v2
         with:
           repository: play-dl/play-dl.github.io
-          path: ./docs
+          path: docs
           token: "${{ secrets.DOCS_TOKEN }}"
-        
-      - name: Generate docs
+
+      - name: Setup Node 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: TypeDoc
         run: npx typedoc
-        
-      - name: Publish docs
+
+      - name: Adding, committing and Pushing
         run: |
-          echo $PWD
-          git add .
-          git cm 'Automated docs update'
+          cd docs/
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add *
+          git commit -m "Automated Docs"
           git push
-        working-directory: docs
