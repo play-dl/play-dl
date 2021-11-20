@@ -1,5 +1,5 @@
 {
     "entryPoints": ["./play-dl"],
 	"plugin" : "typedoc-plugin-missing-exports",
-    "out": "docs"
+    "out": "docs/docs"
 }
