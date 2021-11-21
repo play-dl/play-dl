@@ -29,4 +29,4 @@ import * as play from 'play-dl' // ES-6 import or TS import
 const play = require('play-dl') //JS importing
 ```
 
-## [Documentation](https://play-dl.github.io/)
+## [Documentation](https://play-dl.github.io/modules.html)
