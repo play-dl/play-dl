@@ -46,12 +46,23 @@ export function setCookieToken(options: { cookie: string }) {
     youtubeData = { cookie };
     youtubeData.file = false;
 }
-
-export function cookieHeaders(headCookie: string[]) {
+/**
+ * Updates cookies locally either in file or in memory.
+ * 
+ * Example
+ * ```ts
+ * const response = ... // Any https package get function.
+ * 
+ * play.cookieHeaders(response.headers['set-cookie'])
+ * ``` 
+ * @param headCookie response headers['set-cookie'] array
+ * @returns Nothing
+ */
+export function cookieHeaders(headCookie: string[]): void {
     if (!youtubeData?.cookie) return;
     headCookie.forEach((x: string) => {
-        x.split(';').forEach((x) => {
-            const arr = x.split('=');
+        x.split(';').forEach((z) => {
+            const arr = z.split('=');
             if (arr.length <= 1) return;
             const key = arr.shift()?.trim() as string;
             const value = arr.join('=').trim();

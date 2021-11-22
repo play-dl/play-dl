@@ -91,7 +91,6 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
  * @returns Array of YouTube or Spotify or SoundCloud or Deezer
         deezer?: 'track' | 'playlist' | 'album';
  */
-
 export async function search( query: string, options: { source : { deezer : "album" } } & SearchOptions) : Promise<DeezerAlbum[]>;
 export async function search( query: string, options: { source : { deezer : "playlist" } } & SearchOptions) : Promise<DeezerPlaylist[]>;
 export async function search( query: string, options: { source : { deezer : "track" } } & SearchOptions) : Promise<DeezerTrack[]>;
@@ -104,6 +103,8 @@ export async function search( query: string, options: { source : { spotify : "tr
 export async function search( query: string, options: { source : { youtube : "channel" } } & SearchOptions) : Promise<YouTubeChannel[]>;
 export async function search( query: string, options: { source : { youtube : "playlist" } } & SearchOptions) : Promise<YouTubePlayList[]>;
 export async function search( query: string, options: { source : { youtube : "video" } } & SearchOptions) : Promise<YouTubeVideo[]>;
+export async function search( query: string, options: { limit : number } & SearchOptions ) : Promise<YouTubeVideo[]>;
+export async function search( query: string, options? : SearchOptions) : Promise<YouTubeVideo[]>;
 export async function search(
     query: string,
     options: SearchOptions = {}

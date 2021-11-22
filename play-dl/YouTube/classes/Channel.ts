@@ -41,9 +41,9 @@ export class YouTubeChannel {
      */
     url?: string;
     /**
-     * YouTube Channel Icon data.
+     * YouTube Channel Icons data.
      */
-    icon?: ChannelIconInterface;
+    icons?: ChannelIconInterface[];
     /**
      * YouTube Channel subscribers count.
      */
@@ -60,7 +60,7 @@ export class YouTubeChannel {
         this.artist = !!data.artist || false;
         this.id = data.id || null;
         this.url = data.url || null;
-        this.icon = data.icon || { url: null, width: 0, height: 0 };
+        this.icons = data.icon || [{ url: null, width: 0, height: 0 }];
         this.subscribers = data.subscribers || null;
     }
 
@@ -71,9 +71,9 @@ export class YouTubeChannel {
      */
     iconURL(options = { size: 0 }): string | undefined {
         if (typeof options.size !== 'number' || options.size < 0) throw new Error('invalid icon size');
-        if (!this.icon?.url) return undefined;
-        const def = this.icon.url.split('=s')[1].split('-c')[0];
-        return this.icon.url.replace(`=s${def}-c`, `=s${options.size}-c`);
+        if (!this.icons?.[0]?.url) return undefined;
+        const def = this.icons?.[0]?.url.split('=s')[1].split('-c')[0];
+        return this.icons?.[0]?.url.replace(`=s${def}-c`, `=s${options.size}-c`);
     }
     /**
      * Converts Channel Class to channel name.
@@ -93,7 +93,7 @@ export class YouTubeChannel {
             artist: this.artist,
             id: this.id,
             url: this.url,
-            icon: this.icon,
+            icons: this.icons,
             type: this.type,
             subscribers: this.subscribers
         };
@@ -128,7 +128,7 @@ interface ChannelJSON{
      /**
       * YouTube Channel Icon data.
       */
-     icon?: ChannelIconInterface;
+     icons?: ChannelIconInterface[];
      /**
       * YouTube Channel subscribers count.
       */
