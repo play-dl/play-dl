@@ -1,6 +1,6 @@
 {
   "name": "play-dl",
-  "version": "1.3.2",
+  "version": "1.3.5",
   "description": "YouTube, SoundCloud, Spotify streaming for discord.js bots",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
