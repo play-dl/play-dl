@@ -1,5 +1,6 @@
 {
     "entryPoints": ["./play-dl"],
-	"plugin" : "typedoc-plugin-missing-exports",
-    "out": "docs/docs"
+    "plugin" : [ "typedoc-plugin-missing-exports", "typedoc-plugin-extras" ],
+    "out": "docs/docs",
+    "favicon": "./docs/favicon.ico"
 }
