@@ -61,13 +61,13 @@ import { YouTubePlayList } from './YouTube/classes/Playlist';
 import { YouTubeChannel } from './YouTube/classes/Channel';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './Spotify/classes';
 import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './Deezer/classes';
+
 /**
  * Main stream Command for streaming through various sources
  * @param url The video / track url to make stream of
  * @param options contains quality, cookie and proxy to set for stream
  * @returns YouTube / SoundCloud Stream to play
  */
-
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
     if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
     if (url.indexOf('spotify') !== -1) {

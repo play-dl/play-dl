@@ -26,9 +26,20 @@ export interface SpotifyDataOptions {
 
 const pattern = /^((https:)?\/\/)?open.spotify.com\/(track|album|playlist)\//;
 /**
- * Function to get Playlist | Album | Track
- * @param url url of spotify from which you want info
- * @returns Spotify type.
+ * Gets Spotify url details.
+ * 
+ * ```ts
+ * let spot = await play.spotify('spotify url')
+ * 
+ * // spot.type === "track" | "playlist" | "album"
+ * 
+ * if (spot.type === "track") {
+ *      spot = spot as play.SpotifyTrack
+ *      // Code with spotify track class.
+ * }
+ * ```
+ * @param url Spotify Url
+ * @returns A {@link SpotifyTrack} or {@link SpotifyPlaylist} or {@link SpotifyAlbum}
  */
 export async function spotify(url: string): Promise<Spotify> {
     if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
@@ -72,12 +83,16 @@ export async function spotify(url: string): Promise<Spotify> {
     } else throw new Error('URL is out of scope for play-dl.');
 }
 /**
- * Function to validate Spotify url
- * @param url url for validation
- * @returns type of url or false.
+ * Validate Spotify url
+ * @param url Spotify URL
+ * @returns 
+ * ```ts
+ * 'track' | 'playlist' | 'album' | 'search' | false
+ * ```
  */
 export function sp_validate(url: string): 'track' | 'playlist' | 'album' | 'search' | false {
-    if (!url.match(pattern)) return 'search';
+    if (!url.startsWith('https')) return 'search';
+    if (!url.match(pattern)) return false;
     if (url.indexOf('track/') !== -1) {
         return 'track';
     } else if (url.indexOf('album/') !== -1) {
@@ -128,7 +143,14 @@ export async function SpotifyAuthorize(data: SpotifyDataOptions, file: boolean):
     return true;
 }
 /**
- * Function to check if authorization token is expired or not.
+ * Checks if spotify token is expired or not.
+ * 
+ * Update token if returned false.
+ * ```ts
+ * if (!play.is_expired()) {
+ *      await play.refreshToken()
+ * }
+ * ```
  * @returns boolean
  */
 export function is_expired(): boolean {
@@ -183,8 +205,14 @@ export async function sp_search(
     return results;
 }
 /**
- * Function to refresh Token
- * @returns boolean to check whether token is refreshed or not
+ * Refreshes Token
+ * 
+ * ```ts
+ * if (!play.is_expired()) {
+ *      await play.refreshToken()
+ * }
+ * ```
+ * @returns boolean
  */
 export async function refreshToken(): Promise<boolean> {
     const response = await request(`https://accounts.spotify.com/api/token`, {
