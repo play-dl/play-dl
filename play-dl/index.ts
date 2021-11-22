@@ -61,13 +61,13 @@ import { YouTubePlayList } from './YouTube/classes/Playlist';
 import { YouTubeChannel } from './YouTube/classes/Channel';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './Spotify/classes';
 import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './Deezer/classes';
+
 /**
  * Main stream Command for streaming through various sources
  * @param url The video / track url to make stream of
  * @param options contains quality, cookie and proxy to set for stream
  * @returns YouTube / SoundCloud Stream to play
  */
-
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
     if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
     if (url.indexOf('spotify') !== -1) {
@@ -91,7 +91,6 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
  * @returns Array of YouTube or Spotify or SoundCloud or Deezer
         deezer?: 'track' | 'playlist' | 'album';
  */
-
 export async function search( query: string, options: { source : { deezer : "album" } } & SearchOptions) : Promise<DeezerAlbum[]>;
 export async function search( query: string, options: { source : { deezer : "playlist" } } & SearchOptions) : Promise<DeezerPlaylist[]>;
 export async function search( query: string, options: { source : { deezer : "track" } } & SearchOptions) : Promise<DeezerTrack[]>;
@@ -104,6 +103,8 @@ export async function search( query: string, options: { source : { spotify : "tr
 export async function search( query: string, options: { source : { youtube : "channel" } } & SearchOptions) : Promise<YouTubeChannel[]>;
 export async function search( query: string, options: { source : { youtube : "playlist" } } & SearchOptions) : Promise<YouTubePlayList[]>;
 export async function search( query: string, options: { source : { youtube : "video" } } & SearchOptions) : Promise<YouTubeVideo[]>;
+export async function search( query: string, options: { limit : number } & SearchOptions ) : Promise<YouTubeVideo[]>;
+export async function search( query: string, options? : SearchOptions) : Promise<YouTubeVideo[]>;
 export async function search(
     query: string,
     options: SearchOptions = {}

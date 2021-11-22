@@ -13,9 +13,20 @@ interface SoundDataOptions {
 
 const pattern = /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(api\.soundcloud\.com|soundcloud\.com|snd\.sc)\/(.*)$/;
 /**
- * Function to get info from a soundcloud url
+ * Gets info from a soundcloud url.
+ * 
+ * ```ts
+ * let sound = await play.soundcloud('soundcloud url')
+ * 
+ * // sound.type === "track" | "playlist" | "user"
+ * 
+ * if (sound.type === "track") {
+ *      spot = spot as play.SoundCloudTrack
+ *      // Code with SoundCloud track class.
+ * }
+ * ```
  * @param url soundcloud url
- * @returns SoundCloud Track or SoundCloud Playlist
+ * @returns A {@link SoundCloudTrack} or {@link SoundCloudPlaylist}
  */
 export async function soundcloud(url: string): Promise<SoundCloud> {
     if (!soundData) throw new Error('SoundCloud Data is missing\nDid you forgot to do authorization ?');
@@ -85,7 +96,17 @@ export async function stream(url: string, quality?: number): Promise<SoundCloudS
     return new SoundCloudStream(s_data.url, type);
 }
 /**
- * Function to get Free Client ID of soundcloud.
+ * Gets Free SoundCloud Client ID.
+ * 
+ * Use this in beginning of your code to add SoundCloud support.
+ * 
+ * ```ts
+ * play.getFreeClientID().then((clientID) => play.setToken({
+ *      soundcloud : {
+ *          client_id : clientID
+ *      }
+ * }))
+ * ```
  * @returns client ID
  */
 export async function getFreeClientID(): Promise<string> {
@@ -133,12 +154,16 @@ export async function check_id(id: string): Promise<boolean> {
     else return true;
 }
 /**
- * Function to validate for a soundcloud url
+ * Validates a soundcloud url
  * @param url soundcloud url
- * @returns "false" | 'track' | 'playlist'
+ * @returns 
+ * ```ts
+ * false | 'track' | 'playlist'
+ * ```
  */
 export async function so_validate(url: string): Promise<false | 'track' | 'playlist' | 'search'> {
-    if (!url.match(pattern)) return 'search';
+    if (!url.startsWith('https')) return 'search';
+    if (!url.match(pattern)) return false;
     const data = await request(
         `https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${soundData.client_id}`
     ).catch((err: Error) => err);
@@ -153,7 +178,7 @@ export async function so_validate(url: string): Promise<false | 'track' | 'playl
 /**
  * Function to select only hls streams from SoundCloud format array
  * @param data SoundCloud Track Format data
- * @returns a new array containing hls formats
+ * @returns HLS Formats Array
  */
 function parseHlsFormats(data: SoundCloudTrackFormat[]) {
     const result: SoundCloudTrackFormat[] = [];

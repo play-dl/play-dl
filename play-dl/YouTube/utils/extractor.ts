@@ -18,13 +18,25 @@ const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
 const playlist_id_pattern = /^(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}$/;
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
-    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}(.*)?$/;
 /**
- * Command to validate a YouTube url
- * @param url Url for validation
- * @returns type of url or false.
+ * Validate YouTube URL or ID.
+ * 
+ * **CAUTION :** If your search word is 11-12 long, you might get it validated as video ID.
+ * 
+ * To avoid above, add one more condition to yt_validate
+ * ```ts
+ * if (url.startsWith('https') && yt_validate(url) === 'video') {
+ *      // YouTube Video Url.
+ * }
+ * ```
+ * @param url YouTube URL OR ID
+ * @returns 
+ * ```
+ * 'playlist' | 'video' | 'search' | false
+ * ```
  */
 export function yt_validate(url: string): 'playlist' | 'video' | 'search' | false {
     if (url.indexOf('list=') === -1) {
@@ -51,7 +63,7 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
     }
 }
 /**
- * Function to extract ID of YouTube url.
+ * Extract ID of YouTube url.
  * @param url ID or url of YouTube
  * @returns ID of video or playlist.
  */
@@ -75,9 +87,32 @@ export function extractID(url: string): string {
 }
 /**
  * Basic function to get data from a YouTube url or ID.
- * @param url YouTube url or ID
- * @param options cookie and proxy parameters to add
- * @returns Data containing video_details, LiveStreamData and formats of video url.
+ * 
+ * Example
+ * ```ts
+ * const video = await play.video_basic_info('youtube video url')
+ * 
+ * const res = ... // Any https package get function.
+ * const video = await play.video_basic_info(res.body, { htmldata : true })
+ * 
+ * const video = await play.video_basic_info('youtube video url', { proxy : [{
+        host : "IP or hostname",
+        port : 8080,
+        authentication: {
+            username: 'username';
+            password: 'very secret';
+        }
+    }] }) // Authentication is optional.
+
+    // OR
+
+    const video = await play.video_basic_info('youtube video url', { proxy : ['url'] })
+ * ```
+ * @param url YouTube url or ID or html body data
+ * @param options Video Info Options
+ *  - `Proxy[]` proxy : sends data through a proxy
+ *  - `boolean` htmldata : given data is html data or not
+ * @returns Video Basic Info {@link InfoData}.
  */
 export async function video_basic_info(url: string, options: InfoOptions = {}) : Promise<InfoData> {
     let body: string;
@@ -112,11 +147,11 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) :
                 player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
             }`
         );
+    const ownerInfo = initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
+    ?.owner?.videoOwnerRenderer
     const badge =
-        initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
-            ?.owner?.videoOwnerRenderer?.badges &&
-        initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
-            ?.owner?.videoOwnerRenderer?.badges[0];
+        ownerInfo?.badges &&
+        ownerInfo?.badges[0];
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const related: string[] = [];
     initial_response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.forEach(
@@ -142,7 +177,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) :
             id: vid.channelId,
             url: `https://www.youtube.com/channel/${vid.channelId}`,
             verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
-            artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist'))
+            artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist')),
+            icons : ownerInfo?.thumbnail?.thumbnails || undefined
         },
         views: vid.viewCount,
         tags: vid.keywords,
@@ -182,14 +218,40 @@ function parseSeconds(seconds: number): string {
     return hDisplay + mDisplay + sDisplay;
 }
 /**
- * Function which gets data from video_basic_info and deciphers it if it contains signatures.
- * @param url YouTube Video URL
- * @param options cookie and proxy parameters to add
- * @returns Data containing video_details, LiveStreamData and formats of video url.
+ * Gets data from YouTube url or ID or html body data and deciphers it.
+ * ```
+ * video_basic_info + decipher_info = video_info
+ * ```
+ * 
+ * Example
+ * ```ts
+ * const video = await play.video_info('youtube video url')
+ * 
+ * const res = ... // Any https package get function.
+ * const video = await play.video_info(res.body, { htmldata : true })
+ * 
+ * const video = await play.video_info('youtube video url', { proxy : [{
+        host : "IP or hostname",
+        port : 8080,
+        authentication: {
+            username: 'username';
+            password: 'very secret';
+        }
+    }] }) // Authentication is optional.
+
+    // OR
+
+    const video = await play.video_info('youtube video url', { proxy : ['url'] })
+ * ```
+ * @param url YouTube url or ID or html body data
+ * @param options Video Info Options
+ *  - `Proxy[]` proxy : sends data through a proxy
+ *  - `boolean` htmldata : given data is html data or not
+ * @returns Deciphered Video Info {@link InfoData}.
  */
 export async function video_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
     const data = await video_basic_info(url, options);
-    if (data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null) {
+    if (data.LiveStreamData.isLive === true && data.LiveStreamData.dashManifestUrl !== null) {
         return data;
     } else if (data.format[0].signatureCipher || data.format[0].cipher) {
         data.format = await format_decipher(data.format, data.html5player);
@@ -200,11 +262,11 @@ export async function video_info(url: string, options: InfoOptions = {}): Promis
 }
 /**
  * Function uses data from video_basic_info and deciphers it if it contains signatures.
- * @param data basic_video_info data
- * @returns Data containing video_details, LiveStreamData and formats of video url.
+ * @param data Data - {@link InfoData}
+ * @returns Deciphered Video Info {@link InfoData}
  */
 export async function decipher_info(data: InfoData) {
-    if (data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null) {
+    if (data.LiveStreamData.isLive === true && data.LiveStreamData.dashManifestUrl !== null) {
         return data;
     } else if (data.format[0].signatureCipher || data.format[0].cipher) {
         data.format = await format_decipher(data.format, data.html5player);
@@ -214,9 +276,32 @@ export async function decipher_info(data: InfoData) {
     }
 }
 /**
- * Function to get YouTube playlist info from a playlist url.
+ * Gets YouTube playlist info from a playlist url.
+ * 
+ * Example
+ * ```ts
+ * const playlist = await play.playlist_info('youtube playlist url')
+ * 
+ * const playlist = await play.playlist_info('youtube playlist url', { incomplete : true })
+ * 
+ * const playlist = await play.playlist_info('youtube playlist url', { proxy : [{
+        host : "IP or hostname",
+        port : 8080,
+        authentication: {
+            username: 'username';
+            password: 'very secret';
+        }
+    }] }) // Authentication is optional.
+
+    // OR
+
+    const playlist = await play.playlist_info('youtube playlist url', { proxy : ['url'] })
+ * ```
  * @param url Playlist URL
- * @param options incomplete and proxy to add.
+ * @param options Playlist Info Options
+ * - `boolean` incomplete : If set to true, parses playlist with hidden videos.
+ * - `Proxy[]` proxy : sends data through a proxy
+ * 
  * @returns YouTube Playlist
  */
 export async function playlist_info(url: string, options: PlaylistOptions = {}): Promise<YouTubePlayList> {
