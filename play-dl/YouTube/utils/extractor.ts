@@ -23,9 +23,9 @@ const playlist_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}(.*)?$/;
 /**
  * Validate YouTube URL or ID.
- * 
+ *
  * **CAUTION :** If your search word is 11-12 long, you might get it validated as video ID.
- * 
+ *
  * To avoid above, add one more condition to yt_validate
  * ```ts
  * if (url.startsWith('https') && yt_validate(url) === 'video') {
@@ -33,7 +33,7 @@ const playlist_pattern =
  * }
  * ```
  * @param url YouTube URL OR ID
- * @returns 
+ * @returns
  * ```
  * 'playlist' | 'video' | 'search' | false
  * ```
@@ -114,7 +114,7 @@ export function extractID(url: string): string {
  *  - `boolean` htmldata : given data is html data or not
  * @returns Video Basic Info {@link InfoData}.
  */
-export async function video_basic_info(url: string, options: InfoOptions = {}) : Promise<InfoData> {
+export async function video_basic_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
     let body: string;
     if (options.htmldata) {
         body = url;
@@ -147,11 +147,10 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) :
                 player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
             }`
         );
-    const ownerInfo = initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
-    ?.owner?.videoOwnerRenderer
-    const badge =
-        ownerInfo?.badges &&
-        ownerInfo?.badges[0];
+    const ownerInfo =
+        initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
+            ?.owner?.videoOwnerRenderer;
+    const badge = ownerInfo?.badges && ownerInfo?.badges[0];
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const related: string[] = [];
     initial_response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.forEach(
@@ -178,7 +177,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}) :
             url: `https://www.youtube.com/channel/${vid.channelId}`,
             verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
             artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist')),
-            icons : ownerInfo?.thumbnail?.thumbnails || undefined
+            icons: ownerInfo?.thumbnail?.thumbnails || undefined
         },
         views: vid.viewCount,
         tags: vid.keywords,

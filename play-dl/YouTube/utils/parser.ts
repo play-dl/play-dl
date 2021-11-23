@@ -134,8 +134,8 @@ export function parseVideo(data?: any): YouTubeVideo {
                 data.videoRenderer.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl ||
                 data.videoRenderer.ownerText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url
             }`,
-            icons : data.videoRenderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail
-            .thumbnails,
+            icons: data.videoRenderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail
+                .thumbnails,
             verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
             artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist'))
         },

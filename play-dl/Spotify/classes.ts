@@ -115,7 +115,7 @@ export class SpotifyTrack {
     thumbnail: SpotifyThumbnail | undefined;
     /**
      * Constructor for Spotify Track
-     * @param data 
+     * @param data
      */
     constructor(data: any) {
         this.name = data.name;
@@ -149,7 +149,7 @@ export class SpotifyTrack {
         else this.thumbnail = data.album.images[0];
     }
 
-    toJSON() : TrackJSON {
+    toJSON(): TrackJSON {
         return {
             name: this.name,
             id: this.id,
@@ -205,13 +205,13 @@ export class SpotifyPlaylist {
     tracksCount: number;
     /**
      * Spotify Playlist Spotify data
-     *  
+     *
      * @private
      */
     private spotifyData: SpotifyDataOptions;
     /**
      * Spotify Playlist fetched tracks Map
-     * 
+     *
      * @private
      */
     private fetched_tracks: Map<string, SpotifyTrack[]>;
@@ -244,7 +244,7 @@ export class SpotifyPlaylist {
     }
     /**
      * Fetches Spotify Playlist tracks more than 100 tracks.
-     * 
+     *
      * For getting all tracks in playlist, see `total_pages` property.
      * @returns Playlist Class.
      */
@@ -283,18 +283,18 @@ export class SpotifyPlaylist {
     }
     /**
      * Spotify Playlist tracks are divided in pages.
-     * 
+     *
      * For example getting data of 101 - 200 videos in a playlist,
-     * 
+     *
      * ```ts
      * const playlist = await play.spotify('playlist url')
-     * 
+     *
      * await playlist.fetch()
-     * 
+     *
      * const result = playlist.page(2)
      * ```
      * @param num Page Number
-     * @returns 
+     * @returns
      */
     page(num: number) {
         if (!num) throw new Error('Page number is not provided');
@@ -303,16 +303,16 @@ export class SpotifyPlaylist {
     }
     /**
      * Spotify Playlist total no of pages in a playlist
-     * 
+     *
      * For getting all songs in a playlist,
-     * 
+     *
      * ```ts
      * const playlist = await play.spotify('playlist url')
-     * 
+     *
      * await playlist.fetch()
-     * 
+     *
      * const result = []
-     * 
+     *
      * for (let i = 0; i <= playlist.tota_pages; i++) {
      *      result.push(playlist.page(i))
      * }
@@ -332,7 +332,7 @@ export class SpotifyPlaylist {
      * Converts Class to JSON
      * @returns JSON data
      */
-    toJSON() : PlaylistJSON{
+    toJSON(): PlaylistJSON {
         return {
             name: this.name,
             collaborative: this.collaborative,
@@ -341,7 +341,7 @@ export class SpotifyPlaylist {
             id: this.id,
             thumbnail: this.thumbnail,
             owner: this.owner,
-            tracksCount : this.tracksCount
+            tracksCount: this.tracksCount
         };
     }
 }
@@ -391,21 +391,21 @@ export class SpotifyAlbum {
     tracksCount: number;
     /**
      * Spotify Album Spotify data
-     *  
+     *
      * @private
      */
-     private spotifyData: SpotifyDataOptions;
-     /**
-      * Spotify Album fetched tracks Map
-      * 
-      * @private
-      */
-     private fetched_tracks: Map<string, SpotifyTrack[]>;
-     /**
-      * Constructor for Spotify Album Class
-      * @param data Json parsed album data
-      * @param spotifyData Spotify credentials
-      */
+    private spotifyData: SpotifyDataOptions;
+    /**
+     * Spotify Album fetched tracks Map
+     *
+     * @private
+     */
+    private fetched_tracks: Map<string, SpotifyTrack[]>;
+    /**
+     * Constructor for Spotify Album Class
+     * @param data Json parsed album data
+     * @param spotifyData Spotify credentials
+     */
     constructor(data: any, spotifyData: SpotifyDataOptions) {
         this.name = data.name;
         this.type = 'album';
@@ -435,7 +435,7 @@ export class SpotifyAlbum {
     }
     /**
      * Fetches Spotify Album tracks more than 50 tracks.
-     * 
+     *
      * For getting all tracks in album, see `total_pages` property.
      * @returns Album Class.
      */
@@ -474,18 +474,18 @@ export class SpotifyAlbum {
     }
     /**
      * Spotify Album tracks are divided in pages.
-     * 
+     *
      * For example getting data of 51 - 100 videos in a album,
-     * 
+     *
      * ```ts
      * const album = await play.spotify('album url')
-     * 
+     *
      * await album.fetch()
-     * 
+     *
      * const result = album.page(2)
      * ```
      * @param num Page Number
-     * @returns 
+     * @returns
      */
     page(num: number) {
         if (!num) throw new Error('Page number is not provided');
@@ -494,16 +494,16 @@ export class SpotifyAlbum {
     }
     /**
      * Spotify Album total no of pages in a album
-     * 
+     *
      * For getting all songs in a album,
-     * 
+     *
      * ```ts
      * const album = await play.spotify('album url')
-     * 
+     *
      * await album.fetch()
-     * 
+     *
      * const result = []
-     * 
+     *
      * for (let i = 0; i <= album.tota_pages; i++) {
      *      result.push(album.page(i))
      * }
@@ -520,10 +520,10 @@ export class SpotifyAlbum {
         return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyTrack[]).length;
     }
 
-    toJSON() : AlbumJSON {
+    toJSON(): AlbumJSON {
         return {
             name: this.name,
-            id : this.id,
+            id: this.id,
             type: this.type,
             url: this.url,
             thumbnail: this.thumbnail,
@@ -531,7 +531,7 @@ export class SpotifyAlbum {
             copyrights: this.copyrights,
             release_date: this.release_date,
             release_date_precision: this.release_date_precision,
-            tracksCount : this.tracksCount
+            tracksCount: this.tracksCount
         };
     }
 }

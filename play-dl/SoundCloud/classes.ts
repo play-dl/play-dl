@@ -182,7 +182,7 @@ export class SoundCloudTrack {
      * Converts class to JSON
      * @returns JSON parsed Data
      */
-    toJSON() : SoundTrackJSON {
+    toJSON(): SoundTrackJSON {
         return {
             name: this.name,
             id: this.id,
@@ -288,7 +288,7 @@ export class SoundCloudPlaylist {
     }
     /**
      * Fetches all unfetched songs in a playlist.
-     * 
+     *
      * For fetching songs and getting all songs, see `fetched_tracks` property.
      * @returns playlist class
      */
@@ -325,14 +325,14 @@ export class SoundCloudPlaylist {
     }
     /**
      * Get all fetched tracks as a array.
-     * 
+     *
      * For getting all feetched tracks
-     * 
+     *
      * ```ts
      * const playlist = await play.soundcloud("playlist url")
-     * 
+     *
      * await playlist.fetch()
-     * 
+     *
      * const result = playlist.fetched_tracks
      * ```
      */
@@ -370,9 +370,9 @@ export class SoundCloudStream {
      * Readable Stream through which data passes
      */
     stream: Readable;
-     /**
-      * Type of audio data that we recieved from normal youtube url.
-      */
+    /**
+     * Type of audio data that we recieved from normal youtube url.
+     */
     type: StreamType;
     /**
      * Dash Url containing segment urls.
@@ -396,7 +396,7 @@ export class SoundCloudStream {
     private downloaded_segments: number;
     /**
      * Incoming message that we recieve.
-     * 
+     *
      * Storing this is essential.
      * This helps to destroy the TCP connection completely if you stopped player in between the stream
      * @private
@@ -503,7 +503,7 @@ export class SoundCloudStream {
     }
     /**
      * This cleans every used variable in class.
-     * 
+     *
      * This is used to prevent re-use of this class and helping garbage collector to collect it.
      */
     private cleanup() {
@@ -519,7 +519,7 @@ export class SoundCloudStream {
     /**
      * Pauses timer.
      * Stops running of loop.
-     * 
+     *
      * Useful if you don't want to get excess data to be stored in stream.
      */
     pause() {

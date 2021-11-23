@@ -27,12 +27,12 @@ export interface SpotifyDataOptions {
 const pattern = /^((https:)?\/\/)?open.spotify.com\/(track|album|playlist)\//;
 /**
  * Gets Spotify url details.
- * 
+ *
  * ```ts
  * let spot = await play.spotify('spotify url')
- * 
+ *
  * // spot.type === "track" | "playlist" | "album"
- * 
+ *
  * if (spot.type === "track") {
  *      spot = spot as play.SpotifyTrack
  *      // Code with spotify track class.
@@ -85,7 +85,7 @@ export async function spotify(url: string): Promise<Spotify> {
 /**
  * Validate Spotify url
  * @param url Spotify URL
- * @returns 
+ * @returns
  * ```ts
  * 'track' | 'playlist' | 'album' | 'search' | false
  * ```
@@ -144,7 +144,7 @@ export async function SpotifyAuthorize(data: SpotifyDataOptions, file: boolean):
 }
 /**
  * Checks if spotify token is expired or not.
- * 
+ *
  * Update token if returned false.
  * ```ts
  * if (!play.is_expired()) {
@@ -206,7 +206,7 @@ export async function sp_search(
 }
 /**
  * Refreshes Token
- * 
+ *
  * ```ts
  * if (!play.is_expired()) {
  *      await play.refreshToken()
@@ -243,4 +243,4 @@ export function setSpotifyToken(options: SpotifyDataOptions) {
     refreshToken();
 }
 
-export { SpotifyTrack, SpotifyAlbum, SpotifyPlaylist }
+export { SpotifyTrack, SpotifyAlbum, SpotifyPlaylist };

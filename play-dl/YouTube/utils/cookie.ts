@@ -46,6 +46,7 @@ export function setCookieToken(options: { cookie: string }) {
     youtubeData = { cookie };
     youtubeData.file = false;
 }
+
 /**
  * Updates cookies locally either in file or in memory.
  * 
@@ -58,7 +59,7 @@ export function setCookieToken(options: { cookie: string }) {
  * @param headCookie response headers['set-cookie'] array
  * @returns Nothing
  */
-export function cookieHeaders(headCookie: string[]): void {
+ export function cookieHeaders(headCookie: string[]): void {
     if (!youtubeData?.cookie) return;
     headCookie.forEach((x: string) => {
         x.split(';').forEach((z) => {
