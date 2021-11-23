@@ -5,68 +5,68 @@ interface VideoOptions {
     /**
      * YouTube Video ID
      */
-     id?: string;
-     /**
-      * YouTube video url
-      */
-     url: string;
-     /**
-      * YouTube Video title
-      */
-     title?: string;
-     /**
-      * YouTube Video description.
-      */
-     description?: string;
-     /**
-      * YouTube Video Duration Formatted
-      */
-     durationRaw: string;
-     /**
-      * YouTube Video Duration in seconds
-      */
-     durationInSec: number;
-     /**
-      * YouTube Video Uploaded Date
-      */
-     uploadedAt?: string;
-     /**
-      * YouTube Views
-      */
-     views: number;
-     /**
-      * YouTube Thumbnail Data
-      */
-     thumbnail?: {
+    id?: string;
+    /**
+     * YouTube video url
+     */
+    url: string;
+    /**
+     * YouTube Video title
+     */
+    title?: string;
+    /**
+     * YouTube Video description.
+     */
+    description?: string;
+    /**
+     * YouTube Video Duration Formatted
+     */
+    durationRaw: string;
+    /**
+     * YouTube Video Duration in seconds
+     */
+    durationInSec: number;
+    /**
+     * YouTube Video Uploaded Date
+     */
+    uploadedAt?: string;
+    /**
+     * YouTube Views
+     */
+    views: number;
+    /**
+     * YouTube Thumbnail Data
+     */
+    thumbnail?: {
         id: string | undefined;
         width: number | undefined;
         height: number | undefined;
         url: string | undefined;
     };
-     /**
-      * YouTube Video's uploader Channel Data
-      */
-     channel?: YouTubeChannel;
-     /**
-      * YouTube Video's likes
-      */
-     likes: number;
-     /**
-      * YouTube Video's dislikes
-      */
-     dislikes: number;
-     /**
-      * YouTube Video live status
-      */
-     live: boolean;
-     /**
-      * YouTube Video private status
-      */
-     private: boolean;
-     /**
-      * YouTube Video tags
-      */
-     tags: string[];
+    /**
+     * YouTube Video's uploader Channel Data
+     */
+    channel?: YouTubeChannel;
+    /**
+     * YouTube Video's likes
+     */
+    likes: number;
+    /**
+     * YouTube Video's dislikes
+     */
+    dislikes: number;
+    /**
+     * YouTube Video live status
+     */
+    live: boolean;
+    /**
+     * YouTube Video private status
+     */
+    private: boolean;
+    /**
+     * YouTube Video tags
+     */
+    tags: string[];
 }
 /**
  * Class for YouTube Video url

@@ -47,19 +47,19 @@ export class LiveStream {
     private video_url: string;
     /**
      * Timer used to update dash url so as to avoid 404 errors after long hours of streaming.
-     * 
+     *
      * It updates dash_url every 30 minutes.
      */
     private dash_timer: Timer;
     /**
      * Segments of url that we recieve in dash file.
-     * 
+     *
      * base_url + segment_urls[0] = One complete url for one segment.
      */
     private segments_urls: string[];
     /**
      * Incoming message that we recieve.
-     * 
+     *
      * Storing this is essential.
      * This helps to destroy the TCP connection completely if you stopped player in between the stream
      */
@@ -94,7 +94,7 @@ export class LiveStream {
     }
     /**
      * Updates dash url.
-     * 
+     *
      * Used by dash_timer for updating dash_url every 30 minutes.
      */
     private async dash_updater() {
@@ -109,7 +109,7 @@ export class LiveStream {
     }
     /**
      * Parses data recieved from dash_url.
-     * 
+     *
      * Updates base_url , segments_urls array.
      */
     private async dash_getter() {
@@ -126,7 +126,7 @@ export class LiveStream {
     }
     /**
      * This cleans every used variable in class.
-     * 
+     *
      * This is used to prevent re-use of this class and helping garbage collector to collect it.
      */
     private cleanup() {
@@ -143,7 +143,7 @@ export class LiveStream {
     }
     /**
      * This starts function in Live Stream Class.
-     * 
+     *
      * Gets data from dash url and pass it to dash getter function.
      * Get data from complete segment url and pass data to Stream.
      */
@@ -197,14 +197,14 @@ export class Stream {
     /**
      * Readable Stream through which data passes
      */
-     stream: Readable;
-     /**
-      * Type of audio data that we recieved from normal youtube url.
-      */
-     type: StreamType;
-     /**
-      * Audio Endpoint Format Url to get data from.
-      */
+    stream: Readable;
+    /**
+     * Type of audio data that we recieved from normal youtube url.
+     */
+    type: StreamType;
+    /**
+     * Audio Endpoint Format Url to get data from.
+     */
     private url: string;
     /**
      * Used to calculate no of bytes data that we have recieved
@@ -236,7 +236,7 @@ export class Stream {
     private proxy: Proxy[] | undefined;
     /**
      * Incoming message that we recieve.
-     * 
+     *
      * Storing this is essential.
      * This helps to destroy the TCP connection completely if you stopped player in between the stream
      */
@@ -288,7 +288,7 @@ export class Stream {
     }
     /**
      * This cleans every used variable in class.
-     * 
+     *
      * This is used to prevent re-use of this class and helping garbage collector to collect it.
      */
     private cleanup() {
@@ -298,7 +298,7 @@ export class Stream {
     }
     /**
      * Getting data from audio endpoint url and passing it to stream.
-     * 
+     *
      * If 404 or 403 occurs, it will retry again.
      */
     private async loop() {
@@ -354,7 +354,7 @@ export class Stream {
     /**
      * Pauses timer.
      * Stops running of loop.
-     * 
+     *
      * Useful if you don't want to get excess data to be stored in stream.
      */
     pause() {
@@ -370,7 +370,7 @@ export class Stream {
 }
 /**
  * Timer Class.
- * 
+ *
  * setTimeout + extra features ( re-starting, pausing, resuming ).
  */
 export class Timer {
@@ -456,7 +456,7 @@ export class Timer {
     }
     /**
      * Destroy timer.
-     * 
+     *
      * It can't be used again.
      */
     destroy() {

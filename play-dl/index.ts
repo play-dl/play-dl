@@ -11,9 +11,34 @@ export {
     YouTubePlayList,
     YouTubeVideo
 } from './YouTube';
-export { spotify, sp_validate, refreshToken, is_expired, SpotifyAlbum, SpotifyPlaylist, SpotifyTrack, Spotify } from './Spotify';
-export { soundcloud, so_validate, SoundCloud, SoundCloudStream, getFreeClientID, SoundCloudPlaylist, SoundCloudTrack } from './SoundCloud';
-export { deezer, dz_validate, dz_advanced_track_search, Deezer, DeezerTrack, DeezerPlaylist, DeezerAlbum } from './Deezer';
+export {
+    spotify,
+    sp_validate,
+    refreshToken,
+    is_expired,
+    SpotifyAlbum,
+    SpotifyPlaylist,
+    SpotifyTrack,
+    Spotify
+} from './Spotify';
+export {
+    soundcloud,
+    so_validate,
+    SoundCloud,
+    SoundCloudStream,
+    getFreeClientID,
+    SoundCloudPlaylist,
+    SoundCloudTrack
+} from './SoundCloud';
+export {
+    deezer,
+    dz_validate,
+    dz_advanced_track_search,
+    Deezer,
+    DeezerTrack,
+    DeezerPlaylist,
+    DeezerAlbum
+} from './Deezer';
 export { setToken } from './token';
 
 enum AudioPlayerStatus {
@@ -83,6 +108,56 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     else return await yt_stream(url, options);
 }
 
+export async function search(
+    query: string,
+    options: { source: { deezer: 'album' } } & SearchOptions
+): Promise<DeezerAlbum[]>;
+export async function search(
+    query: string,
+    options: { source: { deezer: 'playlist' } } & SearchOptions
+): Promise<DeezerPlaylist[]>;
+export async function search(
+    query: string,
+    options: { source: { deezer: 'track' } } & SearchOptions
+): Promise<DeezerTrack[]>;
+export async function search(
+    query: string,
+    options: { source: { soundcloud: 'albums' } } & SearchOptions
+): Promise<SoundCloudPlaylist[]>;
+export async function search(
+    query: string,
+    options: { source: { soundcloud: 'playlists' } } & SearchOptions
+): Promise<SoundCloudPlaylist[]>;
+export async function search(
+    query: string,
+    options: { source: { soundcloud: 'tracks' } } & SearchOptions
+): Promise<SoundCloudTrack[]>;
+export async function search(
+    query: string,
+    options: { source: { spotify: 'album' } } & SearchOptions
+): Promise<SpotifyAlbum[]>;
+export async function search(
+    query: string,
+    options: { source: { spotify: 'playlist' } } & SearchOptions
+): Promise<SpotifyPlaylist[]>;
+export async function search(
+    query: string,
+    options: { source: { spotify: 'track' } } & SearchOptions
+): Promise<SpotifyTrack[]>;
+export async function search(
+    query: string,
+    options: { source: { youtube: 'channel' } } & SearchOptions
+): Promise<YouTubeChannel[]>;
+export async function search(
+    query: string,
+    options: { source: { youtube: 'playlist' } } & SearchOptions
+): Promise<YouTubePlayList[]>;
+export async function search(
+    query: string,
+    options: { source: { youtube: 'video' } } & SearchOptions
+): Promise<YouTubeVideo[]>;
+export async function search(query: string, options: { limit: number } & SearchOptions): Promise<YouTubeVideo[]>;
+export async function search(query: string, options?: SearchOptions): Promise<YouTubeVideo[]>;
 /**
  *  Main Search Command for searching through various sources
  * @param query string to search.
@@ -90,20 +165,6 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
  * @returns Array of YouTube or Spotify or SoundCloud or Deezer
         deezer?: 'track' | 'playlist' | 'album';
  */
-export async function search( query: string, options: { source : { deezer : "album" } } & SearchOptions) : Promise<DeezerAlbum[]>;
-export async function search( query: string, options: { source : { deezer : "playlist" } } & SearchOptions) : Promise<DeezerPlaylist[]>;
-export async function search( query: string, options: { source : { deezer : "track" } } & SearchOptions) : Promise<DeezerTrack[]>;
-export async function search( query: string, options: { source : { soundcloud : "albums" } } & SearchOptions) : Promise<SoundCloudPlaylist[]>;
-export async function search( query: string, options: { source : { soundcloud : "playlists" } } & SearchOptions) : Promise<SoundCloudPlaylist[]>;
-export async function search( query: string, options: { source : { soundcloud : "tracks" } } & SearchOptions) : Promise<SoundCloudTrack[]>;
-export async function search( query: string, options: { source : { spotify : "album" } } & SearchOptions) : Promise<SpotifyAlbum[]>;
-export async function search( query: string, options: { source : { spotify : "playlist" } } & SearchOptions) : Promise<SpotifyPlaylist[]>;
-export async function search( query: string, options: { source : { spotify : "track" } } & SearchOptions) : Promise<SpotifyTrack[]>;
-export async function search( query: string, options: { source : { youtube : "channel" } } & SearchOptions) : Promise<YouTubeChannel[]>;
-export async function search( query: string, options: { source : { youtube : "playlist" } } & SearchOptions) : Promise<YouTubePlayList[]>;
-export async function search( query: string, options: { source : { youtube : "video" } } & SearchOptions) : Promise<YouTubeVideo[]>;
-export async function search( query: string, options: { limit : number } & SearchOptions ) : Promise<YouTubeVideo[]>;
-export async function search( query: string, options? : SearchOptions) : Promise<YouTubeVideo[]>;
 export async function search(
     query: string,
     options: SearchOptions = {}
@@ -114,7 +175,7 @@ export async function search(
     else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
     else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
     else if (options.source.deezer)
-        return await dz_search(query, { limit: options.limit, type: options.source.deezer, fuzzy : options.fuzzy });
+        return await dz_search(query, { limit: options.limit, type: options.source.deezer, fuzzy: options.fuzzy });
     else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
 }
 

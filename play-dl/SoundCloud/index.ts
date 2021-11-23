@@ -14,12 +14,12 @@ interface SoundDataOptions {
 const pattern = /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(api\.soundcloud\.com|soundcloud\.com|snd\.sc)\/(.*)$/;
 /**
  * Gets info from a soundcloud url.
- * 
+ *
  * ```ts
  * let sound = await play.soundcloud('soundcloud url')
- * 
+ *
  * // sound.type === "track" | "playlist" | "user"
- * 
+ *
  * if (sound.type === "track") {
  *      spot = spot as play.SoundCloudTrack
  *      // Code with SoundCloud track class.
@@ -97,9 +97,9 @@ export async function stream(url: string, quality?: number): Promise<SoundCloudS
 }
 /**
  * Gets Free SoundCloud Client ID.
- * 
+ *
  * Use this in beginning of your code to add SoundCloud support.
- * 
+ *
  * ```ts
  * play.getFreeClientID().then((clientID) => play.setToken({
  *      soundcloud : {
@@ -156,7 +156,7 @@ export async function check_id(id: string): Promise<boolean> {
 /**
  * Validates a soundcloud url
  * @param url soundcloud url
- * @returns 
+ * @returns
  * ```ts
  * false | 'track' | 'playlist'
  * ```
@@ -192,4 +192,4 @@ export function setSoundCloudToken(options: SoundDataOptions) {
     soundData = options;
 }
 
-export { SoundCloudTrack, SoundCloudPlaylist, SoundCloudStream }
+export { SoundCloudTrack, SoundCloudPlaylist, SoundCloudStream };

@@ -256,4 +256,4 @@ export async function dz_advanced_track_search(options: DeezerAdvancedSearchOpti
     return results;
 }
 
-export { DeezerTrack, DeezerAlbum, DeezerPlaylist }
+export { DeezerTrack, DeezerAlbum, DeezerPlaylist };

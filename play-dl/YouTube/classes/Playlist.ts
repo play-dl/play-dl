@@ -47,7 +47,7 @@ export class YouTubePlayList {
     /**
      * YouTube Playlist thumbnail Data
      */
-    thumbnail?: YouTubeThumbnail
+    thumbnail?: YouTubeThumbnail;
     /**
      * Videos array containing data of first 100 videos
      */
@@ -121,7 +121,7 @@ export class YouTubePlayList {
     /**
      * Parses next segment of videos from playlist and returns parsed data.
      * @param limit Total no of videos to parse.
-     * 
+     *
      * Default = Infinity
      * @returns Array of YouTube Video Class
      */
@@ -157,12 +157,12 @@ export class YouTubePlayList {
     }
     /**
      * Fetches remaining data from playlist
-     * 
+     *
      * For fetching and getting all songs data, see `total_pages` property.
      * @param max Max no of videos to fetch
-     * 
+     *
      * Default = Infinity
-     * @returns 
+     * @returns
      */
     async fetch(max = Infinity): Promise<YouTubePlayList> {
         const continuation = this._continuation.token;
@@ -173,7 +173,7 @@ export class YouTubePlayList {
             this.__count++;
             const res = await this.next();
             max -= res.length;
-            if(max <= 0) break;
+            if (max <= 0) break;
             if (!res.length) break;
         }
 
@@ -181,14 +181,14 @@ export class YouTubePlayList {
     }
     /**
      * YouTube Playlist is divided into pages.
-     * 
+     *
      * For example, if you want to get 101 - 200 songs
-     * 
+     *
      * ```ts
      * const playlist = await play.playlist_info('playlist url')
-     * 
+     *
      * await playlist.fetch()
-     * 
+     *
      * const result = playlist.page(2)
      * ```
      * @param number Page number
@@ -201,16 +201,16 @@ export class YouTubePlayList {
     }
     /**
      * Gets total no of pages in that playlist class.
-     * 
+     *
      * For getting all songs in a playlist
-     * 
+     *
      * ```ts
      * const playlist = await play.playlist_info('playlist url');
-     * 
+     *
      * await playlist.fetch();
-     * 
+     *
      * let result = [];
-     * 
+     *
      * for (let i = 0; i <= playlist.total_pages; i++) {
      *      result.push(playlist.page(i));
      * }
@@ -221,7 +221,7 @@ export class YouTubePlayList {
     }
     /**
      * This tells total no of videos that have been fetched so far.
-     * 
+     *
      * This can be equal to videosCount if all videos in playlist have been fetched and they are not hidden.
      */
     get total_videos() {
@@ -230,9 +230,9 @@ export class YouTubePlayList {
     }
     /**
      * Converts Playlist Class to a json parsed data.
-     * @returns 
+     * @returns
      */
-    toJSON() : PlaylistJSON {
+    toJSON(): PlaylistJSON {
         return {
             id: this.id,
             title: this.title,
@@ -244,50 +244,50 @@ export class YouTubePlayList {
     }
 }
 
-interface PlaylistJSON{
+interface PlaylistJSON {
     /**
      * YouTube Playlist ID
      */
-     id?: string;
-     /**
-      * YouTube Playlist Name
-      */
-     title?: string;
-     /**
-      * Total no of videos in that playlist
-      */
-     videoCount?: number;
-     /**
-      * Time when playlist was last updated
-      */
-     lastUpdate?: string;
-     /**
-      * Total views of that playlist
-      */
-     views?: number;
-     /**
-      * YouTube Playlist url
-      */
-     url?: string;
-     /**
-      * YouTube Playlist url with starting video url.
-      */
-     link?: string;
-     /**
-      * YouTube Playlist channel data
-      */
-     channel?: YouTubeChannel;
-     /**
-      * YouTube Playlist thumbnail Data
-      */
-     thumbnail?: {
-         id: string | undefined;
-         width: number | undefined;
-         height: number | undefined;
-         url: string | undefined;
-     };
-     /**
-      * first 100 videos in that playlist
-      */
-     videos? : YouTubeVideo[]
+    id?: string;
+    /**
+     * YouTube Playlist Name
+     */
+    title?: string;
+    /**
+     * Total no of videos in that playlist
+     */
+    videoCount?: number;
+    /**
+     * Time when playlist was last updated
+     */
+    lastUpdate?: string;
+    /**
+     * Total views of that playlist
+     */
+    views?: number;
+    /**
+     * YouTube Playlist url
+     */
+    url?: string;
+    /**
+     * YouTube Playlist url with starting video url.
+     */
+    link?: string;
+    /**
+     * YouTube Playlist channel data
+     */
+    channel?: YouTubeChannel;
+    /**
+     * YouTube Playlist thumbnail Data
+     */
+    thumbnail?: {
+        id: string | undefined;
+        width: number | undefined;
+        height: number | undefined;
+        url: string | undefined;
+    };
+    /**
+     * first 100 videos in that playlist
+     */
+    videos?: YouTubeVideo[];
 }

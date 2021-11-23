@@ -86,7 +86,7 @@ export class YouTubeChannel {
      * Converts Channel Class to JSON format
      * @returns json data of the channel
      */
-    toJSON() : ChannelJSON {
+    toJSON(): ChannelJSON {
         return {
             name: this.name,
             verified: this.verified,
@@ -100,37 +100,37 @@ export class YouTubeChannel {
     }
 }
 
-interface ChannelJSON{
+interface ChannelJSON {
     /**
      * YouTube Channel Title
      */
-     name?: string;
-     /**
-      * YouTube Channel Verified status.
-      */
-     verified?: boolean;
-     /**
-      * YouTube Channel artist if any.
-      */
-     artist?: boolean;
-     /**
-      * YouTube Channel ID.
-      */
-     id?: string;
-     /**
-      * Type of Class [ Channel ]
-      */
-     type: 'video' | 'playlist' | 'channel';
-     /**
-      * YouTube Channel Url
-      */
-     url?: string;
-     /**
-      * YouTube Channel Icon data.
-      */
-     icons?: ChannelIconInterface[];
-     /**
-      * YouTube Channel subscribers count.
-      */
-     subscribers?: string;
+    name?: string;
+    /**
+     * YouTube Channel Verified status.
+     */
+    verified?: boolean;
+    /**
+     * YouTube Channel artist if any.
+     */
+    artist?: boolean;
+    /**
+     * YouTube Channel ID.
+     */
+    id?: string;
+    /**
+     * Type of Class [ Channel ]
+     */
+    type: 'video' | 'playlist' | 'channel';
+    /**
+     * YouTube Channel Url
+     */
+    url?: string;
+    /**
+     * YouTube Channel Icon data.
+     */
+    icons?: ChannelIconInterface[];
+    /**
+     * YouTube Channel subscribers count.
+     */
+    subscribers?: string;
 }

@@ -17,14 +17,14 @@ interface tokenOptions {
     };
 }
 /**
- * Sets 
- * 
+ * Sets
+ *
  *  i> YouTube :- cookies.
- * 
+ *
  *  ii> SoundCloud :- client ID.
- * 
+ *
  *  iii> Spotify :- client ID, client secret, refresh token, market.
- * 
+ *
  * locally in memory.
  * @param options {@link tokenOptions}
  */
