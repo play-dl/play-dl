@@ -7,7 +7,6 @@ export {
     extractID,
     YouTube,
     YouTubeStream,
-    cookieHeaders,
     YouTubeChannel,
     YouTubePlayList,
     YouTubeVideo
