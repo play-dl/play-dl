@@ -60,7 +60,7 @@ export class YouTubeChannel {
         this.artist = !!data.artist || false;
         this.id = data.id || null;
         this.url = data.url || null;
-        this.icons = data.icon || [{ url: null, width: 0, height: 0 }];
+        this.icons = data.icons || [{ url: null, width: 0, height: 0 }];
         this.subscribers = data.subscribers || null;
     }
 
