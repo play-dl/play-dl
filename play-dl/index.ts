@@ -326,7 +326,7 @@ export async function validate(
  * Either stores info in `.data` folder or shows relevant data to be used in `setToken` function.
  * 
  * ```ts
- * const play = require('play-dl)
+ * const play = require('play-dl')
  * 
  * play.authorization()
  * ```

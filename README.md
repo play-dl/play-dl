@@ -31,3 +31,4 @@ const play = require('play-dl') //JS importing
 
 ### [Documentation](https://play-dl.github.io/modules.html)
 ### [Examples](./examples)
+### [Instructions](./instructions)
