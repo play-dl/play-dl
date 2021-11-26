@@ -1,3 +1,9 @@
+# Play-dl
+ A **light-weight** youtube downloader and searcher.
+
+-   searches by video, playlist, channel
+-   obtains audio playback url
+
 # Why play-dl ?
 
 [ytdl-core](https://github.com/fent/node-ytdl-core) has some issues with miniget and also stream abort issues. On the other hand, [youtube-dl](https://github.com/ytdl-org/youtube-dl) is a very perfect alternative but it takes time to launch. Hence, play-dl is created to avoid these issues along with providing comparatively faster performance than others.
@@ -7,13 +13,6 @@
 ## Support
 
 You can contact us for support on our [chat server](https://discord.gg/8H3xWcv3D7)
-
-## Stream videos/playlists or search for videos
-
-This is a **light-weight** youtube downloader and searcher.
-
--   searches by video, playlist, channel
--   obtains audio playback url
 
 ### Installation
 
