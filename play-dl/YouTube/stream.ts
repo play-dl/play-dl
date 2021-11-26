@@ -46,35 +46,7 @@ export type YouTubeStream = Stream | LiveStream;
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
     const info = await video_info(url, { proxy: options.proxy, htmldata: options.htmldata });
-    const final: any[] = [];
-    if (
-        info.LiveStreamData.isLive === true &&
-        info.LiveStreamData.dashManifestUrl !== null &&
-        info.video_details.durationInSec === 0
-    ) {
-        return new LiveStream(
-            info.LiveStreamData.dashManifestUrl,
-            info.format[info.format.length - 1].targetDurationSec as number,
-            info.video_details.url
-        );
-    }
-
-    const audioFormat = parseAudioFormats(info.format);
-    if (typeof options.quality !== 'number') options.quality = audioFormat.length - 1;
-    else if (options.quality <= 0) options.quality = 0;
-    else if (options.quality >= audioFormat.length) options.quality = audioFormat.length - 1;
-    if (audioFormat.length !== 0) final.push(audioFormat[options.quality]);
-    else final.push(info.format[info.format.length - 1]);
-    let type: StreamType =
-        final[0].codec === 'opus' && final[0].container === 'webm' ? StreamType.WebmOpus : StreamType.Arbitrary;
-    return new Stream(
-        final[0].url,
-        type,
-        info.video_details.durationInSec,
-        Number(final[0].contentLength),
-        info.video_details.url,
-        options
-    );
+    return await stream_from_info(info, options);
 }
 /**
  * Stream command for YouTube using info from video_info or decipher_info function.
