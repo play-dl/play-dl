@@ -1,5 +1,5 @@
 # Play-dl
- A **light-weight** youtube downloader and searcher.
+ A **light-weight** youtube, soundcloud, spotify, deezer downloader and searcher.
 
 -   searches by video, playlist, channel
 -   obtains audio playback url
