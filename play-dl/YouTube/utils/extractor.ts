@@ -250,14 +250,7 @@ function parseSeconds(seconds: number): string {
  */
 export async function video_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
     const data = await video_basic_info(url, options);
-    if (data.LiveStreamData.isLive === true && data.LiveStreamData.dashManifestUrl !== null) {
-        return data;
-    } else if (data.format[0].signatureCipher || data.format[0].cipher) {
-        data.format = await format_decipher(data.format, data.html5player);
-        return data;
-    } else {
-        return data;
-    }
+    return await decipher_info(data);
 }
 /**
  * Function uses data from video_basic_info and deciphers it if it contains signatures.
