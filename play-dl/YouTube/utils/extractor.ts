@@ -162,6 +162,10 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     const format = [];
     const vid = player_response.videoDetails;
     const microformat = player_response.microformat.playerMicroformatRenderer;
+    const ratingButtons =
+        initial_response.contents.twoColumnWatchNextResults.results.results.contents.find(
+            (content: any) => content.videoPrimaryInfoRenderer
+        )?.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons ?? [];
     const video_details = new YouTubeVideo({
         id: vid.videoId,
         url: `https://www.youtube.com/watch?v=${vid.videoId}`,
@@ -182,6 +186,16 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         views: vid.viewCount,
         tags: vid.keywords,
         averageRating: vid.averageRating,
+        likes: parseInt(
+            ratingButtons
+                .find((button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE')
+                ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
+        ),
+        dislikes: parseInt(
+            ratingButtons
+                .find((button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'DISLIKE')
+                ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
+        ),
         live: vid.isLiveContent,
         private: vid.isPrivate
     });
