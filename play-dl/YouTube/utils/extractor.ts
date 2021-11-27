@@ -132,7 +132,13 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
         .split(/;\s*(var|const|let)/)[0];
-    if (!player_data) throw new Error('Initial Player Response Data is undefined.');
+    if (!player_data) {
+        if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1) {
+            throw new Error('Captcha page: YouTube has detected that you are a bot!');
+        } else {
+            throw new Error('Initial Player Response Data is undefined.');
+        }
+    }
     const initial_data = body
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
