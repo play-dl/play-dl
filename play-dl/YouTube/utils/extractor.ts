@@ -128,6 +128,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
             cookies: true
         });
     }
+    if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1) throw new Error('Captcha page: YouTube has detected that you are a bot!');
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
