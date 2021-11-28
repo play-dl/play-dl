@@ -154,8 +154,8 @@ export class YouTubeVideo {
         this.views = parseInt(data.views) || 0;
         this.thumbnail = data.thumbnail || {};
         this.channel = new YouTubeChannel(data.channel) || {};
-        this.likes = (data.ratings?.likes as number) || 0;
-        this.dislikes = data.ratings?.dislikes || 0;
+        this.likes = data.likes || 0;
+        this.dislikes = data.dislikes || 0;
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
