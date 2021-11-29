@@ -88,20 +88,20 @@ import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './Deezer/classes';
 
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from a url for playing.
- * 
- * Example 
+ *
+ * Example
  * ```ts
  * const source = await play.stream('youtube video URL') // YouTube Video Stream
- * 
+ *
  * const source = await play.stream('soundcloud track URL') // SoundCloud Track Stream
- * 
+ *
  * const resource = createAudioResource(source.stream, {
  *      inputType : source.type
  * }) // Use discordjs voice createAudioResource function.
  * ```
  * @param url Video / Track URL
- * @param options 
- * 
+ * @param options
+ *
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
@@ -201,7 +201,7 @@ export async function search(
     options: { source: { youtube: 'video' } } & SearchOptions
 ): Promise<YouTubeVideo[]>;
 export async function search(query: string, options: { limit: number } & SearchOptions): Promise<YouTubeVideo[]>;
-export async function search(query: string, options? : SearchOptions ): Promise<YouTubeVideo[]>;
+export async function search(query: string, options?: SearchOptions): Promise<YouTubeVideo[]>;
 /**
  * Searches through a particular source and gives respective info.
  * 
@@ -247,22 +247,22 @@ export async function search(
 
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from video or track info for playing.
- * 
- * Example 
+ *
+ * Example
  * ```ts
  * const info = await video_info('youtube URL')
  * const source = await play.stream_from_info(info) // YouTube Video Stream
- * 
+ *
  * const soundInfo = await play.soundcloud('SoundCloud URL')
  * const source = await play.stream_from_info(soundInfo) // SoundCloud Track Stream
- * 
+ *
  * const resource = createAudioResource(source.stream, {
  *      inputType : source.type
  * }) // Use discordjs voice createAudioResource function.
  * ```
  * @param info YouTube video info OR SoundCloud track Class
- * @param options 
- * 
+ * @param options
+ *
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
@@ -277,13 +277,13 @@ export async function stream_from_info(
 }
 /**
  * Validates url that play-dl supports.
- * 
+ *
  * - `so` - SoundCloud
  * - `sp` - Spotify
  * - `dz` - Deezer
  * - `yt` - YouTube
  * @param url URL
- * @returns 
+ * @returns
  * ```ts
  * 'so_playlist' / 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'dz_track' | 'dz_playlist' | 'dz_album' | 'yt_video' | 'yt_playlist' | 'search' | false
  * ```
@@ -322,15 +322,15 @@ export async function validate(
 }
 /**
  * Authorization interface for Spotify, SoundCloud and YouTube.
- * 
+ *
  * Either stores info in `.data` folder or shows relevant data to be used in `setToken` function.
- * 
+ *
  * ```ts
  * const play = require('play-dl')
- * 
+ *
  * play.authorization()
  * ```
- * 
+ *
  * Just run the above command and you will get a interface asking some questions.
  */
 export function authorization(): void {
@@ -447,7 +447,7 @@ export function authorization(): void {
 }
 /**
  * Attaches paused, playing, autoPaused Listeners to discordjs voice AudioPlayer.
- * 
+ *
  * Useful if you don't want extra data to be downloaded by play-dl.
  * @param player discordjs voice AudioPlayer
  * @param resource A {@link YouTubeStream} or {@link SoundCloudStream}

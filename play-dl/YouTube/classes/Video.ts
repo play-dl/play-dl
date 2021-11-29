@@ -152,7 +152,7 @@ export class YouTubeVideo {
         this.durationInSec = (data.duration < 0 ? 0 : data.duration) || 0;
         this.uploadedAt = data.uploadedAt || undefined;
         this.views = parseInt(data.views) || 0;
-        this.thumbnail = data.thumbnail || {};
+        this.thumbnail = new YouTubeThumbnail(data.thumbnail) || {};
         this.channel = new YouTubeChannel(data.channel) || {};
         this.likes = data.likes || 0;
         this.dislikes = data.dislikes || 0;

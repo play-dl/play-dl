@@ -94,7 +94,7 @@ export class YouTubePlayList {
         this.views = data.views || 0;
         this.link = data.link || undefined;
         this.channel = data.author || undefined;
-        this.thumbnail = data.thumbnail || undefined;
+        this.thumbnail = new YouTubeThumbnail(data.thumbnail) || undefined;
         this.videos = data.videos || [];
         this.__count++;
         this.fetched_videos.set(`${this.__count}`, this.videos as YouTubeVideo[]);
@@ -110,7 +110,7 @@ export class YouTubePlayList {
         this.id = data.id || undefined;
         this.url = this.id ? `https://www.youtube.com/playlist?list=${this.id}` : undefined;
         this.title = data.title || undefined;
-        this.thumbnail = data.thumbnail || undefined;
+        this.thumbnail = new YouTubeThumbnail(data.thumbnail) || undefined;
         this.channel = data.channel || undefined;
         this.videos = [];
         this.videoCount = data.videos || 0;
