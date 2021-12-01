@@ -325,6 +325,8 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
         proxies: options.proxy ?? undefined,
         headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
     });
+    if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
+        throw new Error('Captcha page: YouTube has detected that you are a bot!');
     const response = JSON.parse(body.split('var ytInitialData = ')[1].split(';</script>')[0]);
     if (response.alerts) {
         if (response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
