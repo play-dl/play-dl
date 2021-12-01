@@ -22,7 +22,8 @@ export interface thumbnail {
 export function ParseSearchResult(html: string, options?: ParseSearchInterface): YouTube[] {
     if (!html) throw new Error("Can't parse Search result without data");
     if (!options) options = { type: 'video', limit: 0 };
-    if (!options.type) options.type = 'video';
+    else if (!options.type) options.type = 'video';
+    const hasLimit = typeof options.limit === 'number' && options.limit > 0;
 
     const data = html
         .split('var ytInitialData = ')?.[1]
@@ -33,21 +34,27 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     const details =
         json_data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0]
             .itemSectionRenderer.contents;
-    for (let i = 0; i < details.length; i++) {
-        if (typeof options.limit === 'number' && options.limit > 0 && results.length === options.limit) break;
-        if (!details[i].videoRenderer && !details[i].channelRenderer && !details[i].playlistRenderer) continue;
-        if (options.type === 'video') {
-            const parsed = parseVideo(details[i]);
-            if (!parsed) continue;
-            results.push(parsed);
-        } else if (options.type === 'channel') {
-            const parsed = parseChannel(details[i]);
-            if (!parsed) continue;
-            results.push(parsed);
-        } else if (options.type === 'playlist') {
-            const parsed = parsePlaylist(details[i]);
-            if (!parsed) continue;
-            results.push(parsed);
+    for (const detail of details) {
+        if (hasLimit && results.length === options.limit) break;
+        if (!detail.videoRenderer && !detail.channelRenderer && !detail.playlistRenderer) continue;
+        switch (options.type) {
+            case 'video': {
+                const parsed = parseVideo(detail);
+                if (parsed) results.push(parsed);
+                break;
+            }
+            case 'channel': {
+                const parsed = parseChannel(detail);
+                if (parsed) results.push(parsed);
+                break;
+            }
+            case 'playlist': {
+                const parsed = parsePlaylist(detail);
+                if (parsed) results.push(parsed);
+                break;
+            }
+            default:
+                throw new Error(`Unknown search type: ${options.type}`);
         }
     }
     return results;
@@ -58,7 +65,7 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
  * @returns seconds
  */
 function parseDuration(duration: string): number {
-    duration ??= '0:00';
+    if (!duration) return 0;
     const args = duration.split(':');
     let dur = 0;
 
@@ -82,29 +89,24 @@ function parseDuration(duration: string): number {
  */
 export function parseChannel(data?: any): YouTubeChannel {
     if (!data || !data.channelRenderer) throw new Error('Failed to Parse YouTube Channel');
-    const badge = data.channelRenderer.ownerBadges && data.channelRenderer.ownerBadges[0];
+    const badge = data.channelRenderer.ownerBadges?.[0]?.metadataBadgeRenderer?.style?.toLowerCase();
     const url = `https://www.youtube.com${
         data.channelRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl ||
         data.channelRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url
     }`;
+    const thumbnail = data.channelRenderer.thumbnail.thumbnails[data.channelRenderer.thumbnail.thumbnails.length - 1];
     const res = new YouTubeChannel({
         id: data.channelRenderer.channelId,
         name: data.channelRenderer.title.simpleText,
         icon: {
-            url: data.channelRenderer.thumbnail.thumbnails[
-                data.channelRenderer.thumbnail.thumbnails.length - 1
-            ].url.replace('//', 'https://'),
-            width: data.channelRenderer.thumbnail.thumbnails[data.channelRenderer.thumbnail.thumbnails.length - 1]
-                .width,
-            height: data.channelRenderer.thumbnail.thumbnails[data.channelRenderer.thumbnail.thumbnails.length - 1]
-                .height
+            url: thumbnail.url.replace('//', 'https://'),
+            width: thumbnail.width,
+            height: thumbnail.height
         },
         url: url,
-        verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
-        artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist')),
-        subscribers: data.channelRenderer.subscriberCountText?.simpleText
-            ? data.channelRenderer.subscriberCountText.simpleText
-            : '0 subscribers'
+        verified: Boolean(badge?.includes('verified')),
+        artist: Boolean(badge?.includes('artist')),
+        subscribers: data.channelRenderer.subscriberCountText?.simpleText ?? '0 subscribers'
     });
 
     return res;
@@ -117,30 +119,29 @@ export function parseChannel(data?: any): YouTubeChannel {
 export function parseVideo(data?: any): YouTubeVideo {
     if (!data || !data.videoRenderer) throw new Error('Failed to Parse YouTube Video');
 
-    const badge = data.videoRenderer.ownerBadges && data.videoRenderer.ownerBadges[0];
+    const channel = data.videoRenderer.ownerText.runs[0];
+    const badge = data.videoRenderer.ownerBadges?.[0]?.metadataBadgeRenderer?.style?.toLowerCase();
     const res = new YouTubeVideo({
         id: data.videoRenderer.videoId,
         url: `https://www.youtube.com/watch?v=${data.videoRenderer.videoId}`,
         title: data.videoRenderer.title.runs[0].text,
-        description:
-            data.videoRenderer.detailedMetadataSnippets &&
-            data.videoRenderer.detailedMetadataSnippets[0].snippetText.runs[0]
-                ? data.videoRenderer.detailedMetadataSnippets[0].snippetText.runs.map((run: any) => run.text).join('')
-                : '',
+        description: data.videoRenderer.detailedMetadataSnippets?.[0].snippetText.runs.length
+            ? data.videoRenderer.detailedMetadataSnippets[0].snippetText.runs.map((run: any) => run.text).join('')
+            : '',
         duration: data.videoRenderer.lengthText ? parseDuration(data.videoRenderer.lengthText.simpleText) : 0,
         duration_raw: data.videoRenderer.lengthText ? data.videoRenderer.lengthText.simpleText : null,
         thumbnail: data.videoRenderer.thumbnail.thumbnails[data.videoRenderer.thumbnail.thumbnails.length - 1],
         channel: {
-            id: data.videoRenderer.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId || null,
-            name: data.videoRenderer.ownerText.runs[0].text || null,
+            id: channel.navigationEndpoint.browseEndpoint.browseId || null,
+            name: channel.text || null,
             url: `https://www.youtube.com${
-                data.videoRenderer.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl ||
-                data.videoRenderer.ownerText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url
+                channel.navigationEndpoint.browseEndpoint.canonicalBaseUrl ||
+                channel.navigationEndpoint.commandMetadata.webCommandMetadata.url
             }`,
             icons: data.videoRenderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail
                 .thumbnails,
-            verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
-            artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist'))
+            verified: Boolean(badge?.includes('verified')),
+            artist: Boolean(badge?.includes('artist'))
         },
         uploadedAt: data.videoRenderer.publishedTimeText?.simpleText ?? null,
         views: data.videoRenderer.viewCountText?.simpleText?.replace(/[^0-9]/g, '') ?? 0,
@@ -157,26 +158,24 @@ export function parseVideo(data?: any): YouTubeVideo {
 export function parsePlaylist(data?: any): YouTubePlayList {
     if (!data || !data.playlistRenderer) throw new Error('Failed to Parse YouTube Playlist');
 
+    const thumbnail =
+        data.playlistRenderer.thumbnails[0].thumbnails[data.playlistRenderer.thumbnails[0].thumbnails.length - 1];
+    const channel = data.playlistRenderer.shortBylineText.runs?.[0];
+
     const res = new YouTubePlayList(
         {
             id: data.playlistRenderer.playlistId,
             title: data.playlistRenderer.title.simpleText,
             thumbnail: {
                 id: data.playlistRenderer.playlistId,
-                url: data.playlistRenderer.thumbnails[0].thumbnails[
-                    data.playlistRenderer.thumbnails[0].thumbnails.length - 1
-                ].url,
-                height: data.playlistRenderer.thumbnails[0].thumbnails[
-                    data.playlistRenderer.thumbnails[0].thumbnails.length - 1
-                ].height,
-                width: data.playlistRenderer.thumbnails[0].thumbnails[
-                    data.playlistRenderer.thumbnails[0].thumbnails.length - 1
-                ].width
+                url: thumbnail.url,
+                height: thumbnail.height,
+                width: thumbnail.width
             },
             channel: {
-                id: data.playlistRenderer.shortBylineText.runs?.[0].navigationEndpoint.browseEndpoint.browseId,
-                name: data.playlistRenderer.shortBylineText.runs?.[0].text,
-                url: `https://www.youtube.com${data.playlistRenderer.shortBylineText.runs?.[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`
+                id: channel?.navigationEndpoint.browseEndpoint.browseId,
+                name: channel?.text,
+                url: `https://www.youtube.com${channel?.navigationEndpoint.commandMetadata.webCommandMetadata.url}`
             },
             videos: parseInt(data.playlistRenderer.videoCount.replace(/[^0-9]/g, ''))
         },
