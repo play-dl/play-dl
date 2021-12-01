@@ -24,7 +24,10 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     if (!options) options = { type: 'video', limit: 0 };
     if (!options.type) options.type = 'video';
 
-    const data = html.split('var ytInitialData = ')[1].split('}};')[0] + '}}';
+    const data = html
+        .split('var ytInitialData = ')?.[1]
+        ?.split(';</script>')[0]
+        .split(/;\s*(var|const|let)/)[0];
     const json_data = JSON.parse(data);
     const results = [];
     const details =
