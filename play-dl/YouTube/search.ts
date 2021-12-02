@@ -43,7 +43,6 @@ export async function yt_search(search: string, options: ParseSearchInterface = 
         headers: { 
             'accept-language': 'en-US,en;q=0.9',
             'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
-            'accept-encoding' : 'gzip, deflate, br'
         }
     });
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
