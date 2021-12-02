@@ -38,7 +38,11 @@ export async function yt_search(search: string, options: ParseSearchInterface = 
         }
     }
     const body = await request(url, {
-        headers: { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
+        headers: { 
+            'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7',
+            'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
+            'accept-encoding' : 'gzip, deflate, br'
+        }
     });
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
         throw new Error('Captcha page: YouTube has detected that you are a bot!');
