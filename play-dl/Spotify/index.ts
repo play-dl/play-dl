@@ -147,7 +147,7 @@ export async function SpotifyAuthorize(data: SpotifyDataOptions, file: boolean):
  *
  * Update token if returned false.
  * ```ts
- * if (!play.is_expired()) {
+ * if (play.is_expired()) {
  *      await play.refreshToken()
  * }
  * ```
@@ -208,7 +208,7 @@ export async function sp_search(
  * Refreshes Token
  *
  * ```ts
- * if (!play.is_expired()) {
+ * if (play.is_expired()) {
  *      await play.refreshToken()
  * }
  * ```
