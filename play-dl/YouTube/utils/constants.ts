@@ -37,3 +37,10 @@ export interface InfoData {
     video_details: YouTubeVideo;
     related_videos: string[];
 }
+
+export interface StreamInfoData {
+    LiveStreamData: LiveStreamData;
+    html5player: string;
+    format: Partial<formatData>[];
+    video_details: Pick<YouTubeVideo, 'url' | 'durationInSec'>;
+}

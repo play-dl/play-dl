@@ -101,7 +101,7 @@ function deciper_signature(tokens: string[], signature: string) {
         switch (token.slice(0, 2)) {
             case 'sw':
                 pos = parseInt(token.slice(2));
-                sig = swappositions(sig, pos);
+                swappositions(sig, pos);
                 break;
             case 'rv':
                 sig.reverse();
@@ -122,13 +122,11 @@ function deciper_signature(tokens: string[], signature: string) {
  * Function to swap positions in a array
  * @param array array
  * @param position position to switch with first element
- * @returns new array with swapped positions.
  */
 function swappositions(array: string[], position: number) {
     const first = array[0];
     array[0] = array[position];
     array[position] = first;
-    return array;
 }
 /**
  * Sets Download url with some extra parameter
