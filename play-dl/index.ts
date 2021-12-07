@@ -103,7 +103,6 @@ import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './Deezer/classes';
  * @param options
  *
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
- *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */

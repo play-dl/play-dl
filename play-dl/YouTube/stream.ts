@@ -39,7 +39,7 @@ export type YouTubeStream = Stream | LiveStream;
 /**
  * Stream command for YouTube
  * @param url YouTube URL
- * @param options lets you add quality, cookie, proxy support for stream
+ * @param options lets you add quality for stream
  * @returns Stream class with type and stream for playing.
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
@@ -49,7 +49,7 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
 /**
  * Stream command for YouTube using info from video_info or decipher_info function.
  * @param info video_info data
- * @param options lets you add quality, cookie, proxy support for stream
+ * @param options lets you add quality for stream
  * @returns Stream class with type and stream for playing.
  */
 export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<YouTubeStream> {

@@ -91,24 +91,11 @@ export function extractID(url: string): string {
  * const video = await play.video_basic_info('youtube video url')
  * 
  * const res = ... // Any https package get function.
- * const video = await play.video_basic_info(res.body, { htmldata : true })
  * 
- * const video = await play.video_basic_info('youtube video url', { proxy : [{
-        host : "IP or hostname",
-        port : 8080,
-        authentication: {
-            username: 'username';
-            password: 'very secret';
-        }
-    }] }) // Authentication is optional.
-
-    // OR
-
-    const video = await play.video_basic_info('youtube video url', { proxy : ['url'] })
+ * const video = await play.video_basic_info(res.body, { htmldata : true })
  * ```
  * @param url YouTube url or ID or html body data
  * @param options Video Info Options
- *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
  * @returns Video Basic Info {@link InfoData}.
  */
@@ -242,24 +229,11 @@ function parseSeconds(seconds: number): string {
  * const video = await play.video_info('youtube video url')
  * 
  * const res = ... // Any https package get function.
- * const video = await play.video_info(res.body, { htmldata : true })
  * 
- * const video = await play.video_info('youtube video url', { proxy : [{
-        host : "IP or hostname",
-        port : 8080,
-        authentication: {
-            username: 'username';
-            password: 'very secret';
-        }
-    }] }) // Authentication is optional.
-
-    // OR
-
-    const video = await play.video_info('youtube video url', { proxy : ['url'] })
+ * const video = await play.video_info(res.body, { htmldata : true })
  * ```
  * @param url YouTube url or ID or html body data
  * @param options Video Info Options
- *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
  * @returns Deciphered Video Info {@link InfoData}.
  */
@@ -290,24 +264,10 @@ export async function decipher_info(data: InfoData) {
  * const playlist = await play.playlist_info('youtube playlist url')
  * 
  * const playlist = await play.playlist_info('youtube playlist url', { incomplete : true })
- * 
- * const playlist = await play.playlist_info('youtube playlist url', { proxy : [{
-        host : "IP or hostname",
-        port : 8080,
-        authentication: {
-            username: 'username';
-            password: 'very secret';
-        }
-    }] }) // Authentication is optional.
-
-    // OR
-
-    const playlist = await play.playlist_info('youtube playlist url', { proxy : ['url'] })
  * ```
  * @param url Playlist URL
  * @param options Playlist Info Options
  * - `boolean` incomplete : If set to true, parses playlist with hidden videos.
- * - `Proxy[]` proxy : sends data through a proxy
  * 
  * @returns YouTube Playlist
  */
