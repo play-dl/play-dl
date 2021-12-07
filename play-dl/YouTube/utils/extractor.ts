@@ -1,17 +1,15 @@
-import { ProxyOptions as Proxy, request } from './../../Request/index';
+import { request } from './../../Request/index';
 import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 import { InfoData, StreamInfoData } from './constants';
 
 interface InfoOptions {
-    proxy?: Proxy[];
     htmldata?: boolean;
 }
 
 interface PlaylistOptions {
     incomplete?: boolean;
-    proxy?: Proxy[];
 }
 
 const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
@@ -93,24 +91,11 @@ export function extractID(url: string): string {
  * const video = await play.video_basic_info('youtube video url')
  * 
  * const res = ... // Any https package get function.
- * const video = await play.video_basic_info(res.body, { htmldata : true })
  * 
- * const video = await play.video_basic_info('youtube video url', { proxy : [{
-        host : "IP or hostname",
-        port : 8080,
-        authentication: {
-            username: 'username';
-            password: 'very secret';
-        }
-    }] }) // Authentication is optional.
-
-    // OR
-
-    const video = await play.video_basic_info('youtube video url', { proxy : ['url'] })
+ * const video = await play.video_basic_info(res.body, { htmldata : true })
  * ```
  * @param url YouTube url or ID or html body data
  * @param options Video Info Options
- *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
  * @returns Video Basic Info {@link InfoData}.
  */
@@ -123,11 +108,9 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         const video_id: string = extractID(url);
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
-            proxies: options.proxy ?? [],
-            headers: { 
-                'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7',
-                'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
-             },
+            headers: {
+                'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
+            },
             cookies: true
         });
     }
@@ -309,24 +292,11 @@ function parseSeconds(seconds: number): string {
  * const video = await play.video_info('youtube video url')
  * 
  * const res = ... // Any https package get function.
- * const video = await play.video_info(res.body, { htmldata : true })
  * 
- * const video = await play.video_info('youtube video url', { proxy : [{
-        host : "IP or hostname",
-        port : 8080,
-        authentication: {
-            username: 'username';
-            password: 'very secret';
-        }
-    }] }) // Authentication is optional.
-
-    // OR
-
-    const video = await play.video_info('youtube video url', { proxy : ['url'] })
+ * const video = await play.video_info(res.body, { htmldata : true })
  * ```
  * @param url YouTube url or ID or html body data
  * @param options Video Info Options
- *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
  * @returns Deciphered Video Info {@link InfoData}.
  */
@@ -357,24 +327,10 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(data: T
  * const playlist = await play.playlist_info('youtube playlist url')
  * 
  * const playlist = await play.playlist_info('youtube playlist url', { incomplete : true })
- * 
- * const playlist = await play.playlist_info('youtube playlist url', { proxy : [{
-        host : "IP or hostname",
-        port : 8080,
-        authentication: {
-            username: 'username';
-            password: 'very secret';
-        }
-    }] }) // Authentication is optional.
-
-    // OR
-
-    const playlist = await play.playlist_info('youtube playlist url', { proxy : ['url'] })
  * ```
  * @param url Playlist URL
  * @param options Playlist Info Options
  * - `boolean` incomplete : If set to true, parses playlist with hidden videos.
- * - `Proxy[]` proxy : sends data through a proxy
  * 
  * @returns YouTube Playlist
  */
@@ -388,10 +344,8 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
     const new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`;
 
     const body = await request(new_url, {
-        proxies: options.proxy ?? undefined,
-        headers: { 
-            'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7',
-            'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
+        headers: {
+            'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
         }
     });
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)

@@ -1,6 +1,5 @@
 import { video_info } from '.';
 import { LiveStream, Stream } from './classes/LiveStream';
-import { ProxyOptions as Proxy } from './../Request';
 import { InfoData } from './utils/constants';
 
 export enum StreamType {
@@ -13,7 +12,6 @@ export enum StreamType {
 
 export interface StreamOptions {
     quality?: number;
-    proxy?: Proxy[];
     htmldata?: boolean;
 }
 
@@ -41,17 +39,17 @@ export type YouTubeStream = Stream | LiveStream;
 /**
  * Stream command for YouTube
  * @param url YouTube URL
- * @param options lets you add quality, cookie, proxy support for stream
+ * @param options lets you add quality for stream
  * @returns Stream class with type and stream for playing.
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
-    const info = await video_info(url, { proxy: options.proxy, htmldata: options.htmldata });
+    const info = await video_info(url, { htmldata: options.htmldata });
     return await stream_from_info(info, options);
 }
 /**
  * Stream command for YouTube using info from video_info or decipher_info function.
  * @param info video_info data
- * @param options lets you add quality, cookie, proxy support for stream
+ * @param options lets you add quality for stream
  * @returns Stream class with type and stream for playing.
  */
 export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<YouTubeStream> {
