@@ -85,6 +85,7 @@ import { YouTubePlayList } from './YouTube/classes/Playlist';
 import { YouTubeChannel } from './YouTube/classes/Channel';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './Spotify/classes';
 import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './Deezer/classes';
+import { request } from './Request';
 
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from a url for playing.
@@ -433,4 +434,40 @@ export function attachListeners(player: EventEmitter, resource: YouTubeStream | 
         player.removeListener(AudioPlayerStatus.AutoPaused, pauseListener);
         player.removeListener(AudioPlayerStatus.Playing, resumeListener);
     });
+}
+/**
+ * Fetches the lyrics of a song using the artist and title
+ *
+ * Warning: This function requires the exact name of the artist and song title (case insensitive),
+ * passing user input directly into this function is not recommended.
+ *
+ * Use the {@link search} or one of the other functions to get the song title and artist.
+ *
+ * Example:
+ * ```ts
+ * const song = await deezer(songURL);
+ *
+ * const songLyrics = await lyrics(song.artist.name, song.title);
+ * ```
+ *
+ * Second example:
+ * ```ts
+ * const songs = await search('artist - title', {limit: 1, source: {deezer: 'track'}});
+ *
+ * const songLyrics = await lyrics(songs[0].artist.name, songs[0].title);
+ * ```
+ *
+ * @param artist The artist of the song
+ * @param title The title of the song
+ * @returns The lyrics of the song
+ * @throws an error if the lyrics are not available
+ */
+export async function lyrics(artist: string, title: string): Promise<string> {
+    const response = await request(
+        `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
+    ).catch(() => {
+        throw new Error('Lyrics not found: please check the name of the artist and song title for typos.');
+    });
+
+    return JSON.parse(response).lyrics;
 }
