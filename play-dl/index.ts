@@ -123,35 +123,6 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     else return await yt_stream(url, options);
 }
 
-/**
- * Searches through a particular source and gives respective info.
- * 
- * Example
- * ```ts
- * const searched = await play.search('Rick Roll', { source : { youtube : "video" } }) // YouTube Video Search
- * 
- * const searched = await play.search('Rick Roll', { limit : 1 }) // YouTube Video Search but returns only 1 video.
- * 
- * const searched = await play.search('Rick Roll', { source : { spotify : "track" } }) // Spotify Track Search
- * 
- * const searched = await play.search('Rick Roll', { source : { soundcloud : "tracks" } }) // SoundCloud Track Search
- * 
- * const searched = await play.search('Rick Roll', { source : { deezer : "track" } }) // Deezer Track Search
- * ```
- * @param query string to search.
- * @param options
- * 
- *  - `number` limit : No of searches you want to have.
- *  - `boolean` fuzzy : Whether the search should be fuzzy or only return exact matches. Defaults to `true`. [ for `Deezer` Only ]
- *  - `Object` source : Contains type of source and type of result you want to have
- * ```ts
- *      - youtube : 'video' | 'playlist' | 'channel';
-        - spotify : 'album' | 'playlist' | 'track';
-        - soundcloud : 'tracks' | 'playlists' | 'albums';
-        - deezer : 'track' | 'playlist' | 'album';
-    ```
- * @returns Array of {@link YouTube} or {@link Spotify} or {@link SoundCloud} or {@link Deezer} type
- */
 export async function search(
     query: string,
     options: { source: { deezer: 'album' } } & SearchOptions

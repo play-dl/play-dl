@@ -1,17 +1,15 @@
-import { ProxyOptions as Proxy, request } from './../../Request/index';
+import { request } from './../../Request/index';
 import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 import { InfoData } from './constants';
 
 interface InfoOptions {
-    proxy?: Proxy[];
     htmldata?: boolean;
 }
 
 interface PlaylistOptions {
     incomplete?: boolean;
-    proxy?: Proxy[];
 }
 
 const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
@@ -123,11 +121,9 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         const video_id: string = extractID(url);
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
-            proxies: options.proxy ?? [],
-            headers: { 
-                'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7',
-                'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
-             },
+            headers: {
+                'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
+            },
             cookies: true
         });
     }
@@ -325,10 +321,8 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
     const new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`;
 
     const body = await request(new_url, {
-        proxies: options.proxy ?? undefined,
-        headers: { 
-            'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7',
-            'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
+        headers: {
+            'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
         }
     });
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)

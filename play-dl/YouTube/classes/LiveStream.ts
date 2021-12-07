@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream';
 import { IncomingMessage } from 'node:http';
 import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
-import { ProxyOptions as Proxy, request, request_stream } from '../../Request';
+import { request, request_stream } from '../../Request';
 import { video_info } from '..';
 
 export interface FormatInterface {
@@ -231,10 +231,6 @@ export class Stream {
      */
     private quality: number;
     /**
-     * Proxy config given by user. [ Used only for retrying purposes only. ]
-     */
-    private proxy: Proxy[] | undefined;
-    /**
      * Incoming message that we recieve.
      *
      * Storing this is essential.
@@ -261,7 +257,6 @@ export class Stream {
         this.stream = new Readable({ highWaterMark: 5 * 1000 * 1000, read() {} });
         this.url = url;
         this.quality = options.quality as number;
-        this.proxy = options.proxy || undefined;
         this.type = type;
         this.bytes_count = 0;
         this.video_url = video_url;
@@ -282,7 +277,7 @@ export class Stream {
      * Retry if we get 404 or 403 Errors.
      */
     private async retry() {
-        const info = await video_info(this.video_url, { proxy: this.proxy });
+        const info = await video_info(this.video_url);
         const audioFormat = parseAudioFormats(info.format);
         this.url = audioFormat[this.quality].url;
     }
