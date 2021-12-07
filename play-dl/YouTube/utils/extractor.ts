@@ -223,7 +223,6 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         const video_id: string = extractID(url);
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
-            proxies: options.proxy ?? [],
             headers: { 'accept-language': 'en-US,en;q=0.9' },
             cookies: true
         });
