@@ -2,7 +2,7 @@ import { ProxyOptions as Proxy, request } from './../../Request/index';
 import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
-import { InfoData } from './constants';
+import { InfoData, StreamInfoData } from './constants';
 
 interface InfoOptions {
     proxy?: Proxy[];
@@ -220,6 +220,69 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     };
 }
 /**
+ * Gets the data required for streaming from YouTube url, ID or html body data and deciphers it.
+ *
+ * Internal function used by {@link stream} instead of {@link video_info}
+ * because it only extracts the information required for streaming.
+ *
+ * @param url YouTube url or ID or html body data
+ * @param options Video Info Options
+ *  - `Proxy[]` proxy : sends data through a proxy
+ *  - `boolean` htmldata : given data is html data or not
+ * @returns Deciphered Video Info {@link StreamInfoData}.
+ */
+export async function video_stream_info(url: string, options: InfoOptions = {}): Promise<StreamInfoData> {
+    let body: string;
+    if (options.htmldata) {
+        body = url;
+    } else {
+        if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
+        const video_id: string = extractID(url);
+        const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
+        body = await request(new_url, {
+            proxies: options.proxy ?? [],
+            headers: { 'accept-language': 'en-US,en;q=0.9' },
+            cookies: true
+        });
+    }
+    if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
+        throw new Error('Captcha page: YouTube has detected that you are a bot!');
+    const player_data = body
+        .split('var ytInitialPlayerResponse = ')?.[1]
+        ?.split(';</script>')[0]
+        .split(/;\s*(var|const|let)/)[0];
+    if (!player_data) throw new Error('Initial Player Response Data is undefined.');
+    const player_response = JSON.parse(player_data);
+    if (player_response.playabilityStatus.status !== 'OK')
+        throw new Error(
+            `While getting info from url\n${
+                player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
+                player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
+            }`
+        );
+    const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
+    const duration = Number(player_response.videoDetails.lengthSeconds);
+    const video_details = {
+        url: `https://www.youtube.com/watch?v=${player_response.videoDetails.videoId}`,
+        durationInSec: (duration < 0 ? 0 : duration) || 0
+    };
+    const format = [];
+    format.push(...(player_response.streamingData.formats ?? []));
+    format.push(...(player_response.streamingData.adaptiveFormats ?? []));
+
+    const LiveStreamData = {
+        isLive: player_response.videoDetails.isLiveContent,
+        dashManifestUrl: player_response.streamingData?.dashManifestUrl ?? null,
+        hlsManifestUrl: player_response.streamingData?.hlsManifestUrl ?? null
+    };
+    return await decipher_info({
+        LiveStreamData,
+        html5player,
+        format,
+        video_details
+    });
+}
+/**
  * Function to convert seconds to [hour : minutes : seconds] format
  * @param seconds seconds to convert
  * @returns [hour : minutes : seconds] format
@@ -276,7 +339,7 @@ export async function video_info(url: string, options: InfoOptions = {}): Promis
  * @param data Data - {@link InfoData}
  * @returns Deciphered Video Info {@link InfoData}
  */
-export async function decipher_info(data: InfoData) {
+export async function decipher_info<T extends InfoData | StreamInfoData>(data: T): Promise<T> {
     if (data.LiveStreamData.isLive === true && data.LiveStreamData.dashManifestUrl !== null) {
         return data;
     } else if (data.format[0].signatureCipher || data.format[0].cipher) {
