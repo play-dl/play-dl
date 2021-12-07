@@ -210,7 +210,6 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
  *
  * @param url YouTube url or ID or html body data
  * @param options Video Info Options
- *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
  * @returns Deciphered Video Info {@link StreamInfoData}.
  */

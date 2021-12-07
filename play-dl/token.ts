@@ -30,6 +30,19 @@ interface tokenOptions {
  *  iv> Useragents :- array of string.
  *
  * locally in memory.
+ * 
+ * Example : 
+ * ```ts
+ * play.setToken({
+ *      youtube : {
+ *          cookie : "Your Cookies"
+ *      }
+ * }) // YouTube Cookies
+ * 
+ * play.setToken({
+ *      useragent: ['Your User-agent']
+ * }) // Use this to avoid 429 errors.
+ * ```
  * @param options {@link tokenOptions}
  */
 export function setToken(options: tokenOptions) {
