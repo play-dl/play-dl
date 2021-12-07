@@ -76,16 +76,22 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
             reject(new Error(`Got ${res.statusCode} from the request`));
         }
         const data: string[] = [];
-        let decoder: BrotliDecompress | Gunzip | Deflate;
+        let decoder: BrotliDecompress | Gunzip | Deflate | undefined = undefined;
         const encoding = res.headers['content-encoding'];
         if (encoding === 'gzip') decoder = zlib.createGunzip();
         else if (encoding === 'br') decoder = zlib.createBrotliDecompress();
-        else decoder = zlib.createDeflate();
+        else if (encoding === 'deflate') decoder = zlib.createDeflate();
 
-        res.pipe(decoder);
-        decoder.setEncoding('utf-8');
-        decoder.on('data', (c) => data.push(c));
-        decoder.on('end', () => resolve(data.join('')));
+        if (decoder) {
+            res.pipe(decoder);
+            decoder.setEncoding('utf-8');
+            decoder.on('data', (c) => data.push(c));
+            decoder.on('end', () => resolve(data.join('')));
+        } else {
+            res.setEncoding('utf-8');
+            res.on('data', (c) => data.push(c));
+            res.on('end', () => resolve(data.join('')));
+        }
     });
 }
 
