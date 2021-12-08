@@ -1,6 +1,6 @@
-import { video_info } from '.';
 import { LiveStream, Stream } from './classes/LiveStream';
-import { InfoData } from './utils/constants';
+import { InfoData, StreamInfoData } from './utils/constants';
+import { video_stream_info } from './utils/extractor';
 
 export enum StreamType {
     Arbitrary = 'arbitrary',
@@ -43,7 +43,7 @@ export type YouTubeStream = Stream | LiveStream;
  * @returns Stream class with type and stream for playing.
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
-    const info = await video_info(url, { htmldata: options.htmldata });
+    const info = await video_stream_info(url, { htmldata: options.htmldata });
     return await stream_from_info(info, options);
 }
 /**
@@ -52,7 +52,10 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
  * @param options lets you add quality for stream
  * @returns Stream class with type and stream for playing.
  */
-export async function stream_from_info(info: InfoData, options: StreamOptions = {}): Promise<YouTubeStream> {
+export async function stream_from_info(
+    info: InfoData | StreamInfoData,
+    options: StreamOptions = {}
+): Promise<YouTubeStream> {
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
