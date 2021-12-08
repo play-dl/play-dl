@@ -9,20 +9,56 @@ interface TypeData {
 }
 
 interface DeezerSearchOptions {
+    /**
+     * The type to search for `'track'`, `'playlist'` or `'album'`. Defaults to `'track'`.
+     */
     type?: 'track' | 'playlist' | 'album';
+    /**
+     * The maximum number of results to return, maximum `100`, defaults to `10`.
+     */
     limit?: number;
+    /**
+     * Whether the search should be fuzzy or only return exact matches. Defaults to `true`.
+     */
     fuzzy?: boolean;
 }
 
 interface DeezerAdvancedSearchOptions {
+    /**
+     * The maximum number of results to return, maximum `100`, defaults to `10`.
+     */
     limit?: number;
+    /**
+     * The name of the artist.
+     */
     artist?: string;
+    /**
+     * The title of the album.
+     */
     album?: string;
+    /**
+     * The title of the track.
+     */
     title?: string;
+    /**
+     * The label that released the track.
+     */
     label?: string;
+    /**
+     * The minimum duration in seconds.
+     */
     minDurationInSec?: number;
+    /**
+     * The maximum duration in seconds.
+     */
     maxDurationInSec?: number;
+    /**
+     * The minimum BPM.
+     */
     minBPM?: number;
+    /**
+     * The minimum BPM.
+     */
     maxBPM?: number;
 }
 
@@ -139,8 +175,8 @@ export async function deezer(url: string): Promise<Deezer> {
 /**
  * Validates a Deezer URL
  * @param url The URL to validate
- * @returns The type of the URL either 'track', 'playlist', 'album', 'search' or false.
- * false means that the provided URL was a wrongly formatted or unsupported Deezer URL.
+ * @returns The type of the URL either `'track'`, `'playlist'`, `'album'`, `'search'` or `false`.
+ * `false` means that the provided URL was a wrongly formatted or an unsupported Deezer URL.
  */
 export async function dz_validate(url: string): Promise<'track' | 'playlist' | 'album' | 'search' | false> {
     const typeData = await internalValidate(url);
