@@ -130,7 +130,7 @@ export function parseVideo(data?: any): YouTubeVideo {
             : '',
         duration: data.videoRenderer.lengthText ? parseDuration(data.videoRenderer.lengthText.simpleText) : 0,
         duration_raw: data.videoRenderer.lengthText ? data.videoRenderer.lengthText.simpleText : null,
-        thumbnail: data.videoRenderer.thumbnail.thumbnails[data.videoRenderer.thumbnail.thumbnails.length - 1],
+        thumbnails: data.videoRenderer.thumbnail.thumbnails,
         channel: {
             id: channel.navigationEndpoint.browseEndpoint.browseId || null,
             name: channel.text || null,
