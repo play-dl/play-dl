@@ -115,7 +115,7 @@ export class YouTubeVideo {
     /**
      * YouTube Thumbnail Data
      */
-    thumbnail?: YouTubeThumbnail;
+    thumbnails: YouTubeThumbnail[];
     /**
      * YouTube Video's uploader Channel Data
      */
@@ -160,7 +160,11 @@ export class YouTubeVideo {
         this.durationInSec = (data.duration < 0 ? 0 : data.duration) || 0;
         this.uploadedAt = data.uploadedAt || undefined;
         this.views = parseInt(data.views) || 0;
-        this.thumbnail = new YouTubeThumbnail(data.thumbnail) || {};
+        const thumbnails = [];
+        for (const thumb of data.thumbnails) {
+            thumbnails.push(new YouTubeThumbnail(thumb));
+        }
+        this.thumbnails = thumbnails || [];
         this.channel = new YouTubeChannel(data.channel) || {};
         this.likes = data.likes || 0;
         this.averageRating = data.averageRating || 0;
@@ -189,7 +193,7 @@ export class YouTubeVideo {
             durationInSec: this.durationInSec,
             durationRaw: this.durationRaw,
             uploadedAt: this.uploadedAt,
-            thumbnail: this.thumbnail?.toJSON() || this.thumbnail,
+            thumbnail: this.thumbnails[this.thumbnails.length - 1].toJSON() || this.thumbnails,
             channel: this.channel,
             views: this.views,
             tags: this.tags,
