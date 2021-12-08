@@ -85,13 +85,13 @@ export function extractID(url: string): string {
 }
 /**
  * Basic function to get data from a YouTube url or ID.
- * 
+ *
  * Example
  * ```ts
  * const video = await play.video_basic_info('youtube video url')
- * 
+ *
  * const res = ... // Any https package get function.
- * 
+ *
  * const video = await play.video_basic_info(res.body, { htmldata : true })
  * ```
  * @param url YouTube url or ID or html body data
@@ -156,7 +156,6 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         )?.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons ?? [];
     const video_details = new YouTubeVideo({
         id: vid.videoId,
-        url: `https://www.youtube.com/watch?v=${vid.videoId}`,
         title: vid.title,
         description: vid.shortDescription,
         duration: Number(vid.lengthSeconds),
@@ -177,11 +176,6 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         likes: parseInt(
             ratingButtons
                 .find((button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE')
-                ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
-        ),
-        dislikes: parseInt(
-            ratingButtons
-                .find((button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'DISLIKE')
                 ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
         ),
         live: vid.isLiveContent,
@@ -284,13 +278,13 @@ function parseSeconds(seconds: number): string {
  * ```
  * video_basic_info + decipher_info = video_info
  * ```
- * 
+ *
  * Example
  * ```ts
  * const video = await play.video_info('youtube video url')
- * 
+ *
  * const res = ... // Any https package get function.
- * 
+ *
  * const video = await play.video_info(res.body, { htmldata : true })
  * ```
  * @param url YouTube url or ID or html body data
@@ -319,17 +313,17 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(data: T
 }
 /**
  * Gets YouTube playlist info from a playlist url.
- * 
+ *
  * Example
  * ```ts
  * const playlist = await play.playlist_info('youtube playlist url')
- * 
+ *
  * const playlist = await play.playlist_info('youtube playlist url', { incomplete : true })
  * ```
  * @param url Playlist URL
  * @param options Playlist Info Options
  * - `boolean` incomplete : If set to true, parses playlist with hidden videos.
- * 
+ *
  * @returns YouTube Playlist
  */
 export async function playlist_info(url: string, options: PlaylistOptions = {}): Promise<YouTubePlayList> {
