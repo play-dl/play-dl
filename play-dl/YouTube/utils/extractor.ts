@@ -328,14 +328,15 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(data: T
  */
 export async function playlist_info(url: string, options: PlaylistOptions = {}): Promise<YouTubePlayList> {
     if (!url || typeof url !== 'string') throw new Error(`Expected playlist url, received ${typeof url}!`);
-    let Playlist_id: string;
-    if (url.startsWith('https')) {
-        if (yt_validate(url) !== 'playlist') throw new Error('This is not a Playlist URL');
-        Playlist_id = extractID(url);
-    } else Playlist_id = url;
-    const new_url = `https://www.youtube.com/playlist?list=${Playlist_id}`;
+    if (!url.startsWith('https')) url = `https://www.youtube.com/playlist?list=${url}`
+    if (url.indexOf('list=') === -1 ) throw new Error('This is not a Playlist URL');
 
-    const body = await request(new_url, {
+    if(yt_validate(url) === 'playlist') {
+        const id = extractID(url)
+        url = `https://www.youtube.com/playlist?list=${id}`
+    }
+
+    const body = await request(url, {
         headers: {
             'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
         }
@@ -353,67 +354,10 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
             throw new Error(`While parsing playlist url\n${response.alerts[0].alertRenderer.text.runs[0].text}`);
         else throw new Error('While parsing playlist url\nUnknown Playlist Error');
     }
-
-    const rawJSON = `${body.split('{"playlistVideoListRenderer":{"contents":')[1].split('}],"playlistId"')[0]}}]`;
-    const parsed = JSON.parse(rawJSON);
-    const playlistDetails = JSON.parse(body.split('{"playlistSidebarRenderer":')[1].split('}};</script>')[0]).items;
-
-    const API_KEY =
-        body.split('INNERTUBE_API_KEY":"')[1]?.split('"')[0] ??
-        body.split('innertubeApiKey":"')[1]?.split('"')[0] ??
-        DEFAULT_API_KEY;
-    const videos = getPlaylistVideos(parsed, 100);
-
-    const data = playlistDetails[0].playlistSidebarPrimaryInfoRenderer;
-    if (!data.title.runs || !data.title.runs.length) throw new Error('Failed to Parse Playlist info.');
-
-    const author = playlistDetails[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner;
-    const views = data.stats.length === 3 ? data.stats[1].simpleText.replace(/[^0-9]/g, '') : 0;
-    const lastUpdate =
-        data.stats
-            .find((x: any) => 'runs' in x && x['runs'].find((y: any) => y.text.toLowerCase().includes('last update')))
-            ?.runs.pop()?.text ?? null;
-    const videosCount = data.stats[0].runs[0].text.replace(/[^0-9]/g, '') || 0;
-
-    const res = new YouTubePlayList({
-        continuation: {
-            api: API_KEY,
-            token: getContinuationToken(parsed),
-            clientVersion:
-                body.split('"INNERTUBE_CONTEXT_CLIENT_VERSION":"')[1]?.split('"')[0] ??
-                body.split('"innertube_context_client_version":"')[1]?.split('"')[0] ??
-                '<some version>'
-        },
-        id: data.title.runs[0].navigationEndpoint.watchEndpoint.playlistId,
-        title: data.title.runs[0].text,
-        videoCount: parseInt(videosCount) || 0,
-        lastUpdate: lastUpdate,
-        views: parseInt(views) || 0,
-        videos: videos,
-        url: `https://www.youtube.com/playlist?list=${data.title.runs[0].navigationEndpoint.watchEndpoint.playlistId}`,
-        link: `https://www.youtube.com${data.title.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
-        author: author
-            ? {
-                  name: author.videoOwnerRenderer.title.runs[0].text,
-                  id: author.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
-                  url: `https://www.youtube.com${
-                      author.videoOwnerRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url ||
-                      author.videoOwnerRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl
-                  }`,
-                  icon: author.videoOwnerRenderer.thumbnail.thumbnails.length
-                      ? author.videoOwnerRenderer.thumbnail.thumbnails[
-                            author.videoOwnerRenderer.thumbnail.thumbnails.length - 1
-                        ].url
-                      : null
-              }
-            : {},
-        thumbnail: data.thumbnailRenderer.playlistVideoThumbnailRenderer?.thumbnail.thumbnails.length
-            ? data.thumbnailRenderer.playlistVideoThumbnailRenderer.thumbnail.thumbnails[
-                  data.thumbnailRenderer.playlistVideoThumbnailRenderer.thumbnail.thumbnails.length - 1
-              ]
-            : null
-    });
-    return res;
+    if(url.indexOf('watch?v=') !== -1){
+        return getWatchPlaylist(response, body)
+    }
+    else return getNormalPlaylist(response, body) 
 }
 /**
  * Function to parse Playlist from YouTube search
@@ -432,7 +376,6 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
         videos.push(
             new YouTubeVideo({
                 id: info.videoId,
-                index: parseInt(info.index?.simpleText) || 0,
                 duration: parseInt(info.lengthSeconds) || 0,
                 duration_raw: info.lengthText?.simpleText ?? '0:00',
                 thumbnails : info.thumbnail.thumbnails,
@@ -459,4 +402,156 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
 export function getContinuationToken(data: any): string {
     return data.find((x: any) => Object.keys(x)[0] === 'continuationItemRenderer')?.continuationItemRenderer
         .continuationEndpoint?.continuationCommand?.token;
+}
+
+
+function getWatchPlaylist(response : any, body : any) : YouTubePlayList{
+    const playlist_details = response.contents.twoColumnWatchNextResults.playlist.playlist
+
+    const videos = getWatchPlaylistVideos(playlist_details.contents)
+    const API_KEY =
+        body.split('INNERTUBE_API_KEY":"')[1]?.split('"')[0] ??
+        body.split('innertubeApiKey":"')[1]?.split('"')[0] ??
+        DEFAULT_API_KEY;
+    
+    const videoCount = playlist_details.totalVideos
+    const channel = playlist_details.shortBylineText?.runs?.[0]
+    const badge = playlist_details.badges?.[0]?.metadataBadgeRenderer?.style.toLowerCase()
+
+    return new YouTubePlayList({
+        continuation: {
+            api: API_KEY,
+            token: getContinuationToken(playlist_details.contents),
+            clientVersion:
+                body.split('"INNERTUBE_CONTEXT_CLIENT_VERSION":"')[1]?.split('"')[0] ??
+                body.split('"innertube_context_client_version":"')[1]?.split('"')[0] ??
+                '<some version>'
+        },
+        id : playlist_details.playlistId || '',
+        title : playlist_details.title || '',
+        videoCount : parseInt(videoCount) || 0,
+        videos : videos,
+        url : `https://www.youtube.com/playlist?list=${playlist_details.playlistId}`,
+        channel : {
+            id: channel?.navigationEndpoint?.browseEndpoint?.browseId || null,
+            name: channel?.text || null,
+            url: `https://www.youtube.com${
+                channel?.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl ||
+                channel?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url
+            }`,
+            verified: Boolean(badge?.includes('verified')),
+            artist: Boolean(badge?.includes('artist'))
+        }
+    })
+}
+
+function getNormalPlaylist(response : any, body : any): YouTubePlayList{
+
+    const json_data = response.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents;
+    const playlist_details = response.sidebar.playlistSidebarRenderer.items;
+
+    const API_KEY =
+        body.split('INNERTUBE_API_KEY":"')[1]?.split('"')[0] ??
+        body.split('innertubeApiKey":"')[1]?.split('"')[0] ??
+        DEFAULT_API_KEY;
+    const videos = getPlaylistVideos(json_data, 100);
+
+    const data = playlist_details[0].playlistSidebarPrimaryInfoRenderer;
+    if (!data.title.runs || !data.title.runs.length) throw new Error('Failed to Parse Playlist info.');
+
+    const author = playlist_details[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner;
+    const views = data.stats.length === 3 ? data.stats[1].simpleText.replace(/[^0-9]/g, '') : 0;
+    const lastUpdate =
+        data.stats
+            .find((x: any) => 'runs' in x && x['runs'].find((y: any) => y.text.toLowerCase().includes('last update')))
+            ?.runs.pop()?.text ?? null;
+    const videosCount = data.stats[0].runs[0].text.replace(/[^0-9]/g, '') || 0;
+
+    const res = new YouTubePlayList({
+        continuation: {
+            api: API_KEY,
+            token: getContinuationToken(json_data),
+            clientVersion:
+                body.split('"INNERTUBE_CONTEXT_CLIENT_VERSION":"')[1]?.split('"')[0] ??
+                body.split('"innertube_context_client_version":"')[1]?.split('"')[0] ??
+                '<some version>'
+        },
+        id: data.title.runs[0].navigationEndpoint.watchEndpoint.playlistId,
+        title: data.title.runs[0].text,
+        videoCount: parseInt(videosCount) || 0,
+        lastUpdate: lastUpdate,
+        views: parseInt(views) || 0,
+        videos: videos,
+        url: `https://www.youtube.com/playlist?list=${data.title.runs[0].navigationEndpoint.watchEndpoint.playlistId}`,
+        link: `https://www.youtube.com${data.title.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
+        channel: author
+            ? {
+                  name: author.videoOwnerRenderer.title.runs[0].text,
+                  id: author.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
+                  url: `https://www.youtube.com${
+                      author.videoOwnerRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url ||
+                      author.videoOwnerRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl
+                  }`,
+                  icon: author.videoOwnerRenderer.thumbnail.thumbnails.length
+                      ? author.videoOwnerRenderer.thumbnail.thumbnails[
+                            author.videoOwnerRenderer.thumbnail.thumbnails.length - 1
+                        ].url
+                      : null
+              }
+            : {},
+        thumbnail: data.thumbnailRenderer.playlistVideoThumbnailRenderer?.thumbnail.thumbnails.length
+            ? data.thumbnailRenderer.playlistVideoThumbnailRenderer.thumbnail.thumbnails[
+                  data.thumbnailRenderer.playlistVideoThumbnailRenderer.thumbnail.thumbnails.length - 1
+              ]
+            : null
+    });
+    return res;
+}
+
+function getWatchPlaylistVideos(data : any, limit = Infinity): YouTubeVideo[] {
+    const videos: YouTubeVideo[] = []
+
+    for(let i = 0; i < data.length ; i++) {
+        if(limit === videos.length) break;
+        const info = data[i].playlistPanelVideoRenderer;
+        if(!info || !info.shortBylineText) continue;
+        const channel_info = info.shortBylineText.runs[0]
+
+        videos.push(
+            new YouTubeVideo({
+                id: info.videoId,
+                duration: parseDuration(info.lengthText?.simpleText) || 0,
+                duration_raw: info.lengthText?.simpleText ?? '0:00',
+                thumbnails : info.thumbnail.thumbnails,
+                title: info.title.simpleText,
+                channel: {
+                    id: channel_info.navigationEndpoint.browseEndpoint.browseId || undefined,
+                    name: channel_info.text || undefined,
+                    url: `https://www.youtube.com${
+                        channel_info.navigationEndpoint.browseEndpoint.canonicalBaseUrl ||
+                        channel_info.navigationEndpoint.commandMetadata.webCommandMetadata.url
+                    }`,
+                    icon: undefined
+                }
+            })
+        );
+    }
+
+    return videos
+}
+
+function parseDuration(text : string): number{
+    if(!text) return 0
+    const split = text.split(':')
+
+    switch (split.length){
+        case 2:
+            return (parseInt(split[0]) * 60) + (parseInt(split[1]))
+        
+        case 3:
+            return (parseInt(split[0]) * 60 * 60) + (parseInt(split[1]) * 60) + (parseInt(split[2]))
+
+        default :
+            return 0
+    }
 }

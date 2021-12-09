@@ -93,8 +93,8 @@ export class YouTubePlayList {
         this.lastUpdate = data.lastUpdate || undefined;
         this.views = data.views || 0;
         this.link = data.link || undefined;
-        this.channel = data.author || undefined;
-        this.thumbnail = new YouTubeThumbnail(data.thumbnail) || undefined;
+        this.channel = new YouTubeChannel(data.channel) || undefined;
+        this.thumbnail = (data.thumbnail) ? new YouTubeThumbnail(data.thumbnail) : undefined;
         this.videos = data.videos || [];
         this.__count++;
         this.fetched_videos.set(`${this.__count}`, this.videos as YouTubeVideo[]);
