@@ -17,6 +17,8 @@ const playlist_id_pattern = /^(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}$/;
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+const playlist_pattern =
+    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}(.*)?$/;
 /**
  * Validate YouTube URL or ID.
  *
@@ -53,7 +55,10 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
             else if (url.match(playlist_id_pattern)) return 'playlist';
             else return 'search';
         }
-    } else return "playlist"
+    } else {
+        if (!url.match(playlist_pattern)) return false;
+        else return 'playlist';
+    }
 }
 /**
  * Extract ID of YouTube url.
