@@ -281,7 +281,6 @@ interface PlaylistJSON {
      * YouTube Playlist thumbnail Data
      */
     thumbnail?: {
-        id: string | undefined;
         width: number | undefined;
         height: number | undefined;
         url: string | undefined;

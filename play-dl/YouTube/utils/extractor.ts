@@ -435,12 +435,7 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
                 index: parseInt(info.index?.simpleText) || 0,
                 duration: parseInt(info.lengthSeconds) || 0,
                 duration_raw: info.lengthText?.simpleText ?? '0:00',
-                thumbnail: {
-                    id: info.videoId,
-                    url: info.thumbnail.thumbnails[info.thumbnail.thumbnails.length - 1].url,
-                    height: info.thumbnail.thumbnails[info.thumbnail.thumbnails.length - 1].height,
-                    width: info.thumbnail.thumbnails[info.thumbnail.thumbnails.length - 1].width
-                },
+                thumbnails : info.thumbnail.thumbnails,
                 title: info.title.runs[0].text,
                 channel: {
                     id: info.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId || undefined,
