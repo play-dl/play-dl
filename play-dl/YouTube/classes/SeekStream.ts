@@ -186,7 +186,7 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
             return;
         }
         this.request = stream;
-        stream.pipe(this.stream)
+        stream.pipe(this.stream, { end : false })
 
         stream.once('error', async () => {
             this.cleanup();
