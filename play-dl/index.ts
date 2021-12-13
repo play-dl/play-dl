@@ -423,14 +423,29 @@ export function authorization(): void {
  * @param resource A {@link YouTubeStream} or {@link SoundCloudStream}
  */
 export function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
+    // cleanup existing listeners if they are still registered
+    type listenerType = (...args: any[]) => void;
+
+    const listeners = player.listeners(AudioPlayerStatus.Idle);
+    for (const cleanup of listeners) {
+        if ((cleanup as any).__playDlAttachedListener) {
+            cleanup();
+            player.removeListener(AudioPlayerStatus.Idle, cleanup as listenerType);
+        }
+    }
+
     const pauseListener = () => resource.pause();
     const resumeListener = () => resource.resume();
-    player.on(AudioPlayerStatus.Paused, pauseListener);
-    player.on(AudioPlayerStatus.AutoPaused, pauseListener);
-    player.on(AudioPlayerStatus.Playing, resumeListener);
-    player.once(AudioPlayerStatus.Idle, () => {
+    const idleListener = () => {
         player.removeListener(AudioPlayerStatus.Paused, pauseListener);
         player.removeListener(AudioPlayerStatus.AutoPaused, pauseListener);
         player.removeListener(AudioPlayerStatus.Playing, resumeListener);
-    });
+    };
+    pauseListener.__playDlAttachedListener = true;
+    resumeListener.__playDlAttachedListener = true;
+    idleListener.__playDlAttachedListener = true;
+    player.on(AudioPlayerStatus.Paused, pauseListener);
+    player.on(AudioPlayerStatus.AutoPaused, pauseListener);
+    player.on(AudioPlayerStatus.Playing, resumeListener);
+    player.once(AudioPlayerStatus.Idle, idleListener);
 }
