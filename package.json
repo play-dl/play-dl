@@ -4,14 +4,15 @@
   "description": "YouTube, SoundCloud, Spotify, Deezer searching and streaming for discord.js bots",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "module": "dist/index.mjs",
   "directories": {
     "example": "examples"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "build:check": "tsc --noEmit --incremental false",
     "pretty": "prettier --config .prettierrc \"play-dl/*.ts\" \"play-dl/*/*.ts\" \"play-dl/*/*/*.ts\" --write ",
-    "prepublishOnly": "tsc --build --clean && tsc --build --verbose"
+    "prepublishOnly": "tsup"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@types/node": "^16.9.4",
     "prettier": "^2.3.1",
+    "tsup": "^5.11.1",
     "typedoc": "^0.22.9",
     "typedoc-plugin-missing-exports": "^0.22.4",
     "typescript": "^4.4.4",

@@ -60,8 +60,8 @@ interface SearchOptions {
     fuzzy?: boolean;
 }
 
-import readline from 'node:readline';
-import fs from 'node:fs';
+import { createInterface } from 'node:readline';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import {
     sp_validate,
     yt_validate,
@@ -304,7 +304,7 @@ export async function validate(
  * Just run the above command and you will get a interface asking some questions.
  */
 export function authorization(): void {
-    const ask = readline.createInterface({
+    const ask = createInterface({
         input: process.stdin,
         output: process.stdout
     });
@@ -346,7 +346,7 @@ export function authorization(): void {
                                     )} \n`
                                 );
                                 ask.question('Paste the url which you just copied : ', async (url) => {
-                                    if (!fs.existsSync('.data')) fs.mkdirSync('.data');
+                                    if (!existsSync('.data')) mkdirSync('.data');
                                     const spotifyData = {
                                         client_id,
                                         client_secret,
@@ -375,11 +375,11 @@ export function authorization(): void {
                         ask.close();
                         return;
                     }
-                    if (!fs.existsSync('.data')) fs.mkdirSync('.data');
+                    if (!existsSync('.data')) mkdirSync('.data');
                     console.log('Validating your client ID, hold on...');
                     if (await check_id(client_id)) {
                         console.log('Client ID has been validated successfully.');
-                        fs.writeFileSync('.data/soundcloud.data', JSON.stringify({ client_id }, undefined, 4));
+                        writeFileSync('.data/soundcloud.data', JSON.stringify({ client_id }, undefined, 4));
                     } else console.log("That doesn't look like a valid client ID. Retry with a correct client ID.");
                     ask.close();
                 });
@@ -395,7 +395,7 @@ export function authorization(): void {
                         ask.close();
                         return;
                     }
-                    if (!fs.existsSync('.data')) fs.mkdirSync('.data');
+                    if (!existsSync('.data')) mkdirSync('.data');
                     console.log('Cookies has been added successfully.');
                     let cookie: Object = {};
                     cook.split(';').forEach((x) => {
@@ -405,7 +405,7 @@ export function authorization(): void {
                         const value = arr.join('=').trim();
                         Object.assign(cookie, { [key]: value });
                     });
-                    fs.writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
+                    writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
                     ask.close();
                 });
             } else {

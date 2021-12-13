@@ -1,10 +1,10 @@
-import fs from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { StreamType } from '../YouTube/stream';
 import { request } from '../Request';
 import { SoundCloudPlaylist, SoundCloudTrack, SoundCloudTrackFormat, SoundCloudStream } from './classes';
 let soundData: SoundDataOptions;
-if (fs.existsSync('.data/soundcloud.data')) {
-    soundData = JSON.parse(fs.readFileSync('.data/soundcloud.data').toString());
+if (existsSync('.data/soundcloud.data')) {
+    soundData = JSON.parse(readFileSync('.data/soundcloud.data').toString());
 }
 
 interface SoundDataOptions {

@@ -1,8 +1,8 @@
-import fs from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 let youtubeData: youtubeDataOptions;
-if (fs.existsSync('.data/youtube.data')) {
-    youtubeData = JSON.parse(fs.readFileSync('.data/youtube.data').toString());
+if (existsSync('.data/youtube.data')) {
+    youtubeData = JSON.parse(readFileSync('.data/youtube.data').toString());
     youtubeData.file = true;
 }
 
@@ -30,7 +30,7 @@ export function setCookie(key: string, value: string): boolean {
 
 export function uploadCookie() {
     if (youtubeData.cookie && youtubeData.file)
-        fs.writeFileSync('.data/youtube.data', JSON.stringify(youtubeData, undefined, 4));
+        writeFileSync('.data/youtube.data', JSON.stringify(youtubeData, undefined, 4));
 }
 
 export function setCookieToken(options: { cookie: string }) {
