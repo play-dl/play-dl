@@ -68,7 +68,7 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
         video_url: string,
         options: StreamOptions
     ) {
-        this.stream = new WebmSeeker({ highWaterMark: 5 * 1000 * 1000, readableObjectMode : true, mode : options.mode });
+        this.stream = new WebmSeeker({ highWaterMark: 5 * 1000 * 1000, readableObjectMode : true, mode : options.seekMode });
         this.url = url;
         this.quality = options.quality as number;
         this.type = StreamType.Opus;

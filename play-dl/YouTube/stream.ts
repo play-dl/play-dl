@@ -12,7 +12,7 @@ export enum StreamType {
 }
 
 export interface StreamOptions {
-    mode? : "precise" | "granular"
+    seekMode? : "precise" | "granular"
     seek? : number
     quality?: number;
     htmldata?: boolean;
