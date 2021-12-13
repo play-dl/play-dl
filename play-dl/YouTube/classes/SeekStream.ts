@@ -202,7 +202,7 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
         stream.on('end', () => {
             if (end >= this.content_length) {
                 this.timer.destroy();
-                this.stream.push(null);
+                this.stream.write(null);
                 this.cleanup();
             }
         });
