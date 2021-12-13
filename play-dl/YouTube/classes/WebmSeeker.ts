@@ -8,25 +8,35 @@ export enum WebmSeekerState{
     READING_DATA = 'READING_DATA',
 }
 
+interface WebmSeekerOptions extends DuplexOptions{
+    mode? : "precise" | "granular"
+}
+
 export class WebmSeeker extends Duplex{
     remaining? : Buffer
     state : WebmSeekerState
+    mode : "precise" | "granular"
     chunk? : Buffer
     cursor : number
     header : WebmHeader
     headfound : boolean
+    headerparsed : boolean
+    time_left : number
     seekfound : boolean
     private data_size : number
     private data_length : number
 
-    constructor(options? : DuplexOptions){
+    constructor(options : WebmSeekerOptions){
         super(options)
         this.state = WebmSeekerState.READING_HEAD
         this.cursor = 0
         this.header = new WebmHeader()
         this.headfound = false
+        this.time_left = 0
+        this.headerparsed = false
         this.seekfound = false
         this.data_length = 0
+        this.mode = options.mode || "granular"
         this.data_size = 0
     }
 
@@ -58,9 +68,10 @@ export class WebmSeeker extends Duplex{
 
     _read() {}
 
-    seek(ms : number): Error | number{
+    seek(sec : number): Error | number{
         let position = 0
-        let time = (Math.floor(ms / 10) * 10)
+        let time = (Math.floor(sec / 10) * 10)
+        this.time_left = (sec - time) * 1000 || 0
         if (!this.header.segment.cues) return new Error("Failed to Parse Cues")
 
         for(const data of this.header.segment.cues){
@@ -172,6 +183,10 @@ export class WebmSeeker extends Duplex{
             else this.cursor += this.data_size + this.data_length
 
             if(ebmlID.name === 'simpleBlock'){
+                if(this.time_left !== 0 && this.mode === "precise"){
+                    if(data.readUInt16BE(1) === this.time_left) this.time_left = 0
+                    else continue;
+                }
                 const track = this.header.segment.tracks![this.header.audioTrack]
                 if(!track || track.trackType !== 2) return new Error("No audio Track in this webm file.")
                 if((data[0] & 0xf) === track.trackNumber) this.push(data.slice(4))

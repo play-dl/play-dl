@@ -1,5 +1,4 @@
 import { IncomingMessage } from "http";
-import { Readable } from "stream";
 import { request_stream } from "../../Request";
 import { parseAudioFormats, StreamOptions, StreamType } from "../stream";
 import { video_info } from "../utils";
@@ -7,11 +6,11 @@ import { Timer } from "./LiveStream";
 import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
 
 /**
- * YouTube Stream Class for playing audio from normal videos.
+ * YouTube Stream Class for seeking audio to a timeStamp.
  */
  export class SeekStream {
     /**
-     * Readable Stream through which data passes
+     * WebmSeeker Stream through which data passes
      */
     stream: WebmSeeker;
     /**
@@ -69,7 +68,7 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
         video_url: string,
         options: StreamOptions
     ) {
-        this.stream = new WebmSeeker({ highWaterMark: 5 * 1000 * 1000, readableObjectMode : true });
+        this.stream = new WebmSeeker({ highWaterMark: 5 * 1000 * 1000, readableObjectMode : true, mode : options.mode });
         this.url = url;
         this.quality = options.quality as number;
         this.type = StreamType.Opus;
@@ -88,44 +87,54 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
         });
         this.seek(options.seek!)
     }
+    /**
+     * **INTERNAL Function**
+     * 
+     * Uses stream functions to parse Webm Head and gets Offset byte to seek to.
+     * @param sec No of seconds to seek to
+     * @returns Nothing
+     */
+    private async seek(sec : number){
+        await new Promise(async(res) => {
+            if(!this.stream.headerparsed){
+                const stream = await request_stream(this.url, {
+                    headers: {
+                        range: `bytes=0-1000`
+                    }
+                }).catch((err: Error) => err);
 
-    private seek(ms : number){
-        return new Promise(async(res) => {
-            const stream = await request_stream(this.url, {
-                headers: {
-                    range: `bytes=0-1000`
-                }
-            }).catch((err: Error) => err);
-
-            if (stream instanceof Error) {
-                this.stream.emit('error', stream);
-                this.bytes_count = 0;
-                this.per_sec_bytes = 0;
-                this.cleanup();
-                return;
-            }
-
-            this.request = stream
-            stream.pipe(this.stream, { end : false })
-
-            stream.once('end', () => {
-                this.stream.state = WebmSeekerState.READING_DATA
-
-                const bytes = this.stream.seek(ms)
-                if (bytes instanceof Error) {
-                    this.stream.emit('error', bytes);
+                if (stream instanceof Error) {
+                    this.stream.emit('error', stream);
                     this.bytes_count = 0;
                     this.per_sec_bytes = 0;
                     this.cleanup();
                     return;
                 }
 
-                this.bytes_count = bytes
-                this.timer.reuse()
-                this.loop()
-                res('')          
-            })
+                this.request = stream
+                stream.pipe(this.stream, { end : false })
+
+                stream.once('end', () => {
+                    this.stream.state = WebmSeekerState.READING_DATA
+                    res('')  
+                })
+            }
+            else res('')  
         })
+
+        const bytes = this.stream.seek(sec)
+        if (bytes instanceof Error) {
+            this.stream.emit('error', bytes);
+            this.bytes_count = 0;
+            this.per_sec_bytes = 0;
+            this.cleanup();
+            return;
+        }
+
+        this.stream.seekfound = false
+        this.bytes_count = bytes
+        this.timer.reuse()
+        this.loop()
     }
     /**
      * Retry if we get 404 or 403 Errors.
