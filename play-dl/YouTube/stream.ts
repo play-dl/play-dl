@@ -1,4 +1,5 @@
 import { LiveStream, Stream } from './classes/LiveStream';
+import { SeekStream } from './classes/SeekStream';
 import { InfoData, StreamInfoData } from './utils/constants';
 import { video_stream_info } from './utils/extractor';
 
@@ -11,6 +12,8 @@ export enum StreamType {
 }
 
 export interface StreamOptions {
+    seekMode?: 'precise' | 'granular';
+    seek?: number;
     quality?: number;
     htmldata?: boolean;
 }
@@ -35,7 +38,7 @@ export function parseAudioFormats(formats: any[]) {
 /**
  * Type for YouTube Stream
  */
-export type YouTubeStream = Stream | LiveStream;
+export type YouTubeStream = Stream | LiveStream | SeekStream;
 /**
  * Stream command for YouTube
  * @param url YouTube URL
@@ -77,12 +80,25 @@ export async function stream_from_info(
     else final.push(info.format[info.format.length - 1]);
     let type: StreamType =
         final[0].codec === 'opus' && final[0].container === 'webm' ? StreamType.WebmOpus : StreamType.Arbitrary;
-    return new Stream(
-        final[0].url,
-        type,
-        info.video_details.durationInSec,
-        Number(final[0].contentLength),
-        info.video_details.url,
-        options
-    );
+    if (options.seek) {
+        if (type === StreamType.WebmOpus) {
+            if (options.seek >= info.video_details.durationInSec || options.seek <= 0)
+                throw new Error(`Seeking beyond limit. [ 1 - ${info.video_details.durationInSec - 1}]`);
+            return new SeekStream(
+                final[0].url,
+                info.video_details.durationInSec,
+                Number(final[0].contentLength),
+                info.video_details.url,
+                options
+            );
+        } else throw new Error('Seek is only supported in Webm Opus Files.');
+    } else
+        return new Stream(
+            final[0].url,
+            type,
+            info.video_details.durationInSec,
+            Number(final[0].contentLength),
+            info.video_details.url,
+            options
+        );
 }

@@ -51,14 +51,6 @@ interface VideoOptions {
      */
     likes: number;
     /**
-     * YouTube Video's dislikes
-     */
-    dislikes: number;
-    /**
-     * YouTube Video's average Rating
-     */
-    averageRating: number;
-    /**
      * YouTube Video live status
      */
     live: boolean;
@@ -124,14 +116,6 @@ export class YouTubeVideo {
      */
     likes: number;
     /**
-     * YouTube Video's dislikes
-     */
-    dislikes: number;
-    /**
-     * YouTube Video's average Rating
-     */
-    averageRating: number;
-    /**
      * YouTube Video live status
      */
     live: boolean;
@@ -166,8 +150,6 @@ export class YouTubeVideo {
         this.thumbnails = thumbnails || [];
         this.channel = new YouTubeChannel(data.channel) || {};
         this.likes = data.likes || 0;
-        this.averageRating = data.averageRating || 0;
-        this.dislikes = Math.floor((this.likes * (5 - this.averageRating)) / (this.averageRating - 1)) || 0;
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
@@ -197,8 +179,6 @@ export class YouTubeVideo {
             views: this.views,
             tags: this.tags,
             likes: this.likes,
-            dislikes: this.dislikes,
-            averageRating: this.averageRating,
             live: this.live,
             private: this.private
         };

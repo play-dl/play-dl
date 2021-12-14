@@ -13,12 +13,12 @@ interface PlaylistOptions {
 }
 
 const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
-const playlist_id_pattern = /^(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}$/;
+const playlist_id_pattern = /^(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}$/;
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern =
-    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{16,41}(.*)?$/;
+    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(.*)?$/;
 /**
  * Validate YouTube URL or ID.
  *
@@ -172,7 +172,6 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         },
         views: vid.viewCount,
         tags: vid.keywords,
-        averageRating: vid.averageRating,
         likes: parseInt(
             ratingButtons
                 .find((button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE')
@@ -328,12 +327,12 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(data: T
  */
 export async function playlist_info(url: string, options: PlaylistOptions = {}): Promise<YouTubePlayList> {
     if (!url || typeof url !== 'string') throw new Error(`Expected playlist url, received ${typeof url}!`);
-    if (!url.startsWith('https')) url = `https://www.youtube.com/playlist?list=${url}`
-    if (url.indexOf('list=') === -1 ) throw new Error('This is not a Playlist URL');
+    if (!url.startsWith('https')) url = `https://www.youtube.com/playlist?list=${url}`;
+    if (url.indexOf('list=') === -1) throw new Error('This is not a Playlist URL');
 
-    if(yt_validate(url) === 'playlist') {
-        const id = extractID(url)
-        url = `https://www.youtube.com/playlist?list=${id}`
+    if (yt_validate(url) === 'playlist') {
+        const id = extractID(url);
+        url = `https://www.youtube.com/playlist?list=${id}`;
     }
 
     const body = await request(url, {
@@ -354,10 +353,9 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
             throw new Error(`While parsing playlist url\n${response.alerts[0].alertRenderer.text.runs[0].text}`);
         else throw new Error('While parsing playlist url\nUnknown Playlist Error');
     }
-    if(url.indexOf('watch?v=') !== -1){
-        return getWatchPlaylist(response, body)
-    }
-    else return getNormalPlaylist(response, body) 
+    if (url.indexOf('watch?v=') !== -1) {
+        return getWatchPlaylist(response, body);
+    } else return getNormalPlaylist(response, body);
 }
 /**
  * Function to parse Playlist from YouTube search
@@ -378,7 +376,7 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
                 id: info.videoId,
                 duration: parseInt(info.lengthSeconds) || 0,
                 duration_raw: info.lengthText?.simpleText ?? '0:00',
-                thumbnails : info.thumbnail.thumbnails,
+                thumbnails: info.thumbnail.thumbnails,
                 title: info.title.runs[0].text,
                 channel: {
                     id: info.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId || undefined,
@@ -404,19 +402,18 @@ export function getContinuationToken(data: any): string {
         .continuationEndpoint?.continuationCommand?.token;
 }
 
+function getWatchPlaylist(response: any, body: any): YouTubePlayList {
+    const playlist_details = response.contents.twoColumnWatchNextResults.playlist.playlist;
 
-function getWatchPlaylist(response : any, body : any) : YouTubePlayList{
-    const playlist_details = response.contents.twoColumnWatchNextResults.playlist.playlist
-
-    const videos = getWatchPlaylistVideos(playlist_details.contents)
+    const videos = getWatchPlaylistVideos(playlist_details.contents);
     const API_KEY =
         body.split('INNERTUBE_API_KEY":"')[1]?.split('"')[0] ??
         body.split('innertubeApiKey":"')[1]?.split('"')[0] ??
         DEFAULT_API_KEY;
-    
-    const videoCount = playlist_details.totalVideos
-    const channel = playlist_details.shortBylineText?.runs?.[0]
-    const badge = playlist_details.badges?.[0]?.metadataBadgeRenderer?.style.toLowerCase()
+
+    const videoCount = playlist_details.totalVideos;
+    const channel = playlist_details.shortBylineText?.runs?.[0];
+    const badge = playlist_details.badges?.[0]?.metadataBadgeRenderer?.style.toLowerCase();
 
     return new YouTubePlayList({
         continuation: {
@@ -427,12 +424,12 @@ function getWatchPlaylist(response : any, body : any) : YouTubePlayList{
                 body.split('"innertube_context_client_version":"')[1]?.split('"')[0] ??
                 '<some version>'
         },
-        id : playlist_details.playlistId || '',
-        title : playlist_details.title || '',
-        videoCount : parseInt(videoCount) || 0,
-        videos : videos,
-        url : `https://www.youtube.com/playlist?list=${playlist_details.playlistId}`,
-        channel : {
+        id: playlist_details.playlistId || '',
+        title: playlist_details.title || '',
+        videoCount: parseInt(videoCount) || 0,
+        videos: videos,
+        url: `https://www.youtube.com/playlist?list=${playlist_details.playlistId}`,
+        channel: {
             id: channel?.navigationEndpoint?.browseEndpoint?.browseId || null,
             name: channel?.text || null,
             url: `https://www.youtube.com${
@@ -442,12 +439,13 @@ function getWatchPlaylist(response : any, body : any) : YouTubePlayList{
             verified: Boolean(badge?.includes('verified')),
             artist: Boolean(badge?.includes('artist'))
         }
-    })
+    });
 }
 
-function getNormalPlaylist(response : any, body : any): YouTubePlayList{
-
-    const json_data = response.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents;
+function getNormalPlaylist(response: any, body: any): YouTubePlayList {
+    const json_data =
+        response.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0]
+            .itemSectionRenderer.contents[0].playlistVideoListRenderer.contents;
     const playlist_details = response.sidebar.playlistSidebarRenderer.items;
 
     const API_KEY =
@@ -508,21 +506,21 @@ function getNormalPlaylist(response : any, body : any): YouTubePlayList{
     return res;
 }
 
-function getWatchPlaylistVideos(data : any, limit = Infinity): YouTubeVideo[] {
-    const videos: YouTubeVideo[] = []
+function getWatchPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
+    const videos: YouTubeVideo[] = [];
 
-    for(let i = 0; i < data.length ; i++) {
-        if(limit === videos.length) break;
+    for (let i = 0; i < data.length; i++) {
+        if (limit === videos.length) break;
         const info = data[i].playlistPanelVideoRenderer;
-        if(!info || !info.shortBylineText) continue;
-        const channel_info = info.shortBylineText.runs[0]
+        if (!info || !info.shortBylineText) continue;
+        const channel_info = info.shortBylineText.runs[0];
 
         videos.push(
             new YouTubeVideo({
                 id: info.videoId,
                 duration: parseDuration(info.lengthText?.simpleText) || 0,
                 duration_raw: info.lengthText?.simpleText ?? '0:00',
-                thumbnails : info.thumbnail.thumbnails,
+                thumbnails: info.thumbnail.thumbnails,
                 title: info.title.simpleText,
                 channel: {
                     id: channel_info.navigationEndpoint.browseEndpoint.browseId || undefined,
@@ -537,21 +535,21 @@ function getWatchPlaylistVideos(data : any, limit = Infinity): YouTubeVideo[] {
         );
     }
 
-    return videos
+    return videos;
 }
 
-function parseDuration(text : string): number{
-    if(!text) return 0
-    const split = text.split(':')
+function parseDuration(text: string): number {
+    if (!text) return 0;
+    const split = text.split(':');
 
-    switch (split.length){
+    switch (split.length) {
         case 2:
-            return (parseInt(split[0]) * 60) + (parseInt(split[1]))
-        
-        case 3:
-            return (parseInt(split[0]) * 60 * 60) + (parseInt(split[1]) * 60) + (parseInt(split[2]))
+            return parseInt(split[0]) * 60 + parseInt(split[1]);
 
-        default :
-            return 0
+        case 3:
+            return parseInt(split[0]) * 60 * 60 + parseInt(split[1]) * 60 + parseInt(split[2]);
+
+        default:
+            return 0;
     }
 }
