@@ -172,7 +172,6 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         },
         views: vid.viewCount,
         tags: vid.keywords,
-        averageRating: vid.averageRating,
         likes: parseInt(
             ratingButtons
                 .find((button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE')
