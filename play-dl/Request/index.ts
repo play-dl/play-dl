@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'node:http';
-import https, { RequestOptions } from 'node:https';
+import { RequestOptions, request as httpsRequest } from 'node:https';
 import { URL } from 'node:url';
-import zlib, { BrotliDecompress, Deflate, Gunzip } from 'node:zlib';
+import { BrotliDecompress, Deflate, Gunzip, createGunzip, createBrotliDecompress, createDeflate } from 'node:zlib';
 import { cookieHeaders, getCookies } from '../YouTube/utils/cookie';
 import { getRandomUserAgent } from './useragent';
 
@@ -78,9 +78,9 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
         const data: string[] = [];
         let decoder: BrotliDecompress | Gunzip | Deflate | undefined = undefined;
         const encoding = res.headers['content-encoding'];
-        if (encoding === 'gzip') decoder = zlib.createGunzip();
-        else if (encoding === 'br') decoder = zlib.createBrotliDecompress();
-        else if (encoding === 'deflate') decoder = zlib.createDeflate();
+        if (encoding === 'gzip') decoder = createGunzip();
+        else if (encoding === 'br') decoder = createBrotliDecompress();
+        else if (encoding === 'deflate') decoder = createDeflate();
 
         if (decoder) {
             res.pipe(decoder);
@@ -137,7 +137,7 @@ function https_getter(req_url: string, options: RequestOpts = {}): Promise<Incom
             method: options.method
         };
 
-        const req = https.request(req_options, resolve);
+        const req = httpsRequest(req_options, resolve);
         req.on('error', (err) => {
             reject(err);
         });

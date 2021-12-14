@@ -1,4 +1,4 @@
-import { URL } from 'url';
+import { URL } from 'node:url';
 import { request, request_resolve_redirect } from '../Request';
 import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './classes';
 
@@ -265,13 +265,13 @@ export async function dz_advanced_track_search(options: DeezerAdvancedSearchOpti
 
     if (options.label) metadata.push(`label:"${encodeURIComponent(options.label)}"`);
 
-    if (Number(options.minDurationInSec) !== NaN) metadata.push(`dur_min:${options.minDurationInSec}`);
+    if (!isNaN(Number(options.minDurationInSec))) metadata.push(`dur_min:${options.minDurationInSec}`);
 
-    if (Number(options.maxDurationInSec) !== NaN) metadata.push(`dur_max:${options.maxDurationInSec}`);
+    if (!isNaN(Number(options.maxDurationInSec))) metadata.push(`dur_max:${options.maxDurationInSec}`);
 
-    if (Number(options.minBPM) !== NaN) metadata.push(`bpm_min:${options.minBPM}`);
+    if (!isNaN(Number(options.minBPM))) metadata.push(`bpm_min:${options.minBPM}`);
 
-    if (Number(options.maxBPM) !== NaN) metadata.push(`bpm_max:${options.maxBPM}`);
+    if (!isNaN(Number(options.maxBPM))) metadata.push(`bpm_max:${options.maxBPM}`);
 
     if (metadata.length === 0) throw new Error('At least one type of metadata is required.');
 

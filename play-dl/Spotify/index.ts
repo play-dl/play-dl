@@ -1,10 +1,10 @@
 import { request } from '../Request';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './classes';
-import fs from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 let spotifyData: SpotifyDataOptions;
-if (fs.existsSync('.data/spotify.data')) {
-    spotifyData = JSON.parse(fs.readFileSync('.data/spotify.data').toString());
+if (existsSync('.data/spotify.data')) {
+    spotifyData = JSON.parse(readFileSync('.data/spotify.data').toString());
     spotifyData.file = true;
 }
 /**
@@ -132,7 +132,7 @@ export async function SpotifyAuthorize(data: SpotifyDataOptions, file: boolean):
         token_type: resp_json.token_type,
         market: data.market
     };
-    if (file) fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
+    if (file) writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
     else {
         console.log(`Client ID : ${spotifyData.client_id}`);
         console.log(`Client Secret : ${spotifyData.client_secret}`);
@@ -233,7 +233,7 @@ export async function refreshToken(): Promise<boolean> {
     spotifyData.expires_in = Number(resp_json.expires_in);
     spotifyData.expiry = Date.now() + (resp_json.expires_in - 1) * 1000;
     spotifyData.token_type = resp_json.token_type;
-    if (spotifyData.file) fs.writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
+    if (spotifyData.file) writeFileSync('.data/spotify.data', JSON.stringify(spotifyData, undefined, 4));
     return true;
 }
 

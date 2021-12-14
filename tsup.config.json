@@ -1,0 +1,16 @@
+{
+    "clean": true,
+    "dts": true,
+    "entryPoints": [
+        "play-dl/index.ts"
+    ],
+    "format": [
+        "esm",
+        "cjs"
+    ],
+    "minify": true,
+    "skipNodeModulesBundle": true,
+    "sourcemap": true,
+    "target": "es2021",
+    "splitting": false
+}
