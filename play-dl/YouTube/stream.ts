@@ -82,6 +82,7 @@ export async function stream_from_info(
         final[0].codec === 'opus' && final[0].container === 'webm' ? StreamType.WebmOpus : StreamType.Arbitrary;
     if(options.seek){
         if(type === StreamType.WebmOpus) {
+            if(options.seek >= info.video_details.durationInSec) throw new Error(`Seeking beyond limit. [0 - ${info.video_details.durationInSec - 1}]`)
             return new SeekStream(
                 final[0].url,
                 info.video_details.durationInSec,
