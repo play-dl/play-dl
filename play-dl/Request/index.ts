@@ -11,14 +11,6 @@ interface RequestOpts extends RequestOptions {
     cookies?: boolean;
 }
 
-interface ProxyOpts {
-    host: string;
-    port: number;
-    authentication?: {
-        username: string;
-        password: string;
-    };
-}
 /**
  * Main module which play-dl uses to make a request to stream url.
  * @param url URL to make https request to
@@ -39,7 +31,37 @@ export function request_stream(req_url: string, options: RequestOpts = { method:
     });
 }
 /**
- * Main module which play-dl uses to make a proxy or normal request
+ * Makes a request and follows redirects if necessary
+ * @param req_url URL to make https request to
+ * @param cookies_added Whether cookies were added or not
+ * @param options Request options for https request
+ * @returns A promise with the final response object
+ */
+function internalRequest(
+    req_url: string,
+    cookies_added: boolean,
+    options: RequestOpts = { method: 'GET' }
+): Promise<IncomingMessage> {
+    return new Promise(async (resolve, reject) => {
+        let res = await https_getter(req_url, options).catch((err: Error) => err);
+        if (res instanceof Error) {
+            reject(res);
+            return;
+        }
+        if (res.headers && res.headers['set-cookie'] && cookies_added) {
+            cookieHeaders(res.headers['set-cookie']);
+        }
+        if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
+            res = await internalRequest(res.headers.location as string, cookies_added, options);
+        } else if (Number(res.statusCode) > 400) {
+            reject(new Error(`Got ${res.statusCode} from the request`));
+            return;
+        }
+        resolve(res);
+    });
+}
+/**
+ * Main module which play-dl uses to make a request
  * @param url URL to make https request to
  * @param options Request options for https request
  * @returns body of that request
@@ -61,19 +83,10 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 'user-agent': getRandomUserAgent()
             };
         }
-        let res = await https_getter(req_url, options).catch((err: Error) => err);
+        const res = await internalRequest(req_url, cookies_added, options).catch((err: Error) => err);
         if (res instanceof Error) {
             reject(res);
             return;
-        }
-        if (res.headers && res.headers['set-cookie'] && cookies_added) {
-            cookieHeaders(res.headers['set-cookie']);
-        }
-        if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
-            res = await https_getter(res.headers.location as string, options).catch((err) => err);
-            if (res instanceof Error) throw res;
-        } else if (Number(res.statusCode) > 400) {
-            reject(new Error(`Got ${res.statusCode} from the request`));
         }
         const data: string[] = [];
         let decoder: BrotliDecompress | Gunzip | Deflate | undefined = undefined;
