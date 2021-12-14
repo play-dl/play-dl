@@ -236,7 +236,7 @@ export class SpotifyPlaylist {
         this.tracksCount = Number(data.tracks.total);
         const videos: SpotifyTrack[] = [];
         data.tracks.items.forEach((v: any) => {
-            videos.push(new SpotifyTrack(v.track));
+            if(v) videos.push(new SpotifyTrack(v.track));
         });
         this.fetched_tracks = new Map();
         this.fetched_tracks.set('1', videos);
