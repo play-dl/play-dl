@@ -1,14 +1,14 @@
-import { IncomingMessage } from "http";
-import { request_stream } from "../../Request";
-import { parseAudioFormats, StreamOptions, StreamType } from "../stream";
-import { video_info } from "../utils";
-import { Timer } from "./LiveStream";
-import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
+import { IncomingMessage } from 'http';
+import { request_stream } from '../../Request';
+import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
+import { video_info } from '../utils';
+import { Timer } from './LiveStream';
+import { WebmSeeker, WebmSeekerState } from './WebmSeeker';
 
 /**
  * YouTube Stream Class for seeking audio to a timeStamp.
  */
- export class SeekStream {
+export class SeekStream {
     /**
      * WebmSeeker Stream through which data passes
      */
@@ -61,14 +61,12 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
      * @param video_url YouTube video url.
      * @param options Options provided to stream function.
      */
-    constructor(
-        url: string,
-        duration: number,
-        contentLength: number,
-        video_url: string,
-        options: StreamOptions
-    ) {
-        this.stream = new WebmSeeker({ highWaterMark: 5 * 1000 * 1000, readableObjectMode : true, mode : options.seekMode });
+    constructor(url: string, duration: number, contentLength: number, video_url: string, options: StreamOptions) {
+        this.stream = new WebmSeeker({
+            highWaterMark: 5 * 1000 * 1000,
+            readableObjectMode: true,
+            mode: options.seekMode
+        });
         this.url = url;
         this.quality = options.quality as number;
         this.type = StreamType.Opus;
@@ -85,18 +83,18 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
             this.timer.destroy();
             this.cleanup();
         });
-        this.seek(options.seek!)
+        this.seek(options.seek!);
     }
     /**
      * **INTERNAL Function**
-     * 
+     *
      * Uses stream functions to parse Webm Head and gets Offset byte to seek to.
      * @param sec No of seconds to seek to
      * @returns Nothing
      */
-    private async seek(sec : number){
-        await new Promise(async(res) => {
-            if(!this.stream.headerparsed){
+    private async seek(sec: number) {
+        await new Promise(async (res) => {
+            if (!this.stream.headerparsed) {
                 const stream = await request_stream(this.url, {
                     headers: {
                         range: `bytes=0-1000`
@@ -111,18 +109,17 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
                     return;
                 }
 
-                this.request = stream
-                stream.pipe(this.stream, { end : false })
+                this.request = stream;
+                stream.pipe(this.stream, { end: false });
 
                 stream.once('end', () => {
-                    this.stream.state = WebmSeekerState.READING_DATA
-                    res('')  
-                })
-            }
-            else res('')  
-        })
+                    this.stream.state = WebmSeekerState.READING_DATA;
+                    res('');
+                });
+            } else res('');
+        });
 
-        const bytes = this.stream.seek(sec)
+        const bytes = this.stream.seek(sec);
         if (bytes instanceof Error) {
             this.stream.emit('error', bytes);
             this.bytes_count = 0;
@@ -131,10 +128,10 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
             return;
         }
 
-        this.stream.seekfound = false
-        this.bytes_count = bytes
-        this.timer.reuse()
-        this.loop()
+        this.stream.seekfound = false;
+        this.bytes_count = bytes;
+        this.timer.reuse();
+        this.loop();
     }
     /**
      * Retry if we get 404 or 403 Errors.
@@ -186,7 +183,7 @@ import { WebmSeeker, WebmSeekerState } from "./WebmSeeker";
             return;
         }
         this.request = stream;
-        stream.pipe(this.stream, { end : false })
+        stream.pipe(this.stream, { end: false });
 
         stream.once('error', async () => {
             this.cleanup();

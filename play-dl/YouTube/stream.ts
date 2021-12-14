@@ -12,8 +12,8 @@ export enum StreamType {
 }
 
 export interface StreamOptions {
-    seekMode? : "precise" | "granular"
-    seek? : number
+    seekMode?: 'precise' | 'granular';
+    seek?: number;
     quality?: number;
     htmldata?: boolean;
 }
@@ -80,25 +80,25 @@ export async function stream_from_info(
     else final.push(info.format[info.format.length - 1]);
     let type: StreamType =
         final[0].codec === 'opus' && final[0].container === 'webm' ? StreamType.WebmOpus : StreamType.Arbitrary;
-    if(options.seek){
-        if(type === StreamType.WebmOpus) {
-            if(options.seek >= info.video_details.durationInSec) throw new Error(`Seeking beyond limit. [0 - ${info.video_details.durationInSec - 1}]`)
+    if (options.seek) {
+        if (type === StreamType.WebmOpus) {
+            if (options.seek >= info.video_details.durationInSec || options.seek <= 0)
+                throw new Error(`Seeking beyond limit. [ 1 - ${info.video_details.durationInSec - 1}]`);
             return new SeekStream(
                 final[0].url,
                 info.video_details.durationInSec,
                 Number(final[0].contentLength),
                 info.video_details.url,
                 options
-            )
-        }
-        else throw new Error("Seek is only supported in Webm Opus Files.")
-    }
-    else return new Stream(
-        final[0].url,
-        type,
-        info.video_details.durationInSec,
-        Number(final[0].contentLength),
-        info.video_details.url,
-        options
-    );
+            );
+        } else throw new Error('Seek is only supported in Webm Opus Files.');
+    } else
+        return new Stream(
+            final[0].url,
+            type,
+            info.video_details.durationInSec,
+            Number(final[0].contentLength),
+            info.video_details.url,
+            options
+        );
 }
