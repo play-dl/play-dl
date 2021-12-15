@@ -65,7 +65,7 @@ export async function spotify(url: string): Promise<Spotify> {
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyAlbum(JSON.parse(response), spotifyData);
+        return new SpotifyAlbum(JSON.parse(response), spotifyData, false);
     } else if (url.indexOf('playlist/') !== -1) {
         const playlistID = url.split('playlist/')[1].split('&')[0].split('?')[0];
         const response = await request(
@@ -79,7 +79,7 @@ export async function spotify(url: string): Promise<Spotify> {
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyPlaylist(JSON.parse(response), spotifyData);
+        return new SpotifyPlaylist(JSON.parse(response), spotifyData, false);
     } else throw new Error('URL is out of scope for play-dl.');
 }
 /**
@@ -158,7 +158,7 @@ export function is_expired(): boolean {
     else return false;
 }
 /**
- * type for Spotify Class
+ * type for Spotify Classes
  */
 export type Spotify = SpotifyAlbum | SpotifyPlaylist | SpotifyTrack;
 /**
@@ -195,11 +195,11 @@ export async function sp_search(
         });
     } else if (type === 'album') {
         json_data.albums.items.forEach((album: any) => {
-            results.push(new SpotifyAlbum(album, spotifyData));
+            results.push(new SpotifyAlbum(album, spotifyData, true));
         });
     } else if (type === 'playlist') {
         json_data.playlists.items.forEach((playlist: any) => {
-            results.push(new SpotifyPlaylist(playlist, spotifyData));
+            results.push(new SpotifyPlaylist(playlist, spotifyData, true));
         });
     }
     return results;

@@ -216,13 +216,18 @@ export class SpotifyPlaylist {
      */
     private fetched_tracks: Map<string, SpotifyTrack[]>;
     /**
+     * Boolean to tell whether it is a searched result or not.
+     */
+    private readonly search : boolean
+    /**
      * Constructor for Spotify Playlist Class
      * @param data JSON parsed data of playlist
      * @param spotifyData Data about sporify token for furhter fetching.
      */
-    constructor(data: any, spotifyData: SpotifyDataOptions) {
+    constructor(data: any, spotifyData: SpotifyDataOptions, search : boolean) {
         this.name = data.name;
         this.type = 'playlist';
+        this.search = search
         this.collaborative = data.collaborative;
         this.description = data.description;
         this.url = data.external_urls.spotify;
@@ -235,7 +240,7 @@ export class SpotifyPlaylist {
         };
         this.tracksCount = Number(data.tracks.total);
         const videos: SpotifyTrack[] = [];
-        data.tracks.items.forEach((v: any) => {
+        if(!this.search) data.tracks.items.forEach((v: any) => {
             if(v.track) videos.push(new SpotifyTrack(v.track));
         });
         this.fetched_tracks = new Map();
@@ -249,10 +254,11 @@ export class SpotifyPlaylist {
      * @returns Playlist Class.
      */
     async fetch() {
+        if(this.search) return this;
         let fetching: number;
         if (this.tracksCount > 1000) fetching = 1000;
         else fetching = this.tracksCount;
-        if (fetching <= 100) return;
+        if (fetching <= 100) return this;
         const work = [];
         for (let i = 2; i <= Math.ceil(fetching / 100); i++) {
             work.push(
@@ -325,6 +331,7 @@ export class SpotifyPlaylist {
      * Spotify Playlist total no of tracks that have been fetched so far.
      */
     get total_tracks() {
+        if(this.search) return this.tracksCount;
         const page_number: number = this.total_pages;
         return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyTrack[]).length;
     }
@@ -402,14 +409,19 @@ export class SpotifyAlbum {
      */
     private fetched_tracks: Map<string, SpotifyTrack[]>;
     /**
+    * Boolean to tell whether it is a searched result or not.
+    */
+    private readonly search : boolean
+    /**
      * Constructor for Spotify Album Class
      * @param data Json parsed album data
      * @param spotifyData Spotify credentials
      */
-    constructor(data: any, spotifyData: SpotifyDataOptions) {
+    constructor(data: any, spotifyData: SpotifyDataOptions, search : boolean) {
         this.name = data.name;
         this.type = 'album';
         this.id = data.id;
+        this.search = search
         this.url = data.external_urls.spotify;
         this.thumbnail = data.images[0];
         const artists: SpotifyArtists[] = [];
@@ -426,7 +438,7 @@ export class SpotifyAlbum {
         this.release_date_precision = data.release_date_precision;
         this.tracksCount = data.total_tracks;
         const videos: SpotifyTrack[] = [];
-        data.tracks.items.forEach((v: any) => {
+        if(!this.search) data.tracks.items.forEach((v: any) => {
             videos.push(new SpotifyTrack(v));
         });
         this.fetched_tracks = new Map();
@@ -440,10 +452,11 @@ export class SpotifyAlbum {
      * @returns Album Class.
      */
     async fetch() {
+        if(this.search) return this
         let fetching: number;
         if (this.tracksCount > 500) fetching = 500;
         else fetching = this.tracksCount;
-        if (fetching <= 50) return;
+        if (fetching <= 50) return this;
         const work = [];
         for (let i = 2; i <= Math.ceil(fetching / 50); i++) {
             work.push(
@@ -516,6 +529,7 @@ export class SpotifyAlbum {
      * Spotify Album total no of tracks that have been fetched so far.
      */
     get total_tracks() {
+        if(this.search) return this.tracksCount
         const page_number: number = this.total_pages;
         return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyTrack[]).length;
     }
