@@ -39,7 +39,6 @@ export function request_stream(req_url: string, options: RequestOpts = { method:
  */
 function internalRequest(
     req_url: string,
-    cookies_added: boolean,
     options: RequestOpts = { method: 'GET' }
 ): Promise<IncomingMessage> {
     return new Promise(async (resolve, reject) => {
@@ -49,13 +48,10 @@ function internalRequest(
             return;
         }
         if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
-            res = await internalRequest(res.headers.location as string, cookies_added, options);
+            res = await internalRequest(res.headers.location as string, options);
         } else if (Number(res.statusCode) > 400) {
             reject(new Error(`Got ${res.statusCode} from the request`));
             return;
-        }
-        if (res.headers && res.headers['set-cookie'] && cookies_added) {
-            cookieHeaders(res.headers['set-cookie']);
         }
         resolve(res);
     });
@@ -83,10 +79,13 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 'user-agent': getRandomUserAgent()
             };
         }
-        const res = await internalRequest(req_url, cookies_added, options).catch((err: Error) => err);
+        const res = await internalRequest(req_url, options).catch((err: Error) => err);
         if (res instanceof Error) {
             reject(res);
             return;
+        }
+        if (res.headers && res.headers['set-cookie'] && cookies_added) {
+            cookieHeaders(res.headers['set-cookie']);
         }
         const data: string[] = [];
         let decoder: BrotliDecompress | Gunzip | Deflate | undefined = undefined;
