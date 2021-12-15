@@ -48,14 +48,14 @@ function internalRequest(
             reject(res);
             return;
         }
-        if (res.headers && res.headers['set-cookie'] && cookies_added) {
-            cookieHeaders(res.headers['set-cookie']);
-        }
         if (Number(res.statusCode) >= 300 && Number(res.statusCode) < 400) {
             res = await internalRequest(res.headers.location as string, cookies_added, options);
         } else if (Number(res.statusCode) > 400) {
             reject(new Error(`Got ${res.statusCode} from the request`));
             return;
+        }
+        if (res.headers && res.headers['set-cookie'] && cookies_added) {
+            cookieHeaders(res.headers['set-cookie']);
         }
         resolve(res);
     });
