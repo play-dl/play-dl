@@ -23,7 +23,7 @@ npm install play-dl@latest
 ### Importing
 
 ```ts
-import play from 'play-dl' // ES-6 import or TS import
+import * as play from 'play-dl' // ES-6 import or TS import
 
 const play = require('play-dl') //JS importing
 ```
