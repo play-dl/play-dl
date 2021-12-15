@@ -105,7 +105,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         body = url;
     } else {
         if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
-        const video_id: string = extractID(url);
+        const video_id = extractID(url);
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
             headers: {
@@ -138,7 +138,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     const ownerInfo =
         initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
             ?.owner?.videoOwnerRenderer;
-    const badge = ownerInfo?.badges && ownerInfo?.badges[0];
+    const badge = ownerInfo?.badges?.[0]?.metadataBadgeRenderer?.style?.toLowerCase();
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const related: string[] = [];
     initial_response.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.forEach(
@@ -147,40 +147,38 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
                 related.push(`https://www.youtube.com/watch?v=${res.compactVideoRenderer.videoId}`);
         }
     );
-    const format = [];
     const vid = player_response.videoDetails;
     const microformat = player_response.microformat.playerMicroformatRenderer;
-    const ratingButtons =
-        initial_response.contents.twoColumnWatchNextResults.results.results.contents.find(
-            (content: any) => content.videoPrimaryInfoRenderer
-        )?.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons ?? [];
     const video_details = new YouTubeVideo({
         id: vid.videoId,
         title: vid.title,
         description: vid.shortDescription,
         duration: Number(vid.lengthSeconds),
-        duration_raw: parseSeconds(Number(vid.lengthSeconds)),
+        duration_raw: parseSeconds(vid.lengthSeconds),
         uploadedAt: microformat.publishDate,
         thumbnails: vid.thumbnail.thumbnails,
         channel: {
             name: vid.author,
             id: vid.channelId,
             url: `https://www.youtube.com/channel/${vid.channelId}`,
-            verified: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified')),
-            artist: Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('artist')),
+            verified: Boolean(badge?.includes('verified')),
+            artist: Boolean(badge?.includes('artist')),
             icons: ownerInfo?.thumbnail?.thumbnails || undefined
         },
         views: vid.viewCount,
         tags: vid.keywords,
         likes: parseInt(
-            ratingButtons
-                .find((button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE')
+            initial_response.contents.twoColumnWatchNextResults.results.results.contents
+                .find((content: any) => content.videoPrimaryInfoRenderer)
+                ?.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons?.find(
+                    (button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE'
+                )
                 ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
         ),
         live: vid.isLiveContent,
         private: vid.isPrivate
     });
-    format.push(...(player_response.streamingData.formats ?? []));
+    const format = player_response.streamingData.formats ?? [];
     format.push(...(player_response.streamingData.adaptiveFormats ?? []));
     const LiveStreamData = {
         isLive: video_details.live,
@@ -212,7 +210,7 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         body = url;
     } else {
         if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
-        const video_id: string = extractID(url);
+        const video_id = extractID(url);
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
             headers: { 'accept-language': 'en-US,en;q=0.9' },
@@ -240,8 +238,7 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         url: `https://www.youtube.com/watch?v=${player_response.videoDetails.videoId}`,
         durationInSec: (duration < 0 ? 0 : duration) || 0
     };
-    const format = [];
-    format.push(...(player_response.streamingData.formats ?? []));
+    const format = player_response.streamingData.formats ?? [];
     format.push(...(player_response.streamingData.adaptiveFormats ?? []));
 
     const LiveStreamData = {

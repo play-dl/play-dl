@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 let spotifyData: SpotifyDataOptions;
 if (existsSync('.data/spotify.data')) {
-    spotifyData = JSON.parse(readFileSync('.data/spotify.data').toString());
+    spotifyData = JSON.parse(readFileSync('.data/spotify.data', 'utf-8'));
     spotifyData.file = true;
 }
 /**
@@ -174,7 +174,7 @@ export async function sp_search(
     limit: number = 10
 ): Promise<Spotify[]> {
     const results: Spotify[] = [];
-    if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
+    if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forget to do authorization ?');
     if (query.length === 0) throw new Error('Pass some query to search.');
     if (limit > 50 || limit < 0) throw new Error(`You crossed limit range of Spotify [ 0 - 50 ]`);
     const response = await request(
