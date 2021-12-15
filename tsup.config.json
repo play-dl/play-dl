@@ -12,5 +12,6 @@
     "skipNodeModulesBundle": true,
     "sourcemap": true,
     "target": "es2021",
-    "splitting": false
+    "splitting": false,
+    "keepNames": true
 }
