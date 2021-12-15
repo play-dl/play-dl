@@ -535,3 +535,158 @@ export class SpotifyAlbum {
         };
     }
 }
+
+export class SpotifySearchPlaylist{
+    /**
+    * Spotify Playlist Name
+    */
+    name: string;
+    /**
+     * Spotify Class type. == "playlist"
+     */
+    type: 'track' | 'playlist' | 'album';
+    /**
+     * Spotify Playlist collaborative boolean.
+     */
+    collaborative: boolean;
+    /**
+     * Spotify Playlist Description
+     */
+    description: string;
+    /**
+     * Spotify Playlist URL
+     */
+    url: string;
+    /**
+     * Spotify Playlist ID
+     */
+    id: string;
+    /**
+     * Spotify Playlist Thumbnail Data
+     */
+    thumbnail: SpotifyThumbnail;
+    /**
+     * Spotify Playlist Owner Artist data
+     */
+    owner: SpotifyArtists;
+    /**
+     * Spotify Playlist total tracks Count
+     */
+    tracksCount: number;
+
+    constructor(data : any){
+        this.name = data.name;
+        this.type = 'playlist';
+        this.collaborative = data.collaborative;
+        this.description = data.description;
+        this.url = data.external_urls.spotify;
+        this.id = data.id;
+        this.thumbnail = data.images[0];
+        this.owner = {
+            name: data.owner.display_name,
+            url: data.owner.external_urls.spotify,
+            id: data.owner.id
+        };
+        this.tracksCount = Number(data.tracks.total);
+    }
+
+    /**
+     * Converts Class to JSON
+     * @returns JSON data
+     */
+     toJSON(): PlaylistJSON {
+        return {
+            name: this.name,
+            collaborative: this.collaborative,
+            description: this.description,
+            url: this.url,
+            id: this.id,
+            thumbnail: this.thumbnail,
+            owner: this.owner,
+            tracksCount: this.tracksCount
+        };
+    }
+}
+
+export class SpotifySearchAlbum{
+    /**
+    * Spotify Album Name
+    */
+    name: string;
+    /**
+     * Spotify Class type. == "album"
+     */
+    type: 'track' | 'playlist' | 'album';
+    /**
+     * Spotify Album url
+     */
+    url: string;
+    /**
+     * Spotify Album id
+     */
+    id: string;
+    /**
+     * Spotify Album Thumbnail data
+     */
+    thumbnail: SpotifyThumbnail;
+    /**
+     * Spotify Album artists [ array ]
+     */
+    artists: SpotifyArtists[];
+    /**
+     * Spotify Album copyright data [ array ]
+     */
+    copyrights: SpotifyCopyright[];
+    /**
+     * Spotify Album Release date
+     */
+    release_date: string;
+    /**
+     * Spotify Album Release Date **precise**
+     */
+    release_date_precision: string;
+    /**
+     * Spotify Album total no of tracks
+     */
+    tracksCount: number;
+    /**
+     * Spotify Album Spotify data
+     *
+     * @private
+     */
+    constructor(data : any){
+        this.name = data.name;
+        this.type = 'album';
+        this.id = data.id;
+        this.url = data.external_urls.spotify;
+        this.thumbnail = data.images[0];
+        const artists: SpotifyArtists[] = [];
+        data.artists.forEach((v: any) => {
+            artists.push({
+                name: v.name,
+                id: v.id,
+                url: v.external_urls.spotify
+            });
+        });
+        this.artists = artists;
+        this.copyrights = data.copyrights;
+        this.release_date = data.release_date;
+        this.release_date_precision = data.release_date_precision;
+        this.tracksCount = data.total_tracks;
+    }
+
+    toJSON(): AlbumJSON {
+        return {
+            name: this.name,
+            id: this.id,
+            type: this.type,
+            url: this.url,
+            thumbnail: this.thumbnail,
+            artists: this.artists,
+            copyrights: this.copyrights,
+            release_date: this.release_date,
+            release_date_precision: this.release_date_precision,
+            tracksCount: this.tracksCount
+        };
+    }
+}

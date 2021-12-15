@@ -19,7 +19,8 @@ export {
     SpotifyAlbum,
     SpotifyPlaylist,
     SpotifyTrack,
-    Spotify
+    Spotify,
+    SpotifySearch
 } from './Spotify';
 export {
     soundcloud,
@@ -72,7 +73,7 @@ import {
     SoundCloud,
     Spotify
 } from '.';
-import { SpotifyAuthorize, sp_search } from './Spotify';
+import { SpotifyAuthorize, SpotifySearch, sp_search } from './Spotify';
 import { check_id, so_search, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
 import { stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { SoundCloudPlaylist, SoundCloudTrack } from './SoundCloud/classes';
@@ -213,7 +214,7 @@ export async function search(query: string, options?: SearchOptions): Promise<Yo
 export async function search(
     query: string,
     options: SearchOptions = {}
-): Promise<YouTube[] | Spotify[] | SoundCloud[] | Deezer[]> {
+): Promise<YouTube[] | SpotifySearch[] | SoundCloud[] | Deezer[]> {
     if (!options.source) options.source = { youtube: 'video' };
     query = encodeURIComponent(query);
     if (options.source.youtube) return await yt_search(query, { limit: options.limit, type: options.source.youtube });

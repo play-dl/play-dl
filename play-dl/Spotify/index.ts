@@ -1,5 +1,5 @@
 import { request } from '../Request';
-import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './classes';
+import { SpotifyAlbum, SpotifyPlaylist, SpotifySearchAlbum, SpotifySearchPlaylist, SpotifyTrack } from './classes';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 let spotifyData: SpotifyDataOptions;
@@ -158,9 +158,13 @@ export function is_expired(): boolean {
     else return false;
 }
 /**
- * type for Spotify Class
+ * type for Spotify Classes
  */
 export type Spotify = SpotifyAlbum | SpotifyPlaylist | SpotifyTrack;
+/**
+ * type for Spotify Searched Classes
+ */
+export type SpotifySearch = SpotifyTrack | SpotifySearchPlaylist | SpotifySearchAlbum
 /**
  * Function for searching songs on Spotify
  * @param query searching query
@@ -172,8 +176,8 @@ export async function sp_search(
     query: string,
     type: 'album' | 'playlist' | 'track',
     limit: number = 10
-): Promise<Spotify[]> {
-    const results: Spotify[] = [];
+): Promise<SpotifySearch[]> {
+    const results: SpotifySearch[] = [];
     if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
     if (query.length === 0) throw new Error('Pass some query to search.');
     if (limit > 50 || limit < 0) throw new Error(`You crossed limit range of Spotify [ 0 - 50 ]`);
@@ -195,11 +199,11 @@ export async function sp_search(
         });
     } else if (type === 'album') {
         json_data.albums.items.forEach((album: any) => {
-            results.push(new SpotifyAlbum(album, spotifyData));
+            results.push(new SpotifySearchAlbum(album));
         });
     } else if (type === 'playlist') {
         json_data.playlists.items.forEach((playlist: any) => {
-            results.push(new SpotifyPlaylist(playlist, spotifyData));
+            results.push(new SpotifySearchPlaylist(playlist));
         });
     }
     return results;
