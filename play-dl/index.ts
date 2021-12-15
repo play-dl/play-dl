@@ -86,8 +86,11 @@ import { YouTubeChannel } from './YouTube/classes/Channel';
 import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './Spotify/classes';
 import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './Deezer/classes';
 
-export async function stream(url: string, options: { seek? : number , seekMode?: 'precise' | 'granular'} & StreamOptions) : Promise<YouTubeStream>
-export async function stream(url: string, options? : StreamOptions) : Promise<YouTubeStream | SoundCloudStream>
+export async function stream(
+    url: string,
+    options: { seek?: number; seekMode?: 'precise' | 'granular' } & StreamOptions
+): Promise<YouTubeStream>;
+export async function stream(url: string, options?: StreamOptions): Promise<YouTubeStream | SoundCloudStream>;
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from a url for playing.
  *
@@ -96,14 +99,14 @@ export async function stream(url: string, options? : StreamOptions) : Promise<Yo
  * const source = await play.stream('youtube video URL') // YouTube Video Stream
  *
  * const source = await play.stream('soundcloud track URL') // SoundCloud Track Stream
- * 
+ *
  * const source = await play.stream('youtube video URL', { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream [ seekMode = "granular" ]
  * // Granular = 1 - 9 seconds before given time. [ Fast ]
  * // Precise = Exact seek [ Little bit Slow ]
  * // Above command seeks to 45 seconds approximately while below command seeks to 45 seconds precisely
- * 
+ *
  * const source = await play.stream('youtube video URL', { seek : 45, seekMode: "precise" }) // Seeks precisely to 45 seconds in YouTube Video Stream
- * 
+ *
  * const resource = createAudioResource(source.stream, {
  *      inputType : source.type
  * }) // Use discordjs voice createAudioResource function.
@@ -224,8 +227,8 @@ export async function search(
     else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
 }
 
-export async function stream_from_info(info: SoundCloudTrack, options? : StreamOptions) : Promise<SoundCloudStream>
-export async function stream_from_info(info: InfoData, options? : StreamOptions) : Promise<YouTubeStream>
+export async function stream_from_info(info: SoundCloudTrack, options?: StreamOptions): Promise<SoundCloudStream>;
+export async function stream_from_info(info: InfoData, options?: StreamOptions): Promise<YouTubeStream>;
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from video or track info for playing.
  *
@@ -236,12 +239,12 @@ export async function stream_from_info(info: InfoData, options? : StreamOptions)
  *
  * const soundInfo = await play.soundcloud('SoundCloud URL')
  * const source = await play.stream_from_info(soundInfo) // SoundCloud Track Stream
- * 
+ *
  * const source = await play.stream_from_info(info, { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream [ seekMode = "granular" ]
  * // Granular = 1 - 9 seconds before given time. [ Fast ]
  * // Precise = Exact seek [ Little bit Slow ]
  * // Above command seeks to 45 seconds approximately while below command seeks to 45 seconds precisely
- * 
+ *
  * const source = await play.stream_from_info(info, { seek : 45, seekMode: "precise" }) // Seeks precisely to 45 seconds in YouTube Video Stream
  *
  * const resource = createAudioResource(source.stream, {
