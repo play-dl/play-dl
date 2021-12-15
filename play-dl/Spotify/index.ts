@@ -1,5 +1,5 @@
 import { request } from '../Request';
-import { SpotifyAlbum, SpotifyPlaylist, SpotifySearchAlbum, SpotifySearchPlaylist, SpotifyTrack } from './classes';
+import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './classes';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 let spotifyData: SpotifyDataOptions;
@@ -65,7 +65,7 @@ export async function spotify(url: string): Promise<Spotify> {
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyAlbum(JSON.parse(response), spotifyData);
+        return new SpotifyAlbum(JSON.parse(response), spotifyData, false);
     } else if (url.indexOf('playlist/') !== -1) {
         const playlistID = url.split('playlist/')[1].split('&')[0].split('?')[0];
         const response = await request(
@@ -79,7 +79,7 @@ export async function spotify(url: string): Promise<Spotify> {
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyPlaylist(JSON.parse(response), spotifyData);
+        return new SpotifyPlaylist(JSON.parse(response), spotifyData, false);
     } else throw new Error('URL is out of scope for play-dl.');
 }
 /**
@@ -162,10 +162,6 @@ export function is_expired(): boolean {
  */
 export type Spotify = SpotifyAlbum | SpotifyPlaylist | SpotifyTrack;
 /**
- * type for Spotify Searched Classes
- */
-export type SpotifySearch = SpotifyTrack | SpotifySearchPlaylist | SpotifySearchAlbum
-/**
  * Function for searching songs on Spotify
  * @param query searching query
  * @param type "album" | "playlist" | "track"
@@ -176,8 +172,8 @@ export async function sp_search(
     query: string,
     type: 'album' | 'playlist' | 'track',
     limit: number = 10
-): Promise<SpotifySearch[]> {
-    const results: SpotifySearch[] = [];
+): Promise<Spotify[]> {
+    const results: Spotify[] = [];
     if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
     if (query.length === 0) throw new Error('Pass some query to search.');
     if (limit > 50 || limit < 0) throw new Error(`You crossed limit range of Spotify [ 0 - 50 ]`);
@@ -199,11 +195,11 @@ export async function sp_search(
         });
     } else if (type === 'album') {
         json_data.albums.items.forEach((album: any) => {
-            results.push(new SpotifySearchAlbum(album));
+            results.push(new SpotifyAlbum(album, spotifyData, true));
         });
     } else if (type === 'playlist') {
         json_data.playlists.items.forEach((playlist: any) => {
-            results.push(new SpotifySearchPlaylist(playlist));
+            results.push(new SpotifyPlaylist(playlist, spotifyData, true));
         });
     }
     return results;
