@@ -37,10 +37,7 @@ export function request_stream(req_url: string, options: RequestOpts = { method:
  * @param options Request options for https request
  * @returns A promise with the final response object
  */
-function internalRequest(
-    req_url: string,
-    options: RequestOpts = { method: 'GET' }
-): Promise<IncomingMessage> {
+function internalRequest(req_url: string, options: RequestOpts = { method: 'GET' }): Promise<IncomingMessage> {
     return new Promise(async (resolve, reject) => {
         let res = await https_getter(req_url, options).catch((err: Error) => err);
         if (res instanceof Error) {

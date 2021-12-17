@@ -470,3 +470,57 @@ export function attachListeners(player: EventEmitter, resource: YouTubeStream | 
     player.on(AudioPlayerStatus.Playing, resumeListener);
     player.once(AudioPlayerStatus.Idle, idleListener);
 }
+
+import {
+    decipher_info,
+    deezer,
+    dz_advanced_track_search,
+    extractID,
+    getFreeClientID,
+    is_expired,
+    playlist_info,
+    refreshToken,
+    setToken,
+    soundcloud,
+    spotify,
+    video_basic_info,
+    video_info
+} from '.';
+
+export default {
+    DeezerAlbum,
+    DeezerPlaylist,
+    DeezerTrack,
+    SoundCloudPlaylist,
+    SoundCloudStream,
+    SoundCloudTrack,
+    SpotifyAlbum,
+    SpotifyPlaylist,
+    SpotifyTrack,
+    YouTubeChannel,
+    YouTubePlayList,
+    YouTubeVideo,
+    attachListeners,
+    authorization,
+    decipher_info,
+    deezer,
+    dz_advanced_track_search,
+    dz_validate,
+    extractID,
+    getFreeClientID,
+    is_expired,
+    playlist_info,
+    refreshToken,
+    search,
+    setToken,
+    so_validate,
+    soundcloud,
+    spotify,
+    sp_validate,
+    stream,
+    stream_from_info,
+    validate,
+    video_basic_info,
+    video_info,
+    yt_validate
+};

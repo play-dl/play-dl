@@ -298,7 +298,11 @@ export async function video_info(url: string, options: InfoOptions = {}): Promis
  * @returns Deciphered Video Info {@link InfoData}
  */
 export async function decipher_info<T extends InfoData | StreamInfoData>(data: T): Promise<T> {
-    if (data.LiveStreamData.isLive === true && data.LiveStreamData.dashManifestUrl !== null) {
+    if (
+        data.LiveStreamData.isLive === true &&
+        data.LiveStreamData.dashManifestUrl !== null &&
+        data.video_details.durationInSec === 0
+    ) {
         return data;
     } else if (data.format[0].signatureCipher || data.format[0].cipher) {
         data.format = await format_decipher(data.format, data.html5player);
