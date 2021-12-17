@@ -45,7 +45,7 @@ const { video_basic_info, stream } = require('play-dl');
 
 **ES6 modules:**
 ```ts
-import * as play from 'play-dl'; // Everything
+import play from 'play-dl'; // Everything
 
 import { video_basic_info, stream } from 'play-dl'; // Individual functions
 ```
