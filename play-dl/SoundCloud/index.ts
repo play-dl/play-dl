@@ -4,7 +4,7 @@ import { request } from '../Request';
 import { SoundCloudPlaylist, SoundCloudTrack, SoundCloudTrackFormat, SoundCloudStream } from './classes';
 let soundData: SoundDataOptions;
 if (existsSync('.data/soundcloud.data')) {
-    soundData = JSON.parse(readFileSync('.data/soundcloud.data').toString());
+    soundData = JSON.parse(readFileSync('.data/soundcloud.data', 'utf-8'));
 }
 
 interface SoundDataOptions {
@@ -29,7 +29,7 @@ const pattern = /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(api\.soundcloud\.com|soundc
  * @returns A {@link SoundCloudTrack} or {@link SoundCloudPlaylist}
  */
 export async function soundcloud(url: string): Promise<SoundCloud> {
-    if (!soundData) throw new Error('SoundCloud Data is missing\nDid you forgot to do authorization ?');
+    if (!soundData) throw new Error('SoundCloud Data is missing\nDid you forget to do authorization ?');
     if (!url.match(pattern)) throw new Error('This is not a SoundCloud URL');
 
     const data = await request(
@@ -82,7 +82,7 @@ export async function so_search(
 export async function stream(url: string, quality?: number): Promise<SoundCloudStream> {
     const data = await soundcloud(url);
 
-    if (data instanceof SoundCloudPlaylist) throw new Error("Streams can't be created from Playlist url");
+    if (data instanceof SoundCloudPlaylist) throw new Error("Streams can't be created from playlist urls");
 
     const HLSformats = parseHlsFormats(data.formats);
     if (typeof quality !== 'number') quality = HLSformats.length - 1;

@@ -121,6 +121,7 @@ export function parseVideo(data?: any): YouTubeVideo {
 
     const channel = data.videoRenderer.ownerText.runs[0];
     const badge = data.videoRenderer.ownerBadges?.[0]?.metadataBadgeRenderer?.style?.toLowerCase();
+    const durationText = data.videoRenderer.lengthText;
     const res = new YouTubeVideo({
         id: data.videoRenderer.videoId,
         url: `https://www.youtube.com/watch?v=${data.videoRenderer.videoId}`,
@@ -128,8 +129,8 @@ export function parseVideo(data?: any): YouTubeVideo {
         description: data.videoRenderer.detailedMetadataSnippets?.[0].snippetText.runs.length
             ? data.videoRenderer.detailedMetadataSnippets[0].snippetText.runs.map((run: any) => run.text).join('')
             : '',
-        duration: data.videoRenderer.lengthText ? parseDuration(data.videoRenderer.lengthText.simpleText) : 0,
-        duration_raw: data.videoRenderer.lengthText ? data.videoRenderer.lengthText.simpleText : null,
+        duration: durationText ? parseDuration(durationText.simpleText) : 0,
+        duration_raw: durationText ? durationText.simpleText : null,
         thumbnails: data.videoRenderer.thumbnail.thumbnails,
         channel: {
             id: channel.navigationEndpoint.browseEndpoint.browseId || null,
@@ -145,7 +146,7 @@ export function parseVideo(data?: any): YouTubeVideo {
         },
         uploadedAt: data.videoRenderer.publishedTimeText?.simpleText ?? null,
         views: data.videoRenderer.viewCountText?.simpleText?.replace(/[^0-9]/g, '') ?? 0,
-        live: data.videoRenderer.lengthText ? false : true
+        live: durationText ? false : true
     });
 
     return res;
