@@ -10,7 +10,7 @@ A **light-weight** YouTube, SoundCloud, Spotify and Deezer streaming and searchi
 [ytdl-core](https://github.com/fent/node-ytdl-core) has some issues with miniget and also stream abort issues. On the other hand, [youtube-dl](https://github.com/ytdl-org/youtube-dl) is a perfect alternative but it takes time to launch. Hence, play-dl is created to avoid these issues along with providing comparatively faster performance than others.
 
 [![Discord](https://img.shields.io/discord/888998674716315679?color=00aa00&label=%20Discord&logo=Discord)](https://discord.gg/8H3xWcv3D7)
-[![NPM](https://img.shields.io/npm/v/badges.svg?color=00aa00&logo=npm)](https://www.npmjs.com/package/play-dl)
+[![NPM](https://img.shields.io/npm/v/play-dl.svg?color=00aa00&logo=npm)](https://www.npmjs.com/package/play-dl)
 
 ## Support
 
