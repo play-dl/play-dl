@@ -199,7 +199,7 @@ export class SeekStream {
         stream.on('end', () => {
             if (end >= this.content_length) {
                 this.timer.destroy();
-                this.stream.write(null);
+                this.stream.end();
                 this.cleanup();
             }
         });
