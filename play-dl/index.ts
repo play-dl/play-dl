@@ -120,6 +120,7 @@ export async function stream(url: string, options?: StreamOptions): Promise<YouT
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
     if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
+    if (options.htmldata) return await yt_stream(url, options);
     if (url.indexOf('spotify') !== -1) {
         throw new Error(
             'Streaming from Spotify is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
