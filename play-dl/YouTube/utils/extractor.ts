@@ -100,8 +100,7 @@ export function extractID(url: string): string {
  * @returns Video Basic Info {@link InfoData}.
  */
 export async function video_basic_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
-    if (url === null || url === undefined || typeof url !== 'string')
-        throw new Error('url parameter is not a URL string or a string of HTML');
+    if (typeof url !== 'string') throw new Error('url parameter is not a URL string or a string of HTML');
     let body: string;
     if (options.htmldata) {
         body = url;
@@ -207,8 +206,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
  * @returns Deciphered Video Info {@link StreamInfoData}.
  */
 export async function video_stream_info(url: string, options: InfoOptions = {}): Promise<StreamInfoData> {
-    if (url === null || url === undefined || typeof url !== 'string')
-        throw new Error('url parameter is not a URL string or a string of HTML');
+    if (typeof url !== 'string') throw new Error('url parameter is not a URL string or a string of HTML');
     let body: string;
     if (options.htmldata) {
         body = url;
