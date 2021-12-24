@@ -42,6 +42,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name:  Deleting default exports for ESM.
+        run: node .github/docs.js
+
       - name: TypeDoc
         run: npx typedoc
 
@@ -53,3 +56,17 @@ jobs:
           git add *
           git commit -m "Automated Docs"
           git push
+
+  publish_discord:
+     runs-on: ubuntu-latest
+     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+        
+      - name: Publish on discord
+        run: node .github/discord.js channel="888999793458835466" body="${{ github.event.release.body }}" tag="${{ github.event.release.tag_name }}"
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}

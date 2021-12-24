@@ -1,4 +1,4 @@
-export {
+import {
     playlist_info,
     video_basic_info,
     video_info,
@@ -11,7 +11,7 @@ export {
     YouTubePlayList,
     YouTubeVideo
 } from './YouTube';
-export {
+import {
     spotify,
     sp_validate,
     refreshToken,
@@ -19,27 +19,34 @@ export {
     SpotifyAlbum,
     SpotifyPlaylist,
     SpotifyTrack,
-    Spotify
+    Spotify,
+    SpotifyAuthorize,
+    sp_search
 } from './Spotify';
-export {
+import {
     soundcloud,
     so_validate,
     SoundCloud,
     SoundCloudStream,
     getFreeClientID,
     SoundCloudPlaylist,
-    SoundCloudTrack
+    SoundCloudTrack,
+    check_id,
+    so_search,
+    stream as so_stream,
+    stream_from_info as so_stream_info
 } from './SoundCloud';
-export {
+import {
     deezer,
     dz_validate,
     dz_advanced_track_search,
     Deezer,
     DeezerTrack,
     DeezerPlaylist,
-    DeezerAlbum
+    DeezerAlbum,
+    dz_search
 } from './Deezer';
-export { setToken } from './token';
+import { setToken } from './token';
 
 enum AudioPlayerStatus {
     Idle = 'idle',
@@ -62,35 +69,16 @@ interface SearchOptions {
 
 import { createInterface } from 'node:readline';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import {
-    sp_validate,
-    yt_validate,
-    so_validate,
-    YouTubeStream,
-    SoundCloudStream,
-    YouTube,
-    SoundCloud,
-    Spotify
-} from '.';
-import { SpotifyAuthorize, sp_search } from './Spotify';
-import { check_id, so_search, stream as so_stream, stream_from_info as so_stream_info } from './SoundCloud';
 import { stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
-import { SoundCloudPlaylist, SoundCloudTrack } from './SoundCloud/classes';
 import { yt_search } from './YouTube/search';
 import { EventEmitter } from 'stream';
-import { Deezer, dz_search, dz_validate } from './Deezer';
 import { InfoData } from './YouTube/utils/constants';
-import { YouTubeVideo } from './YouTube/classes/Video';
-import { YouTubePlayList } from './YouTube/classes/Playlist';
-import { YouTubeChannel } from './YouTube/classes/Channel';
-import { SpotifyAlbum, SpotifyPlaylist, SpotifyTrack } from './Spotify/classes';
-import { DeezerAlbum, DeezerPlaylist, DeezerTrack } from './Deezer/classes';
 
-export async function stream(
+async function stream(
     url: string,
     options: { seek?: number; seekMode?: 'precise' | 'granular' } & StreamOptions
 ): Promise<YouTubeStream>;
-export async function stream(url: string, options?: StreamOptions): Promise<YouTubeStream | SoundCloudStream>;
+async function stream(url: string, options?: StreamOptions): Promise<YouTubeStream | SoundCloudStream>;
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from a url for playing.
  *
@@ -118,7 +106,7 @@ export async function stream(url: string, options?: StreamOptions): Promise<YouT
  *  - `boolean` htmldata : given data is html data or not
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
-export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
+async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
     if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
     if (options.htmldata) return await yt_stream(url, options);
     if (url.indexOf('spotify') !== -1) {
@@ -135,56 +123,56 @@ export async function stream(url: string, options: StreamOptions = {}): Promise<
     else return await yt_stream(url, options);
 }
 
-export async function search(
+async function search(
     query: string,
     options: { source: { deezer: 'album' } } & SearchOptions
 ): Promise<DeezerAlbum[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { deezer: 'playlist' } } & SearchOptions
 ): Promise<DeezerPlaylist[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { deezer: 'track' } } & SearchOptions
 ): Promise<DeezerTrack[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { soundcloud: 'albums' } } & SearchOptions
 ): Promise<SoundCloudPlaylist[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { soundcloud: 'playlists' } } & SearchOptions
 ): Promise<SoundCloudPlaylist[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { soundcloud: 'tracks' } } & SearchOptions
 ): Promise<SoundCloudTrack[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { spotify: 'album' } } & SearchOptions
 ): Promise<SpotifyAlbum[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { spotify: 'playlist' } } & SearchOptions
 ): Promise<SpotifyPlaylist[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { spotify: 'track' } } & SearchOptions
 ): Promise<SpotifyTrack[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { youtube: 'channel' } } & SearchOptions
 ): Promise<YouTubeChannel[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { youtube: 'playlist' } } & SearchOptions
 ): Promise<YouTubePlayList[]>;
-export async function search(
+async function search(
     query: string,
     options: { source: { youtube: 'video' } } & SearchOptions
 ): Promise<YouTubeVideo[]>;
-export async function search(query: string, options: { limit: number } & SearchOptions): Promise<YouTubeVideo[]>;
-export async function search(query: string, options?: SearchOptions): Promise<YouTubeVideo[]>;
+async function search(query: string, options: { limit: number } & SearchOptions): Promise<YouTubeVideo[]>;
+async function search(query: string, options?: SearchOptions): Promise<YouTubeVideo[]>;
 /**
  * Searches through a particular source and gives respective info.
  * 
@@ -214,7 +202,7 @@ export async function search(query: string, options?: SearchOptions): Promise<Yo
     ```
  * @returns Array of {@link YouTube} or {@link Spotify} or {@link SoundCloud} or {@link Deezer} type
  */
-export async function search(
+async function search(
     query: string,
     options: SearchOptions = {}
 ): Promise<YouTube[] | Spotify[] | SoundCloud[] | Deezer[]> {
@@ -228,8 +216,8 @@ export async function search(
     else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
 }
 
-export async function stream_from_info(info: SoundCloudTrack, options?: StreamOptions): Promise<SoundCloudStream>;
-export async function stream_from_info(info: InfoData, options?: StreamOptions): Promise<YouTubeStream>;
+async function stream_from_info(info: SoundCloudTrack, options?: StreamOptions): Promise<SoundCloudStream>;
+async function stream_from_info(info: InfoData, options?: StreamOptions): Promise<YouTubeStream>;
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from video or track info for playing.
  *
@@ -260,7 +248,7 @@ export async function stream_from_info(info: InfoData, options?: StreamOptions):
  *  - `boolean` htmldata : given data is html data or not
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
-export async function stream_from_info(
+async function stream_from_info(
     info: InfoData | SoundCloudTrack,
     options: StreamOptions = {}
 ): Promise<YouTubeStream | SoundCloudStream> {
@@ -280,7 +268,7 @@ export async function stream_from_info(
  * 'so_playlist' / 'so_track' | 'sp_track' | 'sp_album' | 'sp_playlist' | 'dz_track' | 'dz_playlist' | 'dz_album' | 'yt_video' | 'yt_playlist' | 'search' | false
  * ```
  */
-export async function validate(
+async function validate(
     url: string
 ): Promise<
     | 'so_playlist'
@@ -325,7 +313,7 @@ export async function validate(
  *
  * Just run the above command and you will get a interface asking some questions.
  */
-export function authorization(): void {
+function authorization(): void {
     const ask = createInterface({
         input: process.stdin,
         output: process.stdout
@@ -444,7 +432,7 @@ export function authorization(): void {
  * @param player discordjs voice AudioPlayer
  * @param resource A {@link YouTubeStream} or {@link SoundCloudStream}
  */
-export function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
+function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
     // cleanup existing listeners if they are still registered
     type listenerType = (...args: any[]) => void;
 
@@ -472,22 +460,49 @@ export function attachListeners(player: EventEmitter, resource: YouTubeStream | 
     player.once(AudioPlayerStatus.Idle, idleListener);
 }
 
-import {
+// Export Main Commands
+export {
+    DeezerAlbum,
+    DeezerPlaylist,
+    DeezerTrack,
+    SoundCloudPlaylist,
+    SoundCloudStream,
+    SoundCloudTrack,
+    SpotifyAlbum,
+    SpotifyPlaylist,
+    SpotifyTrack,
+    YouTubeChannel,
+    YouTubePlayList,
+    YouTubeVideo,
+    attachListeners,
+    authorization,
     decipher_info,
     deezer,
     dz_advanced_track_search,
+    dz_validate,
     extractID,
     getFreeClientID,
     is_expired,
     playlist_info,
     refreshToken,
+    search,
     setToken,
+    so_validate,
     soundcloud,
     spotify,
+    sp_validate,
+    stream,
+    stream_from_info,
+    validate,
     video_basic_info,
-    video_info
-} from '.';
+    video_info,
+    yt_validate
+}
 
+// Export Types
+export { Deezer, YouTube, SoundCloud, Spotify }
+
+// Export Default 
 export default {
     DeezerAlbum,
     DeezerPlaylist,
