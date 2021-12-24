@@ -123,18 +123,12 @@ async function stream(url: string, options: StreamOptions = {}): Promise<YouTube
     else return await yt_stream(url, options);
 }
 
-async function search(
-    query: string,
-    options: { source: { deezer: 'album' } } & SearchOptions
-): Promise<DeezerAlbum[]>;
+async function search(query: string, options: { source: { deezer: 'album' } } & SearchOptions): Promise<DeezerAlbum[]>;
 async function search(
     query: string,
     options: { source: { deezer: 'playlist' } } & SearchOptions
 ): Promise<DeezerPlaylist[]>;
-async function search(
-    query: string,
-    options: { source: { deezer: 'track' } } & SearchOptions
-): Promise<DeezerTrack[]>;
+async function search(query: string, options: { source: { deezer: 'track' } } & SearchOptions): Promise<DeezerTrack[]>;
 async function search(
     query: string,
     options: { source: { soundcloud: 'albums' } } & SearchOptions
@@ -497,12 +491,12 @@ export {
     video_basic_info,
     video_info,
     yt_validate
-}
+};
 
 // Export Types
-export { Deezer, YouTube, SoundCloud, Spotify }
+export { Deezer, YouTube, SoundCloud, Spotify };
 
-// Export Default 
+// Export Default
 export default {
     DeezerAlbum,
     DeezerPlaylist,

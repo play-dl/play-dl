@@ -67,6 +67,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
         
       - name: Publish on discord
-        run: node .github/discord.js channel="888999793458835466" body="${{ github.event.release.body }}" tag="${{ github.event.release.tag_name }}"
+        run: node .github/discord.js 
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHANNEL: 888999793458835466
+          BODY: ${{ github.event.release.body }}
+          TAG: ${{ github.event.release.tag_name }}
