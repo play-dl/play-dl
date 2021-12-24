@@ -1,17 +1,11 @@
 const bot_token = process.env['BOT_TOKEN']
+const tag = process.env['TAG']
+const body = process.env['BODY']
+const channel = process.env['CHANNEL']
 const { request } = require('https')
 
-let tag = undefined, body = undefined, channel = undefined;
-
-process.argv.forEach((arg) => {
-    const [ key, value ] = arg.split('=')
-    if(key === 'tag') tag = value
-    if(key === 'body') body = value
-    if(key === 'channel') channel = value
-})
-
 if(!tag || !body || !channel) {
-    console.log(`Some args are missing`)
+    console.log(`TAG || BODY || Channel missing`)
     process.exit(1)
 }
 else if(!bot_token) {
@@ -35,8 +29,6 @@ else if(!bot_token) {
         embeds : [embed]
     }
     
-    console.log(payload)
-
     const x = await https_getter(`https://discord.com/api/v9/channels/${channel}/messages`, {
         headers : {
             "Authorization" : `Bot ${bot_token}`,
