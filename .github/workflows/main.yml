@@ -70,6 +70,6 @@ jobs:
         run: node .github/discord.js 
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHANNEL: 888999793458835466
+          CHANNEL: "888999793458835466"
           BODY: ${{ github.event.release.body }}
           TAG: ${{ github.event.release.tag_name }}
