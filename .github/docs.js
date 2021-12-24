@@ -9,4 +9,4 @@ if(!fs.existsSync(path)) {
 
 const oldData = fs.readFileSync(path, 'utf-8')
 
-fs.writeFileSync(path, oldData.split('// Export Default ')[0])
+fs.writeFileSync(path, oldData.split('// Export Default')[0])
