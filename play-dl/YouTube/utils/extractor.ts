@@ -122,12 +122,12 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;(\s*)?(var|const|let)(\s*)?/)[0];
+        .split(/;\s*(var|const|let)\s/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const initial_data = body
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;(\s*)?(var|const|let)(\s*)?/)[0];
+        .split(/;\s*(var|const|let)\s/)[0];
     if (!initial_data) throw new Error('Initial Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     const initial_response = JSON.parse(initial_data);
@@ -226,7 +226,7 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;(\s*)?(var|const|let)(\s*)?/)[0];
+        .split(/;\s*(var|const|let)\s/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     if (player_response.playabilityStatus.status !== 'OK')
@@ -351,7 +351,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
         body
             .split('var ytInitialData = ')[1]
             .split(';</script>')[0]
-            .split(/;(\s*)?(var|const|let)(\s*)?/)[0]
+            .split(/;\s*(var|const|let)\s/)[0]
     );
     if (response.alerts) {
         if (response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
