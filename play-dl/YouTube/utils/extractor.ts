@@ -226,7 +226,7 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*(var|const|let)/)[0];
+        .split(/;(\s*)?(var|const|let)(\s*)?/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     if (player_response.playabilityStatus.status !== 'OK')
