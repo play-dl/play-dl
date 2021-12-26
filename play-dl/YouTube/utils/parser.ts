@@ -29,7 +29,7 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     const data = html
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*"(var|const|let)"/)[0];
+        .split(/;(\s*)?(var|const|let)(\s*)?/)[0];
     const json_data = JSON.parse(data);
     const results = [];
     const details =
