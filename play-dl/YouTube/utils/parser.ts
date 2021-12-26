@@ -6,6 +6,7 @@ import { YouTube } from '..';
 export interface ParseSearchInterface {
     type?: 'video' | 'playlist' | 'channel';
     limit?: number;
+    language?: string;
 }
 
 export interface thumbnail {
@@ -28,7 +29,7 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     const data = html
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*(var|const|let)/)[0];
+        .split(/;\s*"(var|const|let)"/)[0];
     const json_data = JSON.parse(data);
     const results = [];
     const details =

@@ -15,6 +15,7 @@ export interface StreamOptions {
     seekMode?: 'precise' | 'granular';
     seek?: number;
     quality?: number;
+    language?: string;
     htmldata?: boolean;
 }
 
@@ -46,7 +47,7 @@ export type YouTubeStream = Stream | LiveStream | SeekStream;
  * @returns Stream class with type and stream for playing.
  */
 export async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream> {
-    const info = await video_stream_info(url, { htmldata: options.htmldata });
+    const info = await video_stream_info(url, { htmldata: options.htmldata, language: options.language });
     return await stream_from_info(info, options);
 }
 /**

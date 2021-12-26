@@ -65,6 +65,7 @@ interface SearchOptions {
         deezer?: 'track' | 'playlist' | 'album';
     };
     fuzzy?: boolean;
+    language?: string;
 }
 
 import { createInterface } from 'node:readline';
@@ -102,6 +103,9 @@ async function stream(url: string, options?: StreamOptions): Promise<YouTubeStre
  * @param url Video / Track URL
  * @param options
  *
+ *  - `number` seek : No of seconds to seek in stream.
+ *  - `string` seekMode : Choose type of seek you want. [ "precise" | "granular" ]
+ *  - `string` language : Sets language of searched content [ YouTube search only. ], e.g. "en-US"
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `boolean` htmldata : given data is html data or not
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
@@ -186,6 +190,7 @@ async function search(query: string, options?: SearchOptions): Promise<YouTubeVi
  * @param options
  * 
  *  - `number` limit : No of searches you want to have.
+ *  - `string` language : Sets language of searched content [ YouTube search only. ], e.g. "en-US"
  *  - `boolean` fuzzy : Whether the search should be fuzzy or only return exact matches. Defaults to `true`. [ for `Deezer` Only ]
  *  - `Object` source : Contains type of source and type of result you want to have
  * ```ts
@@ -202,7 +207,12 @@ async function search(
 ): Promise<YouTube[] | Spotify[] | SoundCloud[] | Deezer[]> {
     if (!options.source) options.source = { youtube: 'video' };
     query = encodeURIComponent(query);
-    if (options.source.youtube) return await yt_search(query, { limit: options.limit, type: options.source.youtube });
+    if (options.source.youtube)
+        return await yt_search(query, {
+            limit: options.limit,
+            type: options.source.youtube,
+            language: options.language
+        });
     else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
     else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
     else if (options.source.deezer)
@@ -237,8 +247,10 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  * @param info YouTube video info OR SoundCloud track Class
  * @param options
  *
+ *  - `number` seek : No of seconds to seek in stream.
+ *  - `string` seekMode : Choose type of seek you want. [ "precise" | "granular" ]
+ *  - `string` language : Sets language of searched content [ YouTube search only. ], e.g. "en-US"
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
- *  - `Proxy[]` proxy : sends data through a proxy
  *  - `boolean` htmldata : given data is html data or not
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
