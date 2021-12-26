@@ -41,7 +41,7 @@ export async function yt_search(search: string, options: ParseSearchInterface = 
     }
     const body = await request(url, {
         headers: {
-            'accept-language': 'en-US,en;q=0.9'
+            'accept-language': options.language || 'en-US;q=0.9'
         }
     });
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)

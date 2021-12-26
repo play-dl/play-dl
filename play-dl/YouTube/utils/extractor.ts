@@ -6,10 +6,12 @@ import { InfoData, StreamInfoData } from './constants';
 
 interface InfoOptions {
     htmldata?: boolean;
+    language?: string;
 }
 
 interface PlaylistOptions {
     incomplete?: boolean;
+    language?: string;
 }
 
 const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
@@ -110,7 +112,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
             headers: {
-                'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
+                'accept-language': options.language || 'en-US;q=0.9'
             },
             cookies: true
         });
@@ -120,12 +122,12 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*(var|const|let)/)[0];
+        .split(/;\s*"(var|const|let)"/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const initial_data = body
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*(var|const|let)/)[0];
+        .split(/;\s*"(var|const|let)"/)[0];
     if (!initial_data) throw new Error('Initial Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     const initial_response = JSON.parse(initial_data);
@@ -340,12 +342,17 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
 
     const body = await request(url, {
         headers: {
-            'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'
+            'accept-language': options.language || 'en-US;q=0.9'
         }
     });
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
         throw new Error('Captcha page: YouTube has detected that you are a bot!');
-    const response = JSON.parse(body.split('var ytInitialData = ')[1].split(';</script>')[0]);
+    const response = JSON.parse(
+        body
+            .split('var ytInitialData = ')[1]
+            .split(';</script>')[0]
+            .split(/;\s*"(var|const|let)"/)[0]
+    );
     if (response.alerts) {
         if (response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
             if (!options.incomplete)
