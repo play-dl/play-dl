@@ -92,7 +92,7 @@ async function internalValidate(url: string): Promise<TypeData> {
                 return { type: false };
             }
 
-            if ((path[1] === 'track' || path[1] === 'album' || path[1] === 'playlist') && path[2].match(/^[0-9]+$/)) {
+            if ((path[1] === 'track' || path[1] === 'album' || path[1] === 'playlist') && path[2].match(/^\d+$/)) {
                 return {
                     type: path[1],
                     id: path[2]
@@ -105,7 +105,7 @@ async function internalValidate(url: string): Promise<TypeData> {
             if (
                 path.length === 3 &&
                 (path[1] === 'track' || path[1] === 'album' || path[1] === 'playlist') &&
-                path[2].match(/^[0-9]+$/)
+                path[2].match(/^\d+$/)
             ) {
                 return {
                     type: path[1],

@@ -146,7 +146,7 @@ export function parseVideo(data?: any): YouTubeVideo {
             artist: Boolean(badge?.includes('artist'))
         },
         uploadedAt: data.videoRenderer.publishedTimeText?.simpleText ?? null,
-        views: data.videoRenderer.viewCountText?.simpleText?.replace(/[^0-9]/g, '') ?? 0,
+        views: data.videoRenderer.viewCountText?.simpleText?.replace(/\D/g, '') ?? 0,
         live: durationText ? false : true
     });
 
@@ -179,7 +179,7 @@ export function parsePlaylist(data?: any): YouTubePlayList {
                 name: channel?.text,
                 url: `https://www.youtube.com${channel?.navigationEndpoint.commandMetadata.webCommandMetadata.url}`
             },
-            videos: parseInt(data.playlistRenderer.videoCount.replace(/[^0-9]/g, ''))
+            videos: parseInt(data.playlistRenderer.videoCount.replace(/\D/g, ''))
         },
         true
     );
