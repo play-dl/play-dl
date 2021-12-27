@@ -1,3 +1,5 @@
+It's jsut play-dl with some minor changes
+
 # Play-dl
 
 A **light-weight** YouTube, SoundCloud, Spotify and Deezer streaming and searching library.
