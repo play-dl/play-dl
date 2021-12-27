@@ -1,4 +1,4 @@
-It's jsut play-dl with some minor changes
+It's justt play-dl with some minor changes
 
 # Play-dl
 
