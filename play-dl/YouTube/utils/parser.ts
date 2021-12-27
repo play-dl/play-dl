@@ -29,7 +29,7 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     const data = html
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*"(var|const|let)"/)[0];
+        .split(/;\s*(var|const|let)\s/)[0];
     const json_data = JSON.parse(data);
     const results = [];
     const details =
@@ -146,7 +146,7 @@ export function parseVideo(data?: any): YouTubeVideo {
             artist: Boolean(badge?.includes('artist'))
         },
         uploadedAt: data.videoRenderer.publishedTimeText?.simpleText ?? null,
-        views: data.videoRenderer.viewCountText?.simpleText?.replace(/[^0-9]/g, '') ?? 0,
+        views: data.videoRenderer.viewCountText?.simpleText?.replace(/\D/g, '') ?? 0,
         live: durationText ? false : true
     });
 
@@ -179,7 +179,7 @@ export function parsePlaylist(data?: any): YouTubePlayList {
                 name: channel?.text,
                 url: `https://www.youtube.com${channel?.navigationEndpoint.commandMetadata.webCommandMetadata.url}`
             },
-            videos: parseInt(data.playlistRenderer.videoCount.replace(/[^0-9]/g, ''))
+            videos: parseInt(data.playlistRenderer.videoCount.replace(/\D/g, ''))
         },
         true
     );

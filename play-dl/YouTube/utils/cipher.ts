@@ -9,7 +9,7 @@ interface formatOptions {
     s?: string;
 }
 // RegExp for various js functions
-const var_js = '[a-zA-Z_\\$][a-zA-Z_0-9]*';
+const var_js = '[a-zA-Z_\\$]\\w*';
 const singlequote_js = `'[^'\\\\]*(:?\\\\[\\s\\S][^'\\\\]*)*'`;
 const duoblequote_js = `"[^"\\\\]*(:?\\\\[\\s\\S][^"\\\\]*)*"`;
 const quote_js = `(?:${singlequote_js}|${duoblequote_js})`;

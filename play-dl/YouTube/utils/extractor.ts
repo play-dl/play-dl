@@ -122,12 +122,12 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*"(var|const|let)"/)[0];
+        .split(/;\s*(var|const|let)\s/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const initial_data = body
         .split('var ytInitialData = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*"(var|const|let)"/)[0];
+        .split(/;\s*(var|const|let)\s/)[0];
     if (!initial_data) throw new Error('Initial Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     const initial_response = JSON.parse(initial_data);
@@ -226,7 +226,7 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
     const player_data = body
         .split('var ytInitialPlayerResponse = ')?.[1]
         ?.split(';</script>')[0]
-        .split(/;\s*(var|const|let)/)[0];
+        .split(/;\s*(var|const|let)\s/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     if (player_response.playabilityStatus.status !== 'OK')
@@ -346,7 +346,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
         body
             .split('var ytInitialData = ')[1]
             .split(';</script>')[0]
-            .split(/;\s*"(var|const|let)"/)[0]
+            .split(/;\s*(var|const|let)\s/)[0]
     );
     if (response.alerts) {
         if (response.alerts[0].alertWithButtonRenderer?.type === 'INFO') {
@@ -463,12 +463,12 @@ function getNormalPlaylist(response: any, body: any): YouTubePlayList {
     if (!data.title.runs || !data.title.runs.length) throw new Error('Failed to Parse Playlist info.');
 
     const author = playlist_details[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner;
-    const views = data.stats.length === 3 ? data.stats[1].simpleText.replace(/[^0-9]/g, '') : 0;
+    const views = data.stats.length === 3 ? data.stats[1].simpleText.replace(/\D/g, '') : 0;
     const lastUpdate =
         data.stats
             .find((x: any) => 'runs' in x && x['runs'].find((y: any) => y.text.toLowerCase().includes('last update')))
             ?.runs.pop()?.text ?? null;
-    const videosCount = data.stats[0].runs[0].text.replace(/[^0-9]/g, '') || 0;
+    const videosCount = data.stats[0].runs[0].text.replace(/\D/g, '') || 0;
 
     const res = new YouTubePlayList({
         continuation: {

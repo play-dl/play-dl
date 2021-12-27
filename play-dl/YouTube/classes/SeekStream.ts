@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'http';
 import { request_stream } from '../../Request';
 import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
-import { video_info } from '../utils';
+import { video_stream_info } from '../utils/extractor';
 import { Timer } from './LiveStream';
 import { WebmSeeker, WebmSeekerState } from './WebmSeeker';
 
@@ -148,7 +148,7 @@ export class SeekStream {
      * Retry if we get 404 or 403 Errors.
      */
     private async retry() {
-        const info = await video_info(this.video_url);
+        const info = await video_stream_info(this.video_url);
         const audioFormat = parseAudioFormats(info.format);
         this.url = audioFormat[this.quality].url;
     }

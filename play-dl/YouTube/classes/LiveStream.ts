@@ -2,7 +2,7 @@ import { Readable } from 'node:stream';
 import { IncomingMessage } from 'node:http';
 import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
 import { request, request_stream } from '../../Request';
-import { video_info } from '..';
+import { video_stream_info } from '../utils/extractor';
 
 export interface FormatInterface {
     url: string;
@@ -98,7 +98,7 @@ export class LiveStream {
      * Used by dash_timer for updating dash_url every 30 minutes.
      */
     private async dash_updater() {
-        const info = await video_info(this.video_url);
+        const info = await video_stream_info(this.video_url);
         if (
             info.LiveStreamData.isLive === true &&
             info.LiveStreamData.hlsManifestUrl !== null &&
@@ -277,7 +277,7 @@ export class Stream {
      * Retry if we get 404 or 403 Errors.
      */
     private async retry() {
-        const info = await video_info(this.video_url);
+        const info = await video_stream_info(this.video_url);
         const audioFormat = parseAudioFormats(info.format);
         this.url = audioFormat[this.quality].url;
     }
