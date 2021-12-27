@@ -9,6 +9,7 @@ interface RequestOpts extends RequestOptions {
     body?: string;
     method?: 'GET' | 'POST' | 'HEAD';
     cookies?: boolean;
+    cookieJar?: { [key: string]: string };
 }
 
 /**
@@ -33,7 +34,6 @@ export function request_stream(req_url: string, options: RequestOpts = { method:
 /**
  * Makes a request and follows redirects if necessary
  * @param req_url URL to make https request to
- * @param cookies_added Whether cookies were added or not
  * @param options Request options for https request
  * @returns A promise with the final response object
  */
@@ -69,6 +69,18 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
                 cookies_added = true;
             }
         }
+        if (options.cookieJar) {
+            const cookies = [];
+            for (const cookie of Object.entries(options.cookieJar)) {
+                cookies.push(cookie.join('='));
+            }
+
+            if (cookies.length !== 0) {
+                if (!options.headers) options.headers = {};
+                const existingCookies = cookies_added ? `; ${options.headers.cookie}` : '';
+                Object.assign(options.headers, { cookie: `${cookies.join('; ')}${existingCookies}` });
+            }
+        }
         if (options.headers) {
             options.headers = {
                 ...options.headers,
@@ -81,8 +93,16 @@ export function request(req_url: string, options: RequestOpts = { method: 'GET' 
             reject(res);
             return;
         }
-        if (res.headers && res.headers['set-cookie'] && cookies_added) {
-            cookieHeaders(res.headers['set-cookie']);
+        if (res.headers && res.headers['set-cookie']) {
+            if (options.cookieJar) {
+                for (const cookie of res.headers['set-cookie']) {
+                    const parts = cookie.split(';')[0].trim().split('=');
+                    options.cookieJar[parts.shift() as string] = parts.join('=');
+                }
+            }
+            if (cookies_added) {
+                cookieHeaders(res.headers['set-cookie']);
+            }
         }
         const data: string[] = [];
         let decoder: BrotliDecompress | Gunzip | Deflate | undefined = undefined;
