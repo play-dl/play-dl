@@ -1,3 +1,5 @@
+import { Duration } from '../nagDL/Duration';
+import { Song } from '../nagDL/Song';
 import { request } from '../Request';
 
 /**
@@ -54,7 +56,7 @@ interface DeezerUser {
 /**
  * Class representing a Deezer track
  */
-export class DeezerTrack {
+export class DeezerTrack implements Song {
     /**
      * The id of the track
      */
@@ -75,6 +77,12 @@ export class DeezerTrack {
      * The duration of the track in seconds
      */
     durationInSec: number;
+
+    /**
+     * nagDL: 
+     */
+    duration: Duration;
+
     /**
      * The rank of the track
      */
@@ -92,9 +100,19 @@ export class DeezerTrack {
      */
     artist: DeezerArtist;
     /**
+     * nagDL: The author of the track
+     */
+    author: string;
+    /**
      * The album that this track is in
      */
     album: DeezerTrackAlbum;
+    
+    /**
+     * nagDL: The album name
+     */
+    albumName: string;
+
     /**
      * The type, always `'track'`, useful to determine what the deezer function returned
      */
@@ -170,11 +188,14 @@ export class DeezerTrack {
         this.shortTitle = data.title_short;
         this.url = data.link;
         this.durationInSec = data.duration;
+        this.duration = new Duration(this.durationInSec);
         this.rank = data.rank;
         this.explicit = data.explicit_lyrics;
         this.previewURL = data.preview;
         this.artist = new DeezerArtist(data.artist);
+        this.author = this.artist.name;
         this.album = new DeezerTrackAlbum(data.album);
+        this.albumName = this.album.title;
         this.type = 'track';
 
         this.partial = partial;
@@ -281,6 +302,7 @@ export class DeezerAlbum {
      * The album cover available in four sizes
      */
     cover: DeezerImage;
+    thumbnail: string;
     /**
      * The type, always `'album'`, useful to determine what the deezer function returned
      */
@@ -390,7 +412,8 @@ export class DeezerAlbum {
             big: data.cover_big,
             medium: data.cover_medium,
             small: data.cover_small
-        };
+        }
+        this.thumbnail = this.cover.small;
 
         this.partial = partial;
 
