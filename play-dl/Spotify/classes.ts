@@ -1,6 +1,7 @@
 import { request } from '../Request';
 import { SpotifyDataOptions } from '.';
 import { AlbumJSON, PlaylistJSON, TrackJSON } from './constants';
+import { Song } from '../pdlE/Song';
 
 export interface SpotifyTrackAlbum {
     /**
@@ -72,11 +73,17 @@ export interface SpotifyCopyright {
 /**
  * Spotify Track Class
  */
-export class SpotifyTrack {
+export class SpotifyTrack implements Song {
     /**
      * Spotify Track Name
      */
     name: string;
+
+    /**
+     * PDL Enhanced: Spotify Track Name
+     */
+    title: string;
+
     /**
      * Spotify Class type. == "track"
      */
@@ -93,10 +100,12 @@ export class SpotifyTrack {
      * Spotify Track explicit info.
      */
     explicit: boolean;
+
     /**
      * Spotify Track Duration in seconds
      */
     durationInSec: number;
+
     /**
      * Spotify Track Duration in milli seconds
      */
@@ -119,6 +128,7 @@ export class SpotifyTrack {
      */
     constructor(data: any) {
         this.name = data.name;
+        this.title = this.name;
         this.id = data.id;
         this.type = 'track';
         this.url = data.external_urls.spotify;

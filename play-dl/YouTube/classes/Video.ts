@@ -1,3 +1,4 @@
+import { Song } from '../../pdlE/Song';
 import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
 
@@ -66,7 +67,7 @@ interface VideoOptions {
 /**
  * Class for YouTube Video url
  */
-export class YouTubeVideo {
+export class YouTubeVideo implements Song {
     /**
      * YouTube Video ID
      */
@@ -127,6 +128,12 @@ export class YouTubeVideo {
      * YouTube Video tags
      */
     tags: string[];
+
+    /**
+     * PDL Enhanced: The YouTube channel name
+     */
+    author?: string;
+
     /**
      * Constructor for YouTube Video Class
      * @param data JSON parsed data.
@@ -149,6 +156,7 @@ export class YouTubeVideo {
         }
         this.thumbnails = thumbnails || [];
         this.channel = new YouTubeChannel(data.channel) || {};
+        this.author = this.channel.name;
         this.likes = data.likes || 0;
         this.live = !!data.live;
         this.private = !!data.private;
