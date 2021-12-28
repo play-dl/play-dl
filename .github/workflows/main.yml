@@ -1,4 +1,4 @@
-name: Publish NPM package + Docs
+name: Publish NPM package
 on:
   release:
     types: [created]
@@ -19,57 +19,3 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  
-  publish_docs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout play dl
-        uses: actions/checkout@v2
-
-      - name: Checkout play dl GitHub page repo
-        uses: actions/checkout@v2
-        with:
-          repository: play-dl/play-dl.github.io
-          path: docs
-          token: "${{ secrets.DOCS_TOKEN }}"
-
-      - name: Setup Node 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name:  Deleting default exports for ESM.
-        run: node .github/docs.js
-
-      - name: TypeDoc
-        run: npx typedoc
-
-      - name: Adding, committing and Pushing
-        run: |
-          cd docs/
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add *
-          git commit -m "Automated Docs"
-          git push
-
-  publish_discord:
-     runs-on: ubuntu-latest
-     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-        
-      - name: Publish on discord
-        run: node .github/discord.js 
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHANNEL: "888999793458835466"
-          BODY: ${{ github.event.release.body }}
-          TAG: ${{ github.event.release.tag_name }}
