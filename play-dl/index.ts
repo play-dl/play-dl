@@ -46,6 +46,7 @@ import {
     DeezerAlbum,
     dz_search
 } from './Deezer';
+import { Song, Duration } from './nagDL/'
 import { setToken } from './token';
 
 enum AudioPlayerStatus {
@@ -507,6 +508,9 @@ export {
 
 // Export Types
 export { Deezer, YouTube, SoundCloud, Spotify };
+
+// nagDL: Export types
+export { Song, Duration }
 
 // Export Default
 export default {

@@ -1,6 +1,6 @@
 {
   "name": "nagdl",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Play-dl with some modifications for my bot implementation",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
