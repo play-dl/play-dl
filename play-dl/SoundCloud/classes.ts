@@ -4,8 +4,8 @@ import { IncomingMessage } from 'node:http';
 import { StreamType } from '../YouTube/stream';
 import { Timer } from '../YouTube/classes/LiveStream';
 import { PlaylistJSON, SoundTrackJSON } from './constants';
-import { Song } from '../pdlE/Song';
-import { Duration } from '../pdlE/Duration';
+import { Song } from '../nagDL/Song';
+import { Duration } from '../nagDL/Duration';
 
 export interface SoundCloudUser {
     /**
@@ -124,7 +124,7 @@ export class SoundCloudTrack implements Song {
     durationInMs: number;
 
     /**
-     * PDL Enhanced: Duration instance
+     * nagDL: Duration instance
      */
     duration: Duration;
 

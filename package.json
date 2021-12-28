@@ -1,7 +1,7 @@
 {
-  "name": "play-dl",
+  "name": "nagdl",
   "version": "1.6.7",
-  "description": "YouTube, SoundCloud, Spotify, Deezer searching and streaming for discord.js bots",
+  "description": "Play-dl with some modifications for my bot implementation",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "module": "dist/index.mjs",

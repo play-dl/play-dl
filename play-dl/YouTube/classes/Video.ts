@@ -1,5 +1,5 @@
-import { Duration } from '../../pdlE/Duration';
-import { Song } from '../../pdlE/Song';
+import { Duration } from '../../nagDL/Duration';
+import { Song } from '../../nagDL/Song';
 import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
 
@@ -134,7 +134,7 @@ export class YouTubeVideo implements Song {
     tags: string[];
 
     /**
-     * PDL Enhanced: The YouTube channel name
+     * nagDL: The YouTube channel name
      */
     author?: string;
 

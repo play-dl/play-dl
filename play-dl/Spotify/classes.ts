@@ -1,8 +1,8 @@
 import { request } from '../Request';
 import { SpotifyDataOptions } from '.';
 import { AlbumJSON, PlaylistJSON, TrackJSON } from './constants';
-import { Song } from '../pdlE/Song';
-import { Duration } from '../pdlE/Duration';
+import { Song } from '../nagDL/Song';
+import { Duration } from '../nagDL/Duration';
 
 export interface SpotifyTrackAlbum {
     /**
@@ -81,7 +81,7 @@ export class SpotifyTrack implements Song {
     name: string;
 
     /**
-     * PDL Enhanced: Spotify Track Name
+     * nagDL: Spotify Track Name
      */
     title: string;
 
@@ -113,7 +113,7 @@ export class SpotifyTrack implements Song {
     durationInMs: number;
 
     /**
-     * PDL Enhanced: Duration instance
+     * nagDL: Duration instance
      */
     duration: Duration;
 
@@ -123,7 +123,7 @@ export class SpotifyTrack implements Song {
     artists: SpotifyArtists[];
 
     /**
-     * PDL Enhanced: Spotify author(s) 
+     * nagDL: Spotify author(s) 
      */
     author?: string;
 
@@ -133,7 +133,7 @@ export class SpotifyTrack implements Song {
     album: SpotifyTrackAlbum | undefined;
 
     /**
-     * PDL Enhanced: Album name
+     * nagDL: Album name
      */
     albumName?: string;
 
@@ -157,7 +157,7 @@ export class SpotifyTrack implements Song {
         this.duration = new Duration(this.durationInSec);
         const artists: SpotifyArtists[] = [];
         data.artists.forEach((v: any) => {
-            /**PDl Enhanced: Set author */
+            /**nagDL: Set author */
             this.author += v.name + ", "
             artists.push({
                 name: v.name,
