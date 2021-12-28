@@ -4,6 +4,8 @@ import { IncomingMessage } from 'node:http';
 import { StreamType } from '../YouTube/stream';
 import { Timer } from '../YouTube/classes/LiveStream';
 import { PlaylistJSON, SoundTrackJSON } from './constants';
+import { Song } from '../pdlE/Song';
+import { Duration } from '../pdlE/Duration';
 
 export interface SoundCloudUser {
     /**
@@ -91,7 +93,7 @@ export interface SoundCloudTrackFormat {
 /**
  * SoundCloud Track Class
  */
-export class SoundCloudTrack {
+export class SoundCloudTrack implements Song {
     /**
      * SoundCloud Track Name
      */
@@ -120,6 +122,12 @@ export class SoundCloudTrack {
      * SoundCloud Track Duration in miili seconds
      */
     durationInMs: number;
+
+    /**
+     * PDL Enhanced: Duration instance
+     */
+    duration: Duration;
+
     /**
      * SoundCloud Track formats data
      */
@@ -142,6 +150,12 @@ export class SoundCloudTrack {
      * SoundCloud Track user data
      */
     user: SoundCloudUser;
+
+    /**
+     * PDLEnhanced: Author 
+     */
+    author: string;
+
     /**
      * Constructor for SoundCloud Track Class
      * @param data JSON parsed track html data
@@ -163,6 +177,7 @@ export class SoundCloudTrack {
                 writer_composer: data.publisher_metadata.writer_composer
             };
         else this.publisher = null;
+        this.duration = new Duration(this.durationInSec);
         this.formats = data.media.transcodings;
         this.user = {
             name: data.user.username,
@@ -176,6 +191,7 @@ export class SoundCloudTrack {
             last_name: data.user.last_name,
             thumbnail: data.user.avatar_url
         };
+        this.author = this.user.name;
         this.thumbnail = data.artwork_url;
     }
     /**
