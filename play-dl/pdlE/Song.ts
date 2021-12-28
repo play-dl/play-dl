@@ -9,5 +9,6 @@ export interface Song {
     duration: Duration;
     title?: string;
     author?: string;
+    albumName?: string;
     thumbnail?: Thumbnail;
 }

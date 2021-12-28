@@ -2,6 +2,7 @@ import { request } from '../Request';
 import { SpotifyDataOptions } from '.';
 import { AlbumJSON, PlaylistJSON, TrackJSON } from './constants';
 import { Song } from '../pdlE/Song';
+import { Duration } from '../pdlE/Duration';
 
 export interface SpotifyTrackAlbum {
     /**
@@ -110,14 +111,32 @@ export class SpotifyTrack implements Song {
      * Spotify Track Duration in milli seconds
      */
     durationInMs: number;
+
+    /**
+     * PDL Enhanced: Duration instance
+     */
+    duration: Duration;
+
     /**
      * Spotify Track Artists data [ array ]
      */
     artists: SpotifyArtists[];
+
+    /**
+     * PDL Enhanced: Spotify author(s) 
+     */
+    author?: string;
+
     /**
      * Spotify Track Album data
      */
     album: SpotifyTrackAlbum | undefined;
+
+    /**
+     * PDL Enhanced: Album name
+     */
+    albumName?: string;
+
     /**
      * Spotify Track Thumbnail Data
      */
@@ -135,14 +154,19 @@ export class SpotifyTrack implements Song {
         this.explicit = data.explicit;
         this.durationInMs = data.duration_ms;
         this.durationInSec = Math.round(this.durationInMs / 1000);
+        this.duration = new Duration(this.durationInSec);
         const artists: SpotifyArtists[] = [];
         data.artists.forEach((v: any) => {
+            /**PDl Enhanced: Set author */
+            this.author += v.name + ", "
             artists.push({
                 name: v.name,
                 id: v.id,
                 url: v.external_urls.spotify
             });
         });
+        // Remove the last ", "
+        this.author = this.author?.substr(0, this.author.length - 2);
         this.artists = artists;
         if (!data.album?.name) this.album = undefined;
         else {
@@ -155,6 +179,7 @@ export class SpotifyTrack implements Song {
                 total_tracks: data.album.total_tracks
             };
         }
+        this.albumName = this.album?.name;
         if (!data.album?.images?.[0]) this.thumbnail = undefined;
         else this.thumbnail = data.album.images[0];
     }
