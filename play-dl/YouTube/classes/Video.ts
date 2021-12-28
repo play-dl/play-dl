@@ -65,7 +65,7 @@ interface VideoOptions {
     /**
      * `true` if the video has been identified by the YouTube community as inappropriate or offensive to some audiences and viewer discretion is advised
      */
-    discretionAdvised: boolean;
+    discretionAdvised?: boolean;
 }
 /**
  * Class for YouTube Video url
@@ -134,7 +134,7 @@ export class YouTubeVideo {
     /**
      * `true` if the video has been identified by the YouTube community as inappropriate or offensive to some audiences and viewer discretion is advised
      */
-    discretionAdvised: boolean;
+    discretionAdvised?: boolean;
     /**
      * Constructor for YouTube Video Class
      * @param data JSON parsed data.
@@ -161,7 +161,7 @@ export class YouTubeVideo {
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
-        this.discretionAdvised = !!data.discretionAdvised;
+        this.discretionAdvised = data.discretionAdvised === undefined ? undefined : data.discretionAdvised;
     }
     /**
      * Converts class to title name of video.

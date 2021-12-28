@@ -145,12 +145,14 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
                 );
             discretionAdvised = true;
             const cookies =
-                initial_response.topbar.desktopTopbarRenderer.interstitial.consentBumpV2Renderer.agreeButton
+                initial_response.topbar.desktopTopbarRenderer.interstitial?.consentBumpV2Renderer.agreeButton
                     .buttonRenderer.command.saveConsentAction;
-            Object.assign(cookieJar, {
-                VISITOR_INFO1_LIVE: cookies.visitorCookie,
-                CONSENT: cookies.consentCookie
-            });
+            if (cookies) {
+                Object.assign(cookieJar, {
+                    VISITOR_INFO1_LIVE: cookies.visitorCookie,
+                    CONSENT: cookies.consentCookie
+                });
+            }
 
             const updatedValues = await acceptViewerDiscretion(vid.videoId, cookieJar, body, true);
             player_response.streamingData = updatedValues.streamingData;
@@ -270,12 +272,14 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
             if (!initial_data) throw new Error('Initial Response Data is undefined.');
 
             const cookies =
-                JSON.parse(initial_data).topbar.desktopTopbarRenderer.interstitial.consentBumpV2Renderer.agreeButton
+                JSON.parse(initial_data).topbar.desktopTopbarRenderer.interstitial?.consentBumpV2Renderer.agreeButton
                     .buttonRenderer.command.saveConsentAction;
-            Object.assign(cookieJar, {
-                VISITOR_INFO1_LIVE: cookies.visitorCookie,
-                CONSENT: cookies.consentCookie
-            });
+            if (cookies) {
+                Object.assign(cookieJar, {
+                    VISITOR_INFO1_LIVE: cookies.visitorCookie,
+                    CONSENT: cookies.consentCookie
+                });
+            }
 
             const updatedValues = await acceptViewerDiscretion(
                 player_response.videoDetails.videoId,
@@ -462,7 +466,6 @@ export function getContinuationToken(data: any): string {
     return data.find((x: any) => Object.keys(x)[0] === 'continuationItemRenderer')?.continuationItemRenderer
         .continuationEndpoint?.continuationCommand?.token;
 }
-
 
 async function acceptViewerDiscretion(
     videoId: string,
