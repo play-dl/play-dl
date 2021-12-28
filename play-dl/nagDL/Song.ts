@@ -9,5 +9,5 @@ export interface Song {
     title?: string;
     author?: string;
     albumName?: string;
-    thumbnail?: string;
+    thumbnailUrl?: string;
 }

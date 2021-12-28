@@ -145,7 +145,7 @@ export class SoundCloudTrack implements Song {
     /**
      * SoundCloud Track thumbnail
      */
-    thumbnail: string;
+    thumbnailUrl: string;
     /**
      * SoundCloud Track user data
      */
@@ -192,7 +192,7 @@ export class SoundCloudTrack implements Song {
             thumbnail: data.user.avatar_url
         };
         this.author = this.user.name;
-        this.thumbnail = data.artwork_url;
+        this.thumbnailUrl = data.artwork_url;
     }
     /**
      * Converts class to JSON
@@ -208,7 +208,7 @@ export class SoundCloudTrack implements Song {
             durationInSec: this.durationInSec,
             publisher: this.publisher,
             formats: this.formats,
-            thumbnail: this.thumbnail,
+            thumbnail: this.thumbnailUrl,
             user: this.user
         };
     }

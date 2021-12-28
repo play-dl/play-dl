@@ -141,6 +141,9 @@ export class SpotifyTrack implements Song {
      * Spotify Track Thumbnail Data
      */
     thumbnail: SpotifyThumbnail | undefined;
+
+    thumbnailUrl?: string;
+
     /**
      * Constructor for Spotify Track
      * @param data
@@ -182,6 +185,7 @@ export class SpotifyTrack implements Song {
         this.albumName = this.album?.name;
         if (!data.album?.images?.[0]) this.thumbnail = undefined;
         else this.thumbnail = data.album.images[0];
+        this.thumbnailUrl = this.thumbnail?.url;
     }
 
     toJSON(): TrackJSON {
