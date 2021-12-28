@@ -82,13 +82,13 @@ export class Duration {
         }
     }
 
-    public static formatDuration(minutes: number, seconds: number, hours?: number): string {
+    public formatDuration(): string {
         let result = '';
-        if (hours) {
-            result += hours + ':';
+        if (this._hours) {
+            result += this._hours + ':';
         }
-        result += minutes + ':';
-        result += seconds;
+        result += this._minutes + ':';
+        result += this._seconds;
 
         return result;
     }
