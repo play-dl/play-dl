@@ -180,7 +180,7 @@ export class YouTubePlayList {
         return this;
     }
     /**
-     * YouTube Playlist is divided into pages.
+     * YouTube Playlists are divided into pages.
      *
      * For example, if you want to get 101 - 200 songs
      *
@@ -193,6 +193,7 @@ export class YouTubePlayList {
      * ```
      * @param number Page number
      * @returns Array of YouTube Video Class
+     * @see {@link YouTubePlayList.all_videos}
      */
     page(number: number): YouTubeVideo[] {
         if (!number) throw new Error('Page number is not provided');
@@ -200,33 +201,36 @@ export class YouTubePlayList {
         return this.fetched_videos.get(`${number}`) as YouTubeVideo[];
     }
     /**
-     * Gets total no of pages in that playlist class.
-     *
-     * For getting all songs in a playlist
-     *
-     * ```ts
-     * const playlist = await play.playlist_info('playlist url');
-     *
-     * await playlist.fetch();
-     *
-     * let result = [];
-     *
-     * for (let i = 0; i <= playlist.total_pages; i++) {
-     *      result.push(playlist.page(i));
-     * }
-     * ```
+     * Gets total number of pages in that playlist class.
+     * @see {@link YouTubePlayList.all_videos}
      */
     get total_pages() {
         return this.fetched_videos.size;
     }
     /**
-     * This tells total no of videos that have been fetched so far.
+     * This tells total number of videos that have been fetched so far.
      *
      * This can be equal to videosCount if all videos in playlist have been fetched and they are not hidden.
      */
     get total_videos() {
         const page_number: number = this.total_pages;
         return (page_number - 1) * 100 + (this.fetched_videos.get(`${page_number}`) as YouTubeVideo[]).length;
+    }
+    /**
+     * Fetches all the videos in the playlist and returns them
+     * @returns An array of {@link YouTubeVideo} objects
+     * @see {@link YouTubePlayList.fetch}
+     */
+    async all_videos(): Promise<YouTubeVideo[]> {
+        await this.fetch();
+
+        const videos = [];
+
+        for (const [, page] of this.fetched_videos.entries()) {
+            videos.push(...page);
+        }
+
+        return videos;
     }
     /**
      * Converts Playlist Class to a json parsed data.
