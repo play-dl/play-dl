@@ -21,7 +21,7 @@ const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern =
-    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(.*)?$/;
+    /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(.*)?$/;
 /**
  * Validate YouTube URL or ID.
  *
@@ -391,11 +391,6 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
     if (!url.startsWith('https')) url = `https://www.youtube.com/playlist?list=${url}`;
     if (url.indexOf('list=') === -1) throw new Error('This is not a Playlist URL');
 
-    if (yt_validate(url) === 'playlist') {
-        const id = extractID(url);
-        url = `https://www.youtube.com/playlist?list=${id}`;
-    }
-
     const body = await request(url, {
         headers: {
             'accept-language': options.language || 'en-US;q=0.9'
@@ -420,7 +415,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
         else throw new Error('While parsing playlist url\nUnknown Playlist Error');
     }
     if (url.indexOf('watch?v=') !== -1) {
-        return getWatchPlaylist(response, body);
+        return getWatchPlaylist(response, body, url);
     } else return getNormalPlaylist(response, body);
 }
 /**
@@ -467,6 +462,7 @@ export function getContinuationToken(data: any): string {
     return data.find((x: any) => Object.keys(x)[0] === 'continuationItemRenderer')?.continuationItemRenderer
         .continuationEndpoint?.continuationCommand?.token;
 }
+
 
 async function acceptViewerDiscretion(
     videoId: string,
@@ -550,7 +546,7 @@ async function acceptViewerDiscretion(
     return { streamingData };
 }
 
-function getWatchPlaylist(response: any, body: any): YouTubePlayList {
+function getWatchPlaylit(response: any, body: any): YouTubePlayList {
     const playlist_details = response.contents.twoColumnWatchNextResults.playlist.playlist;
 
     const videos = getWatchPlaylistVideos(playlist_details.contents);
@@ -576,7 +572,7 @@ function getWatchPlaylist(response: any, body: any): YouTubePlayList {
         title: playlist_details.title || '',
         videoCount: parseInt(videoCount) || 0,
         videos: videos,
-        url: `https://www.youtube.com/playlist?list=${playlist_details.playlistId}`,
+        url: url,
         channel: {
             id: channel?.navigationEndpoint?.browseEndpoint?.browseId || null,
             name: channel?.text || null,

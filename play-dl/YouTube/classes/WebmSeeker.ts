@@ -85,7 +85,7 @@ export class WebmSeeker extends Duplex {
                 break;
             } else continue;
         }
-        if (position === 0) return Error('Failed to find Cluster Position');
+        if (position === 0) return new Error('Failed to find Cluster Position');
         else return position;
     }
 

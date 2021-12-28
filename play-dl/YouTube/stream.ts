@@ -1,7 +1,9 @@
+import { request_stream } from '../Request';
 import { LiveStream, Stream } from './classes/LiveStream';
 import { SeekStream } from './classes/SeekStream';
 import { InfoData, StreamInfoData } from './utils/constants';
 import { video_stream_info } from './utils/extractor';
+import { URL } from 'node:url';
 
 export enum StreamType {
     Arbitrary = 'arbitrary',
@@ -81,6 +83,7 @@ export async function stream_from_info(
     else final.push(info.format[info.format.length - 1]);
     let type: StreamType =
         final[0].codec === 'opus' && final[0].container === 'webm' ? StreamType.WebmOpus : StreamType.Arbitrary;
+    await request_stream(`https://${new URL(final[0].url).host}/generate_204`)
     if (options.seek) {
         if (type === StreamType.WebmOpus) {
             if (options.seek >= info.video_details.durationInSec || options.seek <= 0)
