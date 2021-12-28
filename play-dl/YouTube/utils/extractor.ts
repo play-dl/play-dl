@@ -3,6 +3,7 @@ import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 import { InfoData, StreamInfoData } from './constants';
+import { URLSearchParams } from 'node:url';
 
 interface InfoOptions {
     htmldata?: boolean;
@@ -20,7 +21,7 @@ const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern =
-    /^((?:https?:)?\/\/)?(?:(?:www|m)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(.*)?$/;
+    /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(.*)?$/;
 /**
  * Validate YouTube URL or ID.
  *
@@ -104,6 +105,7 @@ export function extractID(url: string): string {
 export async function video_basic_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
     if (typeof url !== 'string') throw new Error('url parameter is not a URL string or a string of HTML');
     let body: string;
+    const cookieJar = {};
     if (options.htmldata) {
         body = url;
     } else {
@@ -114,7 +116,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
             headers: {
                 'accept-language': options.language || 'en-US;q=0.9'
             },
-            cookies: true
+            cookies: true,
+            cookieJar
         });
     }
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
@@ -131,13 +134,35 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     if (!initial_data) throw new Error('Initial Response Data is undefined.');
     const player_response = JSON.parse(player_data);
     const initial_response = JSON.parse(initial_data);
-    if (player_response.playabilityStatus.status !== 'OK')
-        throw new Error(
-            `While getting info from url\n${
-                player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
-                player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
-            }`
-        );
+    const vid = player_response.videoDetails;
+
+    let discretionAdvised = false;
+    if (player_response.playabilityStatus.status !== 'OK') {
+        if (player_response.playabilityStatus.status === 'CONTENT_CHECK_REQUIRED') {
+            if (options.htmldata)
+                throw new Error(
+                    `Accepting the viewer discretion is not supported when using htmldata, video: ${vid.videoId}`
+                );
+            discretionAdvised = true;
+            const cookies =
+                initial_response.topbar.desktopTopbarRenderer.interstitial.consentBumpV2Renderer.agreeButton
+                    .buttonRenderer.command.saveConsentAction;
+            Object.assign(cookieJar, {
+                VISITOR_INFO1_LIVE: cookies.visitorCookie,
+                CONSENT: cookies.consentCookie
+            });
+
+            const updatedValues = await acceptViewerDiscretion(vid.videoId, cookieJar, body, true);
+            player_response.streamingData = updatedValues.streamingData;
+            initial_response.contents.twoColumnWatchNextResults.secondaryResults = updatedValues.relatedVideos;
+        } else
+            throw new Error(
+                `While getting info from url\n${
+                    player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
+                    player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
+                }`
+            );
+    }
     const ownerInfo =
         initial_response.contents.twoColumnWatchNextResults.results?.results?.contents[1]?.videoSecondaryInfoRenderer
             ?.owner?.videoOwnerRenderer;
@@ -150,7 +175,6 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
                 related.push(`https://www.youtube.com/watch?v=${res.compactVideoRenderer.videoId}`);
         }
     );
-    const vid = player_response.videoDetails;
     const microformat = player_response.microformat.playerMicroformatRenderer;
     const video_details = new YouTubeVideo({
         id: vid.videoId,
@@ -179,7 +203,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
                 ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
         ),
         live: vid.isLiveContent,
-        private: vid.isPrivate
+        private: vid.isPrivate,
+        discretionAdvised
     });
     const format = player_response.streamingData.formats ?? [];
     format.push(...(player_response.streamingData.adaptiveFormats ?? []));
@@ -210,6 +235,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
 export async function video_stream_info(url: string, options: InfoOptions = {}): Promise<StreamInfoData> {
     if (typeof url !== 'string') throw new Error('url parameter is not a URL string or a string of HTML');
     let body: string;
+    const cookieJar = {};
     if (options.htmldata) {
         body = url;
     } else {
@@ -218,7 +244,8 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
             headers: { 'accept-language': 'en-US,en;q=0.9' },
-            cookies: true
+            cookies: true,
+            cookieJar
         });
     }
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
@@ -229,13 +256,42 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         .split(/;\s*(var|const|let)\s/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const player_response = JSON.parse(player_data);
-    if (player_response.playabilityStatus.status !== 'OK')
-        throw new Error(
-            `While getting info from url\n${
-                player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
-                player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
-            }`
-        );
+    if (player_response.playabilityStatus.status !== 'OK') {
+        if (player_response.playabilityStatus.status === 'CONTENT_CHECK_REQUIRED') {
+            if (options.htmldata)
+                throw new Error(
+                    `Accepting the viewer discretion is not supported when using htmldata, video: ${player_response.videoDetails.videoId}`
+                );
+
+            const initial_data = body
+                .split('var ytInitialData = ')?.[1]
+                ?.split(';</script>')[0]
+                .split(/;\s*(var|const|let)\s/)[0];
+            if (!initial_data) throw new Error('Initial Response Data is undefined.');
+
+            const cookies =
+                JSON.parse(initial_data).topbar.desktopTopbarRenderer.interstitial.consentBumpV2Renderer.agreeButton
+                    .buttonRenderer.command.saveConsentAction;
+            Object.assign(cookieJar, {
+                VISITOR_INFO1_LIVE: cookies.visitorCookie,
+                CONSENT: cookies.consentCookie
+            });
+
+            const updatedValues = await acceptViewerDiscretion(
+                player_response.videoDetails.videoId,
+                cookieJar,
+                body,
+                false
+            );
+            player_response.streamingData = updatedValues.streamingData;
+        } else
+            throw new Error(
+                `While getting info from url\n${
+                    player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
+                    player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
+                }`
+            );
+    }
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const duration = Number(player_response.videoDetails.lengthSeconds);
     const video_details = {
@@ -335,11 +391,6 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
     if (!url.startsWith('https')) url = `https://www.youtube.com/playlist?list=${url}`;
     if (url.indexOf('list=') === -1) throw new Error('This is not a Playlist URL');
 
-    if (yt_validate(url) === 'playlist') {
-        const id = extractID(url);
-        url = `https://www.youtube.com/playlist?list=${id}`;
-    }
-
     const body = await request(url, {
         headers: {
             'accept-language': options.language || 'en-US;q=0.9'
@@ -364,7 +415,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
         else throw new Error('While parsing playlist url\nUnknown Playlist Error');
     }
     if (url.indexOf('watch?v=') !== -1) {
-        return getWatchPlaylist(response, body);
+        return getWatchPlaylist(response, body, url);
     } else return getNormalPlaylist(response, body);
 }
 /**
@@ -412,7 +463,90 @@ export function getContinuationToken(data: any): string {
         .continuationEndpoint?.continuationCommand?.token;
 }
 
-function getWatchPlaylist(response: any, body: any): YouTubePlayList {
+
+async function acceptViewerDiscretion(
+    videoId: string,
+    cookieJar: { [key: string]: string },
+    body: string,
+    extractRelated: boolean
+): Promise<{ streamingData: any; relatedVideos?: any }> {
+    const apiKey =
+        body.split('INNERTUBE_API_KEY":"')[1]?.split('"')[0] ??
+        body.split('innertubeApiKey":"')[1]?.split('"')[0] ??
+        DEFAULT_API_KEY;
+    const sessionToken =
+        body.split('"XSRF_TOKEN":"')[1]?.split('"')[0].replaceAll('\\u003d', '=') ??
+        body.split('"xsrf_token":"')[1]?.split('"')[0].replaceAll('\\u003d', '=');
+    if (!sessionToken)
+        throw new Error(`Unable to extract XSRF_TOKEN to accept the viewer discretion popup for video: ${videoId}.`);
+
+    const verificationResponse = await request(`https://www.youtube.com/youtubei/v1/verify_age?key=${apiKey}`, {
+        method: 'POST',
+        body: JSON.stringify({
+            context: {
+                client: {
+                    utcOffsetMinutes: 0,
+                    gl: 'US',
+                    hl: 'en',
+                    clientName: 'WEB',
+                    clientVersion:
+                        body.split('"INNERTUBE_CONTEXT_CLIENT_VERSION":"')[1]?.split('"')[0] ??
+                        body.split('"innertube_context_client_version":"')[1]?.split('"')[0] ??
+                        '<some version>'
+                },
+                user: {},
+                request: {}
+            },
+            nextEndpoint: {
+                urlEndpoint: {
+                    url: `watch?v=${videoId}`
+                }
+            },
+            setControvercy: true
+        }),
+        cookieJar
+    });
+
+    const endpoint = JSON.parse(verificationResponse).actions[0].navigateAction.endpoint;
+
+    const videoPage = await request(`https://www.youtube.com/${endpoint.urlEndpoint.url}&pbj=1`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams([
+            ['command', JSON.stringify(endpoint)],
+            ['session_token', sessionToken]
+        ]).toString(),
+        cookieJar
+    });
+
+    if (videoPage.includes('<h1>Something went wrong</h1>'))
+        throw new Error(`Unable to accept the viewer discretion popup for video: ${videoId}`);
+
+    const videoPageData = JSON.parse(videoPage);
+
+    if (videoPageData[2].playerResponse.playabilityStatus.status !== 'OK')
+        throw new Error(
+            `While getting info from url after trying to accept the discretion popup for video ${videoId}\n${
+                videoPageData[2].playerResponse.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason
+                    .simpleText ??
+                videoPageData[2].playerResponse.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
+            }`
+        );
+
+    const streamingData = videoPageData[2].playerResponse.streamingData;
+
+    if (extractRelated)
+        return {
+            streamingData,
+            relatedVideos: videoPageData[3].response.contents.twoColumnWatchNextResults.secondaryResults
+        };
+
+    return { streamingData };
+}
+
+function getWatchPlaylist(response: any, body: any, url: string): YouTubePlayList {
     const playlist_details = response.contents.twoColumnWatchNextResults.playlist.playlist;
 
     const videos = getWatchPlaylistVideos(playlist_details.contents);
@@ -438,7 +572,7 @@ function getWatchPlaylist(response: any, body: any): YouTubePlayList {
         title: playlist_details.title || '',
         videoCount: parseInt(videoCount) || 0,
         videos: videos,
-        url: `https://www.youtube.com/playlist?list=${playlist_details.playlistId}`,
+        url: url,
         channel: {
             id: channel?.navigationEndpoint?.browseEndpoint?.browseId || null,
             name: channel?.text || null,

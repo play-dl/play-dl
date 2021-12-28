@@ -92,8 +92,8 @@ export class SeekStream {
      * @param sec No of seconds to seek to
      * @returns Nothing
      */
-    private async seek(sec: number) {
-        await new Promise(async (res) => {
+    private async seek(sec: number): Promise<void> {
+        const parse = await new Promise(async (res, rej) => {
             if (!this.stream.headerparsed) {
                 const stream = await request_stream(this.url, {
                     headers: {
@@ -102,13 +102,13 @@ export class SeekStream {
                 }).catch((err: Error) => err);
 
                 if (stream instanceof Error) {
-                    this.stream.emit('error', stream);
-                    this.bytes_count = 0;
-                    this.per_sec_bytes = 0;
-                    this.cleanup();
+                    rej(stream)
                     return;
                 }
-
+                if (Number(stream.statusCode) >= 400) {
+                    rej(400)
+                    return;
+                }
                 this.request = stream;
                 stream.pipe(this.stream, { end: false });
 
@@ -117,8 +117,19 @@ export class SeekStream {
                     res('');
                 });
             } else res('');
-        });
-
+        }).catch((err) => err);
+        if(parse instanceof Error){
+            this.stream.emit('error', parse);
+            this.bytes_count = 0;
+            this.per_sec_bytes = 0;
+            this.cleanup();
+            return;
+        }
+        else if(parse === 400){
+            await this.retry();
+            this.timer.reuse()
+            return this.seek(sec);
+        }
         const bytes = this.stream.seek(sec);
         if (bytes instanceof Error) {
             this.stream.emit('error', bytes);
