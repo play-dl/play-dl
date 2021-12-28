@@ -1,3 +1,4 @@
+import { Duration } from '../../pdlE/Duration';
 import { Song } from '../../pdlE/Song';
 import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
@@ -96,6 +97,9 @@ export class YouTubeVideo implements Song {
      * YouTube Video Duration in seconds
      */
     durationInSec: number;
+
+    duration: Duration;
+
     /**
      * YouTube Video Uploaded Date
      */
@@ -148,6 +152,7 @@ export class YouTubeVideo implements Song {
         this.description = data.description || undefined;
         this.durationRaw = data.duration_raw || '0:00';
         this.durationInSec = (data.duration < 0 ? 0 : data.duration) || 0;
+        this.duration = new Duration(this.durationInSec);
         this.uploadedAt = data.uploadedAt || undefined;
         this.views = parseInt(data.views) || 0;
         const thumbnails = [];

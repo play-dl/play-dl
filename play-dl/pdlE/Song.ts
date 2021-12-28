@@ -1,3 +1,4 @@
+import { Duration } from "./Duration";
 import { Thumbnail } from "./Thumbnail";
 
 /**
@@ -7,6 +8,6 @@ export interface Song {
     url: string;
     title?: string;
     author?: string;
-    durationInSec: number;
+    duration: Duration;
     thumbnail?: Thumbnail;
 }

@@ -12,16 +12,10 @@ export class Duration {
     public constructor(seconds: number, minutes: number);
     public constructor(seconds: number, minutes: number, hours: number);
     public constructor(seconds = 0, minutes = 0, hours = 0) {
+        this._seconds = seconds;
+        this._minutes = minutes;
         this._hours = hours;
-        this.setMinutes(minutes);
-        this.setSeconds(seconds);
-        this.durationFormatted =
-            this._hours === 0
-                ? `${this._hours} 
-            + ":" + ${this._minutes} 
-            + ":" + ${this._seconds}`
-                : `${this._minutes} 
-            + ":" ${this._seconds}`;
+        this.durationFormatted = Duration.formatDuration(seconds, minutes, hours)
     }
 
     get hours(): number {
@@ -82,14 +76,33 @@ export class Duration {
         }
     }
 
-    public formatDuration(): string {
+    public static formatDuration(seconds: number, minutes: number, hours?: number): string {
         let result = '';
-        if (this._hours) {
-            result += this._hours + ':';
-        }
-        result += this._minutes + ':';
-        result += this._seconds;
 
-        return result;
+        if (hours) {
+            result += hours + ":";
+        }
+
+        if(minutes) {
+            result += minutes + ":";
+        }
+        else if(minutes < 10) {
+            result += "0";
+        }
+        else {
+            result += minutes + ":";
+        }
+
+        if(seconds) {
+            result += seconds + ":";
+        }
+        else if(seconds < 10) {
+            result += "0";
+        }
+        else {
+            result += seconds;
+        }
+
+        return result
     }
 }
