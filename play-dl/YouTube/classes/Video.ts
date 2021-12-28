@@ -62,6 +62,10 @@ interface VideoOptions {
      * YouTube Video tags
      */
     tags: string[];
+    /**
+     * `true` if the video has been identified by the YouTube community as inappropriate or offensive to some audiences and viewer discretion is advised
+     */
+    discretionAdvised: boolean;
 }
 /**
  * Class for YouTube Video url
@@ -128,6 +132,10 @@ export class YouTubeVideo {
      */
     tags: string[];
     /**
+     * `true` if the video has been identified by the YouTube community as inappropriate or offensive to some audiences and viewer discretion is advised
+     */
+    discretionAdvised: boolean;
+    /**
      * Constructor for YouTube Video Class
      * @param data JSON parsed data.
      */
@@ -153,6 +161,7 @@ export class YouTubeVideo {
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
+        this.discretionAdvised = !!data.discretionAdvised;
     }
     /**
      * Converts class to title name of video.
@@ -180,7 +189,8 @@ export class YouTubeVideo {
             tags: this.tags,
             likes: this.likes,
             live: this.live,
-            private: this.private
+            private: this.private,
+            discretionAdvised: this.discretionAdvised
         };
     }
 }
