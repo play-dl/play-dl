@@ -546,7 +546,7 @@ async function acceptViewerDiscretion(
     return { streamingData };
 }
 
-function getWatchPlaylit(response: any, body: any): YouTubePlayList {
+function getWatchPlaylist(response: any, body: any): YouTubePlayList {
     const playlist_details = response.contents.twoColumnWatchNextResults.playlist.playlist;
 
     const videos = getWatchPlaylistVideos(playlist_details.contents);
