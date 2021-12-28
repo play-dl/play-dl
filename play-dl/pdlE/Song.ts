@@ -6,8 +6,8 @@ import { Thumbnail } from "./Thumbnail";
  */
 export interface Song {
     url: string;
+    duration: Duration;
     title?: string;
     author?: string;
-    duration: Duration;
     thumbnail?: Thumbnail;
 }
