@@ -1,4 +1,4 @@
-import { IncomingMessage } from 'http';
+import { IncomingMessage } from 'node:http';
 import { request_stream } from '../../Request';
 import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
 import { video_stream_info } from '../utils/extractor';
@@ -102,11 +102,11 @@ export class SeekStream {
                 }).catch((err: Error) => err);
 
                 if (stream instanceof Error) {
-                    rej(stream)
+                    rej(stream);
                     return;
                 }
                 if (Number(stream.statusCode) >= 400) {
-                    rej(400)
+                    rej(400);
                     return;
                 }
                 this.request = stream;
@@ -118,16 +118,15 @@ export class SeekStream {
                 });
             } else res('');
         }).catch((err) => err);
-        if(parse instanceof Error){
+        if (parse instanceof Error) {
             this.stream.emit('error', parse);
             this.bytes_count = 0;
             this.per_sec_bytes = 0;
             this.cleanup();
             return;
-        }
-        else if(parse === 400){
+        } else if (parse === 400) {
             await this.retry();
-            this.timer.reuse()
+            this.timer.reuse();
             return this.seek(sec);
         }
         const bytes = this.stream.seek(sec);

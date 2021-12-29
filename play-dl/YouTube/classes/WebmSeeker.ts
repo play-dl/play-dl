@@ -1,5 +1,5 @@
 import { WebmElements, WebmHeader } from 'play-audio';
-import { Duplex, DuplexOptions } from 'stream';
+import { Duplex, DuplexOptions } from 'node:stream';
 
 enum DataType {
     master,
@@ -54,7 +54,7 @@ export class WebmSeeker extends Duplex {
         return ++i;
     }
 
-    private get vint_value(): boolean {
+    private vint_value(): boolean {
         if (!this.chunk) return false;
         const length = this.vint_length;
         if (this.chunk.length < this.cursor + length) return false;
@@ -75,7 +75,7 @@ export class WebmSeeker extends Duplex {
 
     seek(sec: number): Error | number {
         let position = 0;
-        let time = Math.floor(sec / 10) * 10;
+        const time = Math.floor(sec / 10) * 10;
         this.time_left = (sec - time) * 1000 || 0;
         if (!this.header.segment.cues) return new Error('Failed to Parse Cues');
 
@@ -98,7 +98,7 @@ export class WebmSeeker extends Duplex {
         let err: Error | undefined;
 
         if (this.state === WebmSeekerState.READING_HEAD) err = this.readHead();
-        else if (!this.seekfound) err = this.getClosetCluster();
+        else if (!this.seekfound) err = this.getClosestCluster();
         else err = this.readTag();
 
         if (err) callback(err);
@@ -115,9 +115,8 @@ export class WebmSeeker extends Duplex {
 
             const ebmlID = this.parseEbmlID(this.chunk.slice(this.cursor, this.cursor + id).toString('hex'));
             this.cursor += id;
-            const vint = this.vint_value;
 
-            if (!vint) {
+            if (!this.vint_value()) {
                 this.cursor = oldCursor;
                 break;
             }
@@ -161,9 +160,8 @@ export class WebmSeeker extends Duplex {
 
             const ebmlID = this.parseEbmlID(this.chunk.slice(this.cursor, this.cursor + id).toString('hex'));
             this.cursor += id;
-            const vint = this.vint_value;
 
-            if (!vint) {
+            if (!this.vint_value()) {
                 this.cursor = oldCursor;
                 break;
             }
@@ -203,7 +201,7 @@ export class WebmSeeker extends Duplex {
         this.cursor = 0;
     }
 
-    private getClosetCluster(): Error | undefined {
+    private getClosestCluster(): Error | undefined {
         if (!this.chunk) return new Error('Chunk is missing');
         const count = this.chunk.indexOf('1f43b675', 0, 'hex');
         if (count === -1) throw new Error('Failed to find nearest Cluster.');
