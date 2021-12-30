@@ -4,24 +4,25 @@ on:
     types: [created]
 jobs:
   publish_npm:
-     runs-on: ubuntu-latest
-     steps:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-          
+          registry-url: "https://registry.npmjs.org"
+
       - name: Install Dependencies
         run: npm install
-        
+
       - name: Publish NPM package
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  
+
   publish_docs:
     runs-on: ubuntu-latest
+    needs: publish_npm
     steps:
       - name: Checkout play dl
         uses: actions/checkout@v2
@@ -37,12 +38,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install Dependencies
         run: npm install
 
-      - name:  Deleting default exports for ESM.
+      - name: Deleting default exports for ESM.
         run: node .github/docs.js
 
       - name: TypeDoc
@@ -58,16 +59,17 @@ jobs:
           git push
 
   publish_discord:
-     runs-on: ubuntu-latest
-     steps:
+    runs-on: ubuntu-latest
+    needs: publish_npm
+    steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-        
+          registry-url: "https://registry.npmjs.org"
+
       - name: Publish on discord
-        run: node .github/discord.js 
+        run: node .github/discord.js
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHANNEL: "888999793458835466"
