@@ -18,6 +18,8 @@ interface WebmSeekerOptions extends DuplexOptions {
     mode?: 'precise' | 'granular';
 }
 
+const WEB_ELEMENT_KEYS = Object.keys(WebmElements);
+
 export class WebmSeeker extends Duplex {
     remaining?: Buffer;
     state: WebmSeekerState;
@@ -211,7 +213,7 @@ export class WebmSeeker extends Duplex {
     }
 
     private parseEbmlID(ebmlID: string) {
-        if (Object.keys(WebmElements).includes(ebmlID)) return WebmElements[ebmlID];
+        if (WEB_ELEMENT_KEYS.includes(ebmlID)) return WebmElements[ebmlID];
         else return false;
     }
 
