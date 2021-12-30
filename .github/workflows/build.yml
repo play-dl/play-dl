@@ -1,0 +1,33 @@
+name: 'Check build'
+on:
+  push:
+    branches:
+      - main
+      - developer
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['16', '17']
+
+    name: Node ${{ matrix.node-version }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Setup node ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
