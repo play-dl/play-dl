@@ -25,7 +25,7 @@ const playlist_pattern =
 /**
  * Validate YouTube URL or ID.
  *
- * **CAUTION :** If your search word is 11-12 long, you might get it validated as video ID.
+ * **CAUTION :** If your search word is 11 or 12 characters long, you might get it validated as video ID.
  *
  * To avoid above, add one more condition to yt_validate
  * ```ts
@@ -64,6 +64,33 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
     }
 }
 /**
+ * Extracts the video ID from a YouTube URL.
+ *
+ * Will return the value of `urlOrId` if it looks like a video ID.
+ * @param urlOrId A YouTube URL or video ID
+ * @returns the video ID or `false` if it can't find a video ID.
+ */
+function extractVideoId(urlOrId: string): string | false {
+    if (urlOrId.startsWith('https://') && urlOrId.match(video_pattern)) {
+        let id: string;
+        if (urlOrId.includes('youtu.be/')) {
+            id = urlOrId.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
+        } else if (urlOrId.includes('youtube.com/embed/')) {
+            id = urlOrId.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
+        } else if (urlOrId.includes('youtube.com/shorts/')) {
+            id = urlOrId.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
+        } else {
+            id = (urlOrId.split('watch?v=')[1] ?? urlOrId.split('&v=')[1]).split(/(\?|\/|&)/)[0];
+        }
+
+        if (id.match(video_id_pattern)) return id;
+    } else if (urlOrId.match(video_id_pattern)) {
+        return urlOrId;
+    }
+
+    return false;
+}
+/**
  * Extract ID of YouTube url.
  * @param url ID or url of YouTube
  * @returns ID of video or playlist.
@@ -73,13 +100,8 @@ export function extractID(url: string): string {
     if (!check || check === 'search') throw new Error('This is not a YouTube url or videoId or PlaylistID');
     if (url.startsWith('https')) {
         if (url.indexOf('list=') === -1) {
-            let video_id: string;
-            if (url.includes('youtu.be/')) video_id = url.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
-            else if (url.includes('youtube.com/embed/'))
-                video_id = url.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
-            else if (url.includes('youtube.com/shorts/'))
-                video_id = url.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
-            else video_id = url.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
+            const video_id = extractVideoId(url);
+            if (!video_id) throw new Error('This is not a YouTube url or videoId or PlaylistID');
             return video_id;
         } else {
             return url.split('list=')[1].split('&')[0];
@@ -109,8 +131,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     if (options.htmldata) {
         body = url;
     } else {
-        if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
-        const video_id = extractID(url);
+        const video_id = extractVideoId(url);
+        if (!video_id) throw new Error('This is not a YouTube Watch URL');
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
             headers: {
@@ -241,8 +263,8 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
     if (options.htmldata) {
         body = url;
     } else {
-        if (yt_validate(url) !== 'video') throw new Error('This is not a YouTube Watch URL');
-        const video_id = extractID(url);
+        const video_id = extractVideoId(url);
+        if (!video_id) throw new Error('This is not a YouTube Watch URL');
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
             headers: { 'accept-language': 'en-US,en;q=0.9' },
