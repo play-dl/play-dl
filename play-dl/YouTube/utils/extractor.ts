@@ -3,7 +3,7 @@ import { format_decipher } from './cipher';
 import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 import { InfoData, StreamInfoData } from './constants';
-import { URLSearchParams } from 'node:url';
+import { URL, URLSearchParams } from 'node:url';
 
 interface InfoOptions {
     htmldata?: boolean;
@@ -416,6 +416,12 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
     if (!url || typeof url !== 'string') throw new Error(`Expected playlist url, received ${typeof url}!`);
     if (!url.startsWith('https')) url = `https://www.youtube.com/playlist?list=${url}`;
     if (url.indexOf('list=') === -1) throw new Error('This is not a Playlist URL');
+
+    if (url.includes('music.youtube.com')) {
+        const urlObj = new URL(url);
+        urlObj.hostname = 'www.youtube.com';
+        url = urlObj.toString();
+    }
 
     const body = await request(url, {
         headers: {
