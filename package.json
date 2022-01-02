@@ -42,7 +42,7 @@
     "dist/*"
   ],
   "devDependencies": {
-    "@types/node": "^16.9.4",
+    "@types/node": "^17.0.6",
     "prettier": "^2.3.1",
     "tsup": "^5.11.1",
     "typedoc": "^0.22.9",
