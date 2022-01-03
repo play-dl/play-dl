@@ -492,6 +492,21 @@ export class DeezerAlbum {
         return this;
     }
     /**
+     * Fetches all the tracks in the album and returns them
+     * 
+     * ```ts
+     * const album = await play.deezer('album url')
+     * 
+     * const tracks = await album.all_tracks()
+     * ```
+     * @returns An array of {@link DeezerTrack}
+     */
+     async all_tracks(): Promise<DeezerTrack[]> {
+        await this.fetch()
+
+        return this.tracks as DeezerTrack[]
+    }
+    /**
      * Converts instances of this class to JSON data
      * @returns JSON data.
      */
@@ -745,6 +760,21 @@ export class DeezerPlaylist {
         }
 
         return this;
+    }
+    /**
+     * Fetches all the tracks in the playlist and returns them
+     * 
+     * ```ts
+     * const playlist = await play.deezer('playlist url')
+     * 
+     * const tracks = await playlist.all_tracks()
+     * ```
+     * @returns An array of {@link DeezerTrack}
+     */
+     async all_tracks(): Promise<DeezerTrack[]> {
+        await this.fetch()
+
+        return this.tracks as DeezerTrack[]
     }
     /**
      * Converts instances of this class to JSON data
