@@ -1,6 +1,14 @@
 import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
 
+interface VideoMusic {
+    song?: string;
+    artist?: string;
+    album?: string;
+    writers?: string;
+    license?: string;
+}
+
 interface VideoOptions {
     /**
      * YouTube Video ID
@@ -66,6 +74,10 @@ interface VideoOptions {
      * `true` if the video has been identified by the YouTube community as inappropriate or offensive to some audiences and viewer discretion is advised
      */
     discretionAdvised?: boolean;
+    /**
+     * Gives info about music content in that video.
+     */
+    music?: VideoMusic[];
 }
 /**
  * Class for YouTube Video url
@@ -136,6 +148,10 @@ export class YouTubeVideo {
      */
     discretionAdvised?: boolean;
     /**
+     * Gives info about music content in that video.
+     */
+    music?: VideoMusic[];
+    /**
      * Constructor for YouTube Video Class
      * @param data JSON parsed data.
      */
@@ -161,7 +177,8 @@ export class YouTubeVideo {
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags || [];
-        this.discretionAdvised = data.discretionAdvised === undefined ? undefined : data.discretionAdvised;
+        this.discretionAdvised = data.discretionAdvised ?? undefined;
+        this.music = data.music || [];
     }
     /**
      * Converts class to title name of video.
@@ -190,7 +207,8 @@ export class YouTubeVideo {
             likes: this.likes,
             live: this.live,
             private: this.private,
-            discretionAdvised: this.discretionAdvised
+            discretionAdvised: this.discretionAdvised,
+            music: this.music
         };
     }
 }

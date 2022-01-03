@@ -325,22 +325,22 @@ export class SpotifyPlaylist {
     }
     /**
      * Fetches all the tracks in the playlist and returns them
-     * 
+     *
      * ```ts
      * const playlist = await play.spotify('playlist url')
-     * 
+     *
      * const tracks = await playlist.all_tracks()
      * ```
      * @returns An array of {@link SpotifyTrack}
      */
-    async all_tracks() : Promise<SpotifyTrack[]>{
-        await this.fetch()
+    async all_tracks(): Promise<SpotifyTrack[]> {
+        await this.fetch();
 
-        const tracks : SpotifyTrack[] = []
+        const tracks: SpotifyTrack[] = [];
 
-        for(const page of this.fetched_tracks.values()) tracks.push(...page);
+        for (const page of this.fetched_tracks.values()) tracks.push(...page);
 
-        return tracks
+        return tracks;
     }
     /**
      * Converts Class to JSON
@@ -530,22 +530,22 @@ export class SpotifyAlbum {
     }
     /**
      * Fetches all the tracks in the album and returns them
-     * 
+     *
      * ```ts
      * const album = await play.spotify('album url')
-     * 
+     *
      * const tracks = await album.all_tracks()
      * ```
      * @returns An array of {@link SpotifyTrack}
      */
-     async all_tracks() : Promise<SpotifyTrack[]>{
-        await this.fetch()
+    async all_tracks(): Promise<SpotifyTrack[]> {
+        await this.fetch();
 
-        const tracks : SpotifyTrack[] = []
+        const tracks: SpotifyTrack[] = [];
 
-        for( const page of this.fetched_tracks.values() ) tracks.push(...page);
+        for (const page of this.fetched_tracks.values()) tracks.push(...page);
 
-        return tracks
+        return tracks;
     }
     /**
      * Converts Class to JSON

@@ -326,18 +326,18 @@ export class SoundCloudPlaylist {
     }
     /**
      * Fetches all the tracks in the playlist and returns them
-     * 
+     *
      * ```ts
      * const playlist = await play.soundcloud('playlist url')
-     * 
+     *
      * const tracks = await playlist.all_tracks()
      * ```
      * @returns An array of {@link SoundCloudTrack}
      */
     async all_tracks(): Promise<SoundCloudTrack[]> {
-        await this.fetch()
+        await this.fetch();
 
-        return this.tracks as SoundCloudTrack[]
+        return this.tracks as SoundCloudTrack[];
     }
     /**
      * Converts Class to JSON data

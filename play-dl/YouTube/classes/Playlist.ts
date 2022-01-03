@@ -218,10 +218,10 @@ export class YouTubePlayList {
     }
     /**
      * Fetches all the videos in the playlist and returns them
-     * 
+     *
      * ```ts
      * const playlist = await play.playlist_info('playlist url')
-     * 
+     *
      * const videos = await playlist.all_videos()
      * ```
      * @returns An array of {@link YouTubeVideo} objects
