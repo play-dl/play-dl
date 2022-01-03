@@ -4,7 +4,14 @@ on:
     branches:
       - main
       - developer
+    paths:
+      - 'play-dl/**'
   pull_request:
+    branches:
+      - main
+      - developer
+    paths:
+      - 'play-dl/**'
 
 jobs:
   build:
