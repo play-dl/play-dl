@@ -39,14 +39,23 @@ interface tokenOptions {
  *      }
  * }) // YouTube Cookies
  *
+ * await play.setToken({
+ *      spotify : {
+ *          client_id: 'ID',
+            client_secret: 'secret',
+            refresh_token: 'token',
+            market: 'US'
+ *      }
+ * }) // Await this only when setting data for spotify
+ * 
  * play.setToken({
  *      useragent: ['Your User-agent']
  * }) // Use this to avoid 429 errors.
  * ```
  * @param options {@link tokenOptions}
  */
-export function setToken(options: tokenOptions) {
-    if (options.spotify) setSpotifyToken(options.spotify);
+export async function setToken(options: tokenOptions) {
+    if (options.spotify) await setSpotifyToken(options.spotify);
     if (options.soundcloud) setSoundCloudToken(options.soundcloud);
     if (options.youtube) setCookieToken(options.youtube);
     if (options.useragent) setUserAgent(options.useragent);

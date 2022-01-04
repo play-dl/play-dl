@@ -314,6 +314,7 @@ export class SoundCloudPlaylist {
     }
     /**
      * Get total no. of fetched tracks
+     * @see {@link SoundCloudPlaylist.all_tracks}
      */
     get total_tracks(): number {
         let count = 0;
@@ -324,25 +325,19 @@ export class SoundCloudPlaylist {
         return count;
     }
     /**
-     * Get all fetched tracks as a array.
-     *
-     * For getting all feetched tracks
+     * Fetches all the tracks in the playlist and returns them
      *
      * ```ts
-     * const playlist = await play.soundcloud("playlist url")
+     * const playlist = await play.soundcloud('playlist url')
      *
-     * await playlist.fetch()
-     *
-     * const result = playlist.fetched_tracks
+     * const tracks = await playlist.all_tracks()
      * ```
+     * @returns An array of {@link SoundCloudTrack}
      */
-    get fetched_tracks(): SoundCloudTrack[] {
-        let result: SoundCloudTrack[] = [];
-        this.tracks.forEach((track) => {
-            if (track instanceof SoundCloudTrack) result.push(track);
-            else return;
-        });
-        return result;
+    async all_tracks(): Promise<SoundCloudTrack[]> {
+        await this.fetch();
+
+        return this.tracks as SoundCloudTrack[];
     }
     /**
      * Converts Class to JSON data

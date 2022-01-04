@@ -131,6 +131,11 @@ export class WebmSeeker extends Duplex {
                 if (ebmlID.name === 'ebml') this.headfound = true;
                 else return new Error('Failed to find EBML ID at start of stream.');
             }
+            if(ebmlID.name === "cluster") {
+                this.emit("headComplete")
+                this.cursor = this.chunk.length
+                break;
+            }
             const data = this.chunk.slice(
                 this.cursor + this.data_size,
                 this.cursor + this.data_size + this.data_length

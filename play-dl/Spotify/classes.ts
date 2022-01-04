@@ -309,21 +309,8 @@ export class SpotifyPlaylist {
         return this.fetched_tracks.get(`${num}`) as SpotifyTrack[];
     }
     /**
-     * Spotify Playlist total no of pages in a playlist
-     *
-     * For getting all songs in a playlist,
-     *
-     * ```ts
-     * const playlist = await play.spotify('playlist url')
-     *
-     * await playlist.fetch()
-     *
-     * const result = []
-     *
-     * for (let i = 0; i <= playlist.tota_pages; i++) {
-     *      result.push(playlist.page(i))
-     * }
-     * ```
+     * Gets total number of pages in that playlist class.
+     * @see {@link SpotifyPlaylist.all_tracks}
      */
     get total_pages() {
         return this.fetched_tracks.size;
@@ -335,6 +322,25 @@ export class SpotifyPlaylist {
         if (this.search) return this.tracksCount;
         const page_number: number = this.total_pages;
         return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyTrack[]).length;
+    }
+    /**
+     * Fetches all the tracks in the playlist and returns them
+     *
+     * ```ts
+     * const playlist = await play.spotify('playlist url')
+     *
+     * const tracks = await playlist.all_tracks()
+     * ```
+     * @returns An array of {@link SpotifyTrack}
+     */
+    async all_tracks(): Promise<SpotifyTrack[]> {
+        await this.fetch();
+
+        const tracks: SpotifyTrack[] = [];
+
+        for (const page of this.fetched_tracks.values()) tracks.push(...page);
+
+        return tracks;
     }
     /**
      * Converts Class to JSON
@@ -508,21 +514,8 @@ export class SpotifyAlbum {
         return this.fetched_tracks.get(`${num}`);
     }
     /**
-     * Spotify Album total no of pages in a album
-     *
-     * For getting all songs in a album,
-     *
-     * ```ts
-     * const album = await play.spotify('album url')
-     *
-     * await album.fetch()
-     *
-     * const result = []
-     *
-     * for (let i = 0; i <= album.tota_pages; i++) {
-     *      result.push(album.page(i))
-     * }
-     * ```
+     * Gets total number of pages in that album class.
+     * @see {@link SpotifyAlbum.all_tracks}
      */
     get total_pages() {
         return this.fetched_tracks.size;
@@ -535,7 +528,29 @@ export class SpotifyAlbum {
         const page_number: number = this.total_pages;
         return (page_number - 1) * 100 + (this.fetched_tracks.get(`${page_number}`) as SpotifyTrack[]).length;
     }
+    /**
+     * Fetches all the tracks in the album and returns them
+     *
+     * ```ts
+     * const album = await play.spotify('album url')
+     *
+     * const tracks = await album.all_tracks()
+     * ```
+     * @returns An array of {@link SpotifyTrack}
+     */
+    async all_tracks(): Promise<SpotifyTrack[]> {
+        await this.fetch();
 
+        const tracks: SpotifyTrack[] = [];
+
+        for (const page of this.fetched_tracks.values()) tracks.push(...page);
+
+        return tracks;
+    }
+    /**
+     * Converts Class to JSON
+     * @returns JSON data
+     */
     toJSON(): AlbumJSON {
         return {
             name: this.name,

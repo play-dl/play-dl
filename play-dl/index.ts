@@ -9,7 +9,8 @@ import {
     YouTubeStream,
     YouTubeChannel,
     YouTubePlayList,
-    YouTubeVideo
+    YouTubeVideo,
+    InfoData
 } from './YouTube';
 import {
     spotify,
@@ -73,7 +74,6 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info } from './YouTube/stream';
 import { yt_search } from './YouTube/search';
 import { EventEmitter } from 'stream';
-import { InfoData } from './YouTube/utils/constants';
 
 async function stream(
     url: string,
@@ -252,6 +252,7 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  *  - `string` language : Sets language of searched content [ YouTube search only. ], e.g. "en-US"
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `boolean` htmldata : given data is html data or not
+ *  - `number` precache : No of segments of data to store before looping [YouTube Live Stream only]. [ Defaults to 3 ]
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
 async function stream_from_info(
@@ -477,7 +478,6 @@ export {
     SpotifyAlbum,
     SpotifyPlaylist,
     SpotifyTrack,
-    YouTubeStream,
     YouTubeChannel,
     YouTubePlayList,
     YouTubeVideo,
@@ -503,11 +503,12 @@ export {
     validate,
     video_basic_info,
     video_info,
-    yt_validate
+    yt_validate,
+    InfoData
 };
 
 // Export Types
-export { Deezer, YouTube, SoundCloud, Spotify };
+export { Deezer, YouTube, SoundCloud, Spotify, YouTubeStream };
 
 // Export Default
 export default {

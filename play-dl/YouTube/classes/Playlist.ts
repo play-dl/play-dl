@@ -218,6 +218,12 @@ export class YouTubePlayList {
     }
     /**
      * Fetches all the videos in the playlist and returns them
+     *
+     * ```ts
+     * const playlist = await play.playlist_info('playlist url')
+     *
+     * const videos = await playlist.all_videos()
+     * ```
      * @returns An array of {@link YouTubeVideo} objects
      * @see {@link YouTubePlayList.fetch}
      */
@@ -226,9 +232,7 @@ export class YouTubePlayList {
 
         const videos = [];
 
-        for (const [, page] of this.fetched_videos.entries()) {
-            videos.push(...page);
-        }
+        for (const page of this.fetched_videos.values()) videos.push(...page);
 
         return videos;
     }
