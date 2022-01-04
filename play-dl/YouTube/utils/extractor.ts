@@ -205,20 +205,17 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
             ?.metadataRowContainer?.metadataRowContainerRenderer?.rows;
     const music: any[] = [];
     if (musicInfo) {
-        let incompleteInfo: any = {};
         musicInfo.forEach((x: any) => {
             if (!x.metadataRowRenderer) return;
             if (x.metadataRowRenderer.title.simpleText.toLowerCase() === 'song') {
-                music.push(incompleteInfo);
-                incompleteInfo = {};
-                incompleteInfo.song =
+                music.push({});
+                music[music.length - 1].song =
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
             } else
-                incompleteInfo[x.metadataRowRenderer.title.simpleText.toLowerCase()] =
+                music[music.length - 1][x.metadataRowRenderer.title.simpleText.toLowerCase()] =
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
         });
     }
-    music.shift();
     const video_details = new YouTubeVideo({
         id: vid.videoId,
         title: vid.title,

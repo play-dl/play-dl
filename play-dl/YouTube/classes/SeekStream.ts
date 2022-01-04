@@ -131,7 +131,7 @@ export class SeekStream {
             this.timer.reuse();
             return this.seek(sec);
         }
-        const bytes = this.stream.seek(parseFloat(sec.toFixed(2)));
+        const bytes = this.stream.seek(sec);
         if (bytes instanceof Error) {
             this.stream.emit('error', bytes);
             this.bytes_count = 0;
