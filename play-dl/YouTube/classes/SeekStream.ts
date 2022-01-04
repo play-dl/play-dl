@@ -97,7 +97,7 @@ export class SeekStream {
             if (!this.stream.headerparsed) {
                 const stream = await request_stream(this.url, {
                     headers: {
-                        range: `bytes=0-1000`
+                        range: `bytes=0-`
                     }
                 }).catch((err: Error) => err);
 
@@ -112,10 +112,12 @@ export class SeekStream {
                 this.request = stream;
                 stream.pipe(this.stream, { end: false });
 
-                stream.once('end', () => {
-                    this.stream.state = WebmSeekerState.READING_DATA;
-                    res('');
-                });
+                this.stream.once("headComplete", () => {
+                    stream.unpipe(this.stream)
+                    stream.destroy()
+                    this.stream.state = WebmSeekerState.READING_DATA
+                    res('')
+                })
             } else res('');
         }).catch((err) => err);
         if (parse instanceof Error) {
