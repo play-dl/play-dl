@@ -237,10 +237,10 @@ export async function refreshToken(): Promise<boolean> {
     return true;
 }
 
-export function setSpotifyToken(options: SpotifyDataOptions) {
+export async function setSpotifyToken(options: SpotifyDataOptions) {
     spotifyData = options;
     spotifyData.file = false;
-    refreshToken();
+    await refreshToken();
 }
 
 export { SpotifyTrack, SpotifyAlbum, SpotifyPlaylist };
