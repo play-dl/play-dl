@@ -252,6 +252,7 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  *  - `string` language : Sets language of searched content [ YouTube search only. ], e.g. "en-US"
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `boolean` htmldata : given data is html data or not
+ *  - `number` precache : No of segments of data to store before looping [YouTube Live Stream only]. [ Defaults to 3 ]
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
 async function stream_from_info(

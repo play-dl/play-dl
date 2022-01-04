@@ -3,12 +3,8 @@ import { IncomingMessage } from 'node:http';
 import { parseAudioFormats, StreamOptions, StreamType } from '../stream';
 import { request, request_stream } from '../../Request';
 import { video_stream_info } from '../utils/extractor';
+import { URL } from 'node:url';
 
-export interface FormatInterface {
-    url: string;
-    targetDurationSec: number;
-    maxDvrDurationSec: number;
-}
 /**
  * YouTube Live Stream class for playing audio from Live Stream videos.
  */
@@ -22,29 +18,16 @@ export class LiveStream {
      */
     type: StreamType;
     /**
-     * Base URL in dash manifest file.
+     * Incoming message that we recieve.
+     *
+     * Storing this is essential.
+     * This helps to destroy the TCP connection completely if you stopped player in between the stream
      */
-    private base_url: string;
-    /**
-     * Given Dash URL.
-     */
-    private url: string;
-    /**
-     * Interval to fetch data again to dash url.
-     */
-    private interval: number;
-    /**
-     * Sequence count of urls in dash file.
-     */
-    private packet_count: number;
+    private request?: IncomingMessage;
     /**
      * Timer that creates loop from interval time provided.
      */
-    private timer: Timer;
-    /**
-     * Live Stream Video url.
-     */
-    private video_url: string;
+    private normal_timer?: Timer;
     /**
      * Timer used to update dash url so as to avoid 404 errors after long hours of streaming.
      *
@@ -52,45 +35,69 @@ export class LiveStream {
      */
     private dash_timer: Timer;
     /**
-     * Segments of url that we recieve in dash file.
-     *
-     * base_url + segment_urls[0] = One complete url for one segment.
+     * Given Dash URL.
      */
-    private segments_urls: string[];
+    private dash_url: string;
     /**
-     * Incoming message that we recieve.
-     *
-     * Storing this is essential.
-     * This helps to destroy the TCP connection completely if you stopped player in between the stream
+     * Base URL in dash manifest file.
      */
-    private request: IncomingMessage | null;
+    private base_url: string;
+    /**
+     * Interval to fetch data again to dash url.
+     */
+    private interval: number;
+    /**
+     * Timer used to update dash url so as to avoid 404 errors after long hours of streaming.
+     *
+     * It updates dash_url every 30 minutes.
+     */
+    private video_url: string;
+    /**
+     * No of segments of data to add in stream before starting to loop
+     */
+    private precache: number;
+    /**
+     * Segment sequence number
+     */
+    private sequence: number;
     /**
      * Live Stream Class Constructor
      * @param dash_url dash manifest URL
      * @param target_interval interval time for fetching dash data again
      * @param video_url Live Stream video url.
      */
-    constructor(dash_url: string, target_interval: number, video_url: string) {
+    constructor(dash_url: string, interval: number, video_url: string, precache?: number) {
         this.stream = new Readable({ highWaterMark: 5 * 1000 * 1000, read() {} });
         this.type = StreamType.Arbitrary;
-        this.url = dash_url;
+        this.sequence = 0;
+        this.dash_url = dash_url;
         this.base_url = '';
-        this.segments_urls = [];
-        this.packet_count = 0;
-        this.request = null;
+        this.interval = interval;
         this.video_url = video_url;
-        this.interval = target_interval || 0;
-        this.timer = new Timer(() => {
-            this.start();
-        }, this.interval);
+        this.precache = precache || 3;
         this.dash_timer = new Timer(() => {
-            this.dash_timer.reuse();
             this.dash_updater();
+            this.dash_timer.reuse();
         }, 1800);
         this.stream.on('close', () => {
             this.cleanup();
         });
-        this.start();
+        this.initialize_dash();
+    }
+    /**
+     * This cleans every used variable in class.
+     *
+     * This is used to prevent re-use of this class and helping garbage collector to collect it.
+     */
+    private cleanup() {
+        this.normal_timer?.destroy();
+        this.dash_timer.destroy();
+        this.request?.destroy();
+        this.video_url = '';
+        this.request = undefined;
+        this.dash_url = '';
+        this.base_url = '';
+        this.interval = 0;
     }
     /**
      * Updates dash url.
@@ -99,68 +106,43 @@ export class LiveStream {
      */
     private async dash_updater() {
         const info = await video_stream_info(this.video_url);
-        if (
-            info.LiveStreamData.isLive === true &&
-            info.LiveStreamData.hlsManifestUrl !== null &&
-            info.video_details.durationInSec === 0
-        ) {
-            this.url = info.LiveStreamData.dashManifestUrl as string;
-        }
+        if (info.LiveStreamData.dashManifestUrl) this.dash_url = info.LiveStreamData.dashManifestUrl;
+        return this.initialize_dash();
     }
     /**
-     * Parses data recieved from dash_url.
+     * Initializes dash after getting dash url.
      *
-     * Updates base_url , segments_urls array.
+     * Start if it is first time of initialishing dash function.
      */
-    private async dash_getter() {
-        const response = await request(this.url);
+    private async initialize_dash() {
+        const response = await request(this.dash_url);
         const audioFormat = response
             .split('<AdaptationSet id="0"')[1]
             .split('</AdaptationSet>')[0]
             .split('</Representation>');
         if (audioFormat[audioFormat.length - 1] === '') audioFormat.pop();
         this.base_url = audioFormat[audioFormat.length - 1].split('<BaseURL>')[1].split('</BaseURL>')[0];
-        const list = audioFormat[audioFormat.length - 1].split('<SegmentList>')[1].split('</SegmentList>')[0];
-        this.segments_urls = list.replace(new RegExp('<SegmentURL media="', 'g'), '').split('"/>');
-        if (this.segments_urls[this.segments_urls.length - 1] === '') this.segments_urls.pop();
-    }
-    /**
-     * This cleans every used variable in class.
-     *
-     * This is used to prevent re-use of this class and helping garbage collector to collect it.
-     */
-    private cleanup() {
-        this.timer.destroy();
-        this.dash_timer.destroy();
-        this.request?.destroy();
-        this.video_url = '';
-        this.request = null;
-        this.url = '';
-        this.base_url = '';
-        this.segments_urls = [];
-        this.packet_count = 0;
-        this.interval = 0;
-    }
-    /**
-     * This starts function in Live Stream Class.
-     *
-     * Gets data from dash url and pass it to dash getter function.
-     * Get data from complete segment url and pass data to Stream.
-     */
-    private async start() {
-        if (this.stream.destroyed) {
-            this.cleanup();
-            return;
+        await request_stream(`https://${new URL(this.base_url).host}/generate_204`);
+        if (this.sequence === 0) {
+            const list = audioFormat[audioFormat.length - 1]
+                .split('<SegmentList>')[1]
+                .split('</SegmentList>')[0]
+                .replaceAll('<SegmentURL media="', '')
+                .split('"/>');
+            if (list[list.length - 1] === '') list.pop();
+            if (list.length > this.precache) list.splice(0, list.length - this.precache);
+            this.sequence = Number(list[0].split('sq/')[1].split('/')[0]);
+            this.first_data(list.length);
         }
-        await this.dash_getter();
-        if (this.segments_urls.length > 3) this.segments_urls.splice(0, this.segments_urls.length - 3);
-        if (this.packet_count === 0) this.packet_count = Number(this.segments_urls[0].split('sq/')[1].split('/')[0]);
-        for await (const segment of this.segments_urls) {
-            if (Number(segment.split('sq/')[1].split('/')[0]) !== this.packet_count) {
-                continue;
-            }
-            await new Promise(async (resolve, reject) => {
-                const stream = await request_stream(this.base_url + segment).catch((err: Error) => err);
+    }
+    /**
+     * Used only after initializing dash function first time.
+     * @param len Length of data that you want to
+     */
+    private async first_data(len: number) {
+        for (let i = 1; i <= len; i++) {
+            await new Promise(async (resolve) => {
+                const stream = await request_stream(this.base_url + 'sq/' + this.sequence).catch((err: Error) => err);
                 if (stream instanceof Error) {
                     this.stream.emit('error', stream);
                     return;
@@ -170,7 +152,7 @@ export class LiveStream {
                     this.stream.push(c);
                 });
                 stream.on('end', () => {
-                    this.packet_count++;
+                    this.sequence++;
                     resolve('');
                 });
                 stream.once('error', (err) => {
@@ -178,8 +160,35 @@ export class LiveStream {
                 });
             });
         }
-
-        this.timer.reuse();
+        this.normal_timer = new Timer(() => {
+            this.loop();
+            this.normal_timer?.reuse();
+        }, this.interval);
+    }
+    /**
+     * This loops function in Live Stream Class.
+     *
+     * Gets next segment and push it.
+     */
+    private loop() {
+        return new Promise(async (resolve) => {
+            const stream = await request_stream(this.base_url + 'sq/' + this.sequence).catch((err: Error) => err);
+            if (stream instanceof Error) {
+                this.stream.emit('error', stream);
+                return;
+            }
+            this.request = stream;
+            stream.on('data', (c) => {
+                this.stream.push(c);
+            });
+            stream.on('end', () => {
+                this.sequence++;
+                resolve('');
+            });
+            stream.once('error', (err) => {
+                this.stream.emit('error', err);
+            });
+        });
     }
     /**
      * Deprecated Functions

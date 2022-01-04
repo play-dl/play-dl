@@ -19,6 +19,7 @@ export interface StreamOptions {
     quality?: number;
     language?: string;
     htmldata?: boolean;
+    precache?: number;
 }
 
 /**
@@ -71,7 +72,8 @@ export async function stream_from_info(
         return new LiveStream(
             info.LiveStreamData.dashManifestUrl,
             info.format[info.format.length - 1].targetDurationSec as number,
-            info.video_details.url
+            info.video_details.url,
+            options.precache
         );
     }
 
