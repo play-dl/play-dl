@@ -79,6 +79,7 @@ export class WebmSeeker extends Duplex {
         let position = 0;
         const time = Math.floor(sec / 10) * 10;
         this.time_left = (sec - time) * 1000 || 0;
+        this.time_left = Math.round(this.time_left / 20) * 20;
         if (!this.header.segment.cues) return new Error('Failed to Parse Cues');
 
         for (const data of this.header.segment.cues) {
@@ -131,9 +132,9 @@ export class WebmSeeker extends Duplex {
                 if (ebmlID.name === 'ebml') this.headfound = true;
                 else return new Error('Failed to find EBML ID at start of stream.');
             }
-            if(ebmlID.name === "cluster") {
-                this.emit("headComplete")
-                this.cursor = this.chunk.length
+            if (ebmlID.name === 'cluster') {
+                this.emit('headComplete');
+                this.cursor = this.chunk.length;
                 break;
             }
             const data = this.chunk.slice(

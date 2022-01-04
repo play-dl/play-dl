@@ -112,12 +112,12 @@ export class SeekStream {
                 this.request = stream;
                 stream.pipe(this.stream, { end: false });
 
-                this.stream.once("headComplete", () => {
-                    stream.unpipe(this.stream)
-                    stream.destroy()
-                    this.stream.state = WebmSeekerState.READING_DATA
-                    res('')
-                })
+                this.stream.once('headComplete', () => {
+                    stream.unpipe(this.stream);
+                    stream.destroy();
+                    this.stream.state = WebmSeekerState.READING_DATA;
+                    res('');
+                });
             } else res('');
         }).catch((err) => err);
         if (parse instanceof Error) {
