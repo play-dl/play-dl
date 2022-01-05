@@ -31,8 +31,11 @@ export class WebmSeeker extends Duplex {
     seekfound: boolean;
     private data_size: number;
     private data_length: number;
+    private sec: number;
+    private time: number;
+    private foundCue: boolean;
 
-    constructor(options: WebmSeekerOptions) {
+    constructor(sec: number, options: WebmSeekerOptions) {
         super(options);
         this.state = WebmSeekerState.READING_HEAD;
         this.cursor = 0;
@@ -42,6 +45,9 @@ export class WebmSeeker extends Duplex {
         this.seekfound = false;
         this.data_length = 0;
         this.data_size = 0;
+        this.sec = sec;
+        this.time = Math.floor(sec / 10) * 10;
+        this.foundCue = false;
     }
 
     private get vint_length(): number {
@@ -71,17 +77,16 @@ export class WebmSeeker extends Duplex {
 
     _read() {}
 
-    seek(sec: number): Error | number {
+    seek(): Error | number {
         let clusterlength = 0,
             position = 0;
-        const time = Math.floor(sec / 10) * 10;
-        let time_left = (sec - time) * 1000 || 0;
+        let time_left = (this.sec - this.time) * 1000 || 0;
         time_left = Math.round(time_left / 20) * 20;
         if (!this.header.segment.cues) return new Error('Failed to Parse Cues');
 
         for (let i = 0; i < this.header.segment.cues.length; i++) {
             const data = this.header.segment.cues[i];
-            if (Math.floor((data.time as number) / 1000) === time) {
+            if (Math.floor((data.time as number) / 1000) === this.time) {
                 position = data.position as number;
                 clusterlength = this.header.segment.cues[i + 1].position! - position - 1;
                 break;
@@ -130,17 +135,23 @@ export class WebmSeeker extends Duplex {
                 if (ebmlID.name === 'ebml') this.headfound = true;
                 else return new Error('Failed to find EBML ID at start of stream.');
             }
-            if (ebmlID.name === 'cluster') {
-                this.emit('headComplete');
-                this.cursor = this.chunk.length;
-                break;
-            }
             const data = this.chunk.slice(
                 this.cursor + this.data_size,
                 this.cursor + this.data_size + this.data_length
             );
             const parse = this.header.parse(ebmlID, data);
             if (parse instanceof Error) return parse;
+
+            // stop parsing the header once we have found the correct cue
+            if (ebmlID.name === 'cueClusterPosition') {
+                if (this.foundCue) {
+                    this.emit('headComplete');
+                    this.cursor = this.chunk.length;
+                    break;
+                } else if (this.time === (this.header.segment.cues!.at(-1)!.time as number) / 1000) {
+                    this.foundCue = true;
+                }
+            }
 
             if (ebmlID.type === DataType.master) {
                 this.cursor += this.data_size;

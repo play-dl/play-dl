@@ -92,6 +92,7 @@ export async function stream_from_info(
             return new SeekStream(
                 final[0].url,
                 info.video_details.durationInSec,
+                final[0].indexRange.end,
                 Number(final[0].contentLength),
                 info.video_details.url,
                 options

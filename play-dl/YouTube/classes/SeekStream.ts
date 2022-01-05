@@ -30,6 +30,10 @@ export class SeekStream {
      */
     private per_sec_bytes: number;
     /**
+     * Length of the header in bytes
+     */
+    private header_length: number;
+    /**
      * Total length of audio file in bytes
      */
     private content_length: number;
@@ -57,12 +61,20 @@ export class SeekStream {
      * @param url Audio Endpoint url.
      * @param type Type of Stream
      * @param duration Duration of audio playback [ in seconds ]
+     * @param headerLength Length of the header in bytes.
      * @param contentLength Total length of Audio file in bytes.
      * @param video_url YouTube video url.
      * @param options Options provided to stream function.
      */
-    constructor(url: string, duration: number, contentLength: number, video_url: string, options: StreamOptions) {
-        this.stream = new WebmSeeker({
+    constructor(
+        url: string,
+        duration: number,
+        headerLength: number,
+        contentLength: number,
+        video_url: string,
+        options: StreamOptions
+    ) {
+        this.stream = new WebmSeeker(options.seek!, {
             highWaterMark: 5 * 1000 * 1000,
             readableObjectMode: true
         });
@@ -72,6 +84,7 @@ export class SeekStream {
         this.bytes_count = 0;
         this.video_url = video_url;
         this.per_sec_bytes = Math.ceil(contentLength / duration);
+        this.header_length = headerLength;
         this.content_length = contentLength;
         this.request = null;
         this.timer = new Timer(() => {
@@ -82,21 +95,20 @@ export class SeekStream {
             this.timer.destroy();
             this.cleanup();
         });
-        this.seek(options.seek!);
+        this.seek();
     }
     /**
      * **INTERNAL Function**
      *
      * Uses stream functions to parse Webm Head and gets Offset byte to seek to.
-     * @param sec No of seconds to seek to
      * @returns Nothing
      */
-    private async seek(sec: number): Promise<void> {
+    private async seek(): Promise<void> {
         const parse = await new Promise(async (res, rej) => {
             if (!this.stream.headerparsed) {
                 const stream = await request_stream(this.url, {
                     headers: {
-                        range: `bytes=0-`
+                        range: `bytes=0-${this.header_length}`
                     }
                 }).catch((err: Error) => err);
 
@@ -110,6 +122,12 @@ export class SeekStream {
                 }
                 this.request = stream;
                 stream.pipe(this.stream, { end: false });
+
+                // headComplete should always be called, leaving this here just in case
+                stream.once('end', () => {
+                    this.stream.state = WebmSeekerState.READING_DATA;
+                    res('');
+                });
 
                 this.stream.once('headComplete', () => {
                     stream.unpipe(this.stream);
@@ -128,9 +146,9 @@ export class SeekStream {
         } else if (parse === 400) {
             await this.retry();
             this.timer.reuse();
-            return this.seek(sec);
+            return this.seek();
         }
-        const bytes = this.stream.seek(sec);
+        const bytes = this.stream.seek();
         if (bytes instanceof Error) {
             this.stream.emit('error', bytes);
             this.bytes_count = 0;
