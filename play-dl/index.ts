@@ -77,7 +77,7 @@ import { EventEmitter } from 'stream';
 
 async function stream(
     url: string,
-    options: { seek?: number; seekMode?: 'precise' | 'granular' } & StreamOptions
+    options: { seek?: number } & StreamOptions
 ): Promise<YouTubeStream>;
 async function stream(url: string, options?: StreamOptions): Promise<YouTubeStream | SoundCloudStream>;
 /**
@@ -89,13 +89,8 @@ async function stream(url: string, options?: StreamOptions): Promise<YouTubeStre
  *
  * const source = await play.stream('soundcloud track URL') // SoundCloud Track Stream
  *
- * const source = await play.stream('youtube video URL', { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream [ seekMode = "granular" ]
- * // Granular = 1 - 9 seconds before given time. [ Fast ]
- * // Precise = Exact seek [ Little bit Slow ]
- * // Above command seeks to 45 seconds approximately while below command seeks to 45 seconds precisely
- *
- * const source = await play.stream('youtube video URL', { seek : 45, seekMode: "precise" }) // Seeks precisely to 45 seconds in YouTube Video Stream
- *
+ * const source = await play.stream('youtube video URL', { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream 
+ * 
  * const resource = createAudioResource(source.stream, {
  *      inputType : source.type
  * }) // Use discordjs voice createAudioResource function.
@@ -104,7 +99,6 @@ async function stream(url: string, options?: StreamOptions): Promise<YouTubeStre
  * @param options
  *
  *  - `number` seek : No of seconds to seek in stream.
- *  - `string` seekMode : Choose type of seek you want. [ "precise" | "granular" ]
  *  - `string` language : Sets language of searched content [ YouTube search only. ], e.g. "en-US"
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `boolean` htmldata : given data is html data or not
@@ -234,12 +228,7 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  * const soundInfo = await play.soundcloud('SoundCloud URL')
  * const source = await play.stream_from_info(soundInfo) // SoundCloud Track Stream
  *
- * const source = await play.stream_from_info(info, { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream [ seekMode = "granular" ]
- * // Granular = 1 - 9 seconds before given time. [ Fast ]
- * // Precise = Exact seek [ Little bit Slow ]
- * // Above command seeks to 45 seconds approximately while below command seeks to 45 seconds precisely
- *
- * const source = await play.stream_from_info(info, { seek : 45, seekMode: "precise" }) // Seeks precisely to 45 seconds in YouTube Video Stream
+ * const source = await play.stream_from_info(info, { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream 
  *
  * const resource = createAudioResource(source.stream, {
  *      inputType : source.type
@@ -249,7 +238,6 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  * @param options
  *
  *  - `number` seek : No of seconds to seek in stream.
- *  - `string` seekMode : Choose type of seek you want. [ "precise" | "granular" ]
  *  - `string` language : Sets language of searched content [ YouTube search only. ], e.g. "en-US"
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `boolean` htmldata : given data is html data or not
