@@ -75,10 +75,7 @@ import { stream as yt_stream, StreamOptions, stream_from_info as yt_stream_info 
 import { yt_search } from './YouTube/search';
 import { EventEmitter } from 'stream';
 
-async function stream(
-    url: string,
-    options: { seek?: number } & StreamOptions
-): Promise<YouTubeStream>;
+async function stream(url: string, options: { seek?: number } & StreamOptions): Promise<YouTubeStream>;
 async function stream(url: string, options?: StreamOptions): Promise<YouTubeStream | SoundCloudStream>;
 /**
  * Creates a Stream [ YouTube or SoundCloud ] class from a url for playing.
@@ -89,8 +86,8 @@ async function stream(url: string, options?: StreamOptions): Promise<YouTubeStre
  *
  * const source = await play.stream('soundcloud track URL') // SoundCloud Track Stream
  *
- * const source = await play.stream('youtube video URL', { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream 
- * 
+ * const source = await play.stream('youtube video URL', { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream
+ *
  * const resource = createAudioResource(source.stream, {
  *      inputType : source.type
  * }) // Use discordjs voice createAudioResource function.
@@ -228,7 +225,7 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  * const soundInfo = await play.soundcloud('SoundCloud URL')
  * const source = await play.stream_from_info(soundInfo) // SoundCloud Track Stream
  *
- * const source = await play.stream_from_info(info, { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream 
+ * const source = await play.stream_from_info(info, { seek : 45 }) // Seeks 45 seconds (approx.) in YouTube Video Stream
  *
  * const resource = createAudioResource(source.stream, {
  *      inputType : source.type
