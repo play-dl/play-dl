@@ -64,7 +64,7 @@ export class SeekStream {
     constructor(url: string, duration: number, contentLength: number, video_url: string, options: StreamOptions) {
         this.stream = new WebmSeeker({
             highWaterMark: 5 * 1000 * 1000,
-            readableObjectMode: true,
+            readableObjectMode: true
         });
         this.url = url;
         this.quality = options.quality as number;

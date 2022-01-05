@@ -71,18 +71,19 @@ export class WebmSeeker extends Duplex {
 
     _read() {}
 
-    seek(sec : number): Error | number{
-        let clusterlength = 0, position = 0;
+    seek(sec: number): Error | number {
+        let clusterlength = 0,
+            position = 0;
         const time = Math.floor(sec / 10) * 10;
         let time_left = (sec - time) * 1000 || 0;
         time_left = Math.round(time_left / 20) * 20;
         if (!this.header.segment.cues) return new Error('Failed to Parse Cues');
 
         for (let i = 0; i < this.header.segment.cues.length; i++) {
-            const data = this.header.segment.cues[i]
+            const data = this.header.segment.cues[i];
             if (Math.floor((data.time as number) / 1000) === time) {
                 position = data.position as number;
-                clusterlength = this.header.segment.cues[i + 1].position! - position - 1
+                clusterlength = this.header.segment.cues[i + 1].position! - position - 1;
                 break;
             } else continue;
         }
@@ -204,13 +205,14 @@ export class WebmSeeker extends Duplex {
 
     private getClosestBlock(): Error | undefined {
         if (!this.chunk) return new Error('Chunk is missing');
-        this.cursor = 0
+        this.cursor = 0;
         let positionFound = false;
-        while(!positionFound){
+        while (!positionFound && this.cursor < this.chunk.length) {
             this.cursor = this.chunk.indexOf('a3', this.cursor, 'hex');
             if (this.cursor === -1) return new Error('Failed to find nearest Block.');
-            this.cursor ++;
-            if(!this.vint_value()) return new Error("Failed to find correct simpleBlock in first chunk")
+            this.cursor++;
+            if (!this.vint_value()) return new Error('Failed to find correct simpleBlock in first chunk');
+            if (this.cursor + this.data_length + this.data_length > this.chunk.length) continue;
             const data = this.chunk.slice(
                 this.cursor + this.data_size,
                 this.cursor + this.data_size + this.data_length
@@ -219,11 +221,11 @@ export class WebmSeeker extends Duplex {
             if (!track || track.trackType !== 2) return new Error('No audio Track in this webm file.');
             if ((data[0] & 0xf) === track.trackNumber) {
                 this.cursor += this.data_size + this.data_length;
-                this.push(data.slice(4))
+                this.push(data.slice(4));
                 positionFound = true;
-            }
-            else continue;
+            } else continue;
         }
+        if (!positionFound) return new Error('Failed to find nearest correct simple Block.');
         this.seekfound = true;
         return this.readTag();
     }
