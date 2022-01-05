@@ -14,7 +14,6 @@ export enum StreamType {
 }
 
 export interface StreamOptions {
-    seekMode?: 'precise' | 'granular';
     seek?: number;
     quality?: number;
     language?: string;

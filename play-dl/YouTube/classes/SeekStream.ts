@@ -65,7 +65,6 @@ export class SeekStream {
         this.stream = new WebmSeeker({
             highWaterMark: 5 * 1000 * 1000,
             readableObjectMode: true,
-            mode: options.seekMode
         });
         this.url = url;
         this.quality = options.quality as number;
