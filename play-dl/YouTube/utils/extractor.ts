@@ -197,6 +197,11 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         (res: any) => {
             if (res.compactVideoRenderer)
                 related.push(`https://www.youtube.com/watch?v=${res.compactVideoRenderer.videoId}`);
+            if (res.itemSectionRenderer?.contents)
+                res.itemSectionRenderer.contents.forEach((x: any) => {
+                    if (x.compactVideoRenderer)
+                        related.push(`https://www.youtube.com/watch?v=${x.compactVideoRenderer.videoId}`);
+                });
         }
     );
     const microformat = player_response.microformat.playerMicroformatRenderer;
@@ -553,6 +558,7 @@ async function acceptViewerDiscretion(
             },
             setControvercy: true
         }),
+        cookies: true,
         cookieJar
     });
 
@@ -567,6 +573,7 @@ async function acceptViewerDiscretion(
             ['command', JSON.stringify(endpoint)],
             ['session_token', sessionToken]
         ]).toString(),
+        cookies: true,
         cookieJar
     });
 
