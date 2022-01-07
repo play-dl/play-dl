@@ -211,7 +211,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
                 music.push({});
                 music[music.length - 1].song =
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
-            } else
+            } else if (music.length === 0) return;
+            else
                 music[music.length - 1][x.metadataRowRenderer.title.simpleText.toLowerCase()] =
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
         });
