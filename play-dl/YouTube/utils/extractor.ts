@@ -212,13 +212,14 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     if (musicInfo) {
         musicInfo.forEach((x: any) => {
             if (!x.metadataRowRenderer) return;
-            if (x.metadataRowRenderer.title.simpleText.toLowerCase() === 'song') {
+            const title = x.metadataRowRenderer.title.simpleText ?? x.metadataRowRenderer.title.runs[0].text;
+            if (title.toLowerCase() === 'song') {
                 music.push({});
                 music[music.length - 1].song =
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
             } else if (music.length === 0) return;
             else
-                music[music.length - 1][x.metadataRowRenderer.title.simpleText.toLowerCase()] =
+                music[music.length - 1][title.toLowerCase()] =
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
         });
     }
