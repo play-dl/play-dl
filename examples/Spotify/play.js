@@ -15,7 +15,7 @@ client.on('messageCreate', async message => {
             adapterCreator: message.guild.voiceAdapterCreator
         })
 		if(play.is_expired()){
-            await play.RefreshToken() // This will check if access token has expired or not. If yes, then refresh the token.
+            await play.refreshToken() // This will check if access token has expired or not. If yes, then refresh the token.
         }
 		let args = message.content.split('play ')[1].split(' ')[0]
         let sp_data = await play.spotify(args) // This will get spotify data from the url [ I used track url, make sure to make a logic for playlist, album ]
