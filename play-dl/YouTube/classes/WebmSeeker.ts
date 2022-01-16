@@ -33,6 +33,7 @@ export class WebmSeeker extends Duplex {
     private data_length: number;
     private sec: number;
     private time: number;
+    private foundCue: boolean;
 
     constructor(sec: number, options: WebmSeekerOptions) {
         super(options);
@@ -46,6 +47,7 @@ export class WebmSeeker extends Duplex {
         this.data_size = 0;
         this.sec = sec;
         this.time = Math.floor(sec / 10) * 10;
+        this.foundCue = false;
     }
 
     private get vint_length(): number {
@@ -86,10 +88,12 @@ export class WebmSeeker extends Duplex {
             const data = this.header.segment.cues[i];
             if (Math.floor((data.time as number) / 1000) === this.time) {
                 position = data.position as number;
-                clusterlength = this.header.segment.cues[i + 1].position! - position - 1;
+                if (this.header.segment.cues.length > 1)
+                    clusterlength = this.header.segment.cues[i + 1].position! - position - 1;
                 break;
             } else continue;
         }
+        if (clusterlength === 0) return position;
         return Math.round(position + (time_left / 20) * (clusterlength / 500));
     }
 
