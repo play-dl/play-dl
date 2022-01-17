@@ -33,7 +33,6 @@ export class WebmSeeker extends Duplex {
     private data_length: number;
     private sec: number;
     private time: number;
-    private foundCue: boolean;
 
     constructor(sec: number, options: WebmSeekerOptions) {
         super(options);
@@ -47,7 +46,6 @@ export class WebmSeeker extends Duplex {
         this.data_size = 0;
         this.sec = sec;
         this.time = Math.floor(sec / 10) * 10;
-        this.foundCue = false;
     }
 
     private get vint_length(): number {
@@ -147,7 +145,7 @@ export class WebmSeeker extends Duplex {
             // stop parsing the header once we have found the correct cue
             if (
                 ebmlID.name === 'cueClusterPosition' &&
-                this.time === (this.header.segment.cues!.at(-1)!.time as number) / 1000
+                this.time === (this.header.segment.cues!.at(-2)!.time as number) / 1000
             )
                 this.emit('headComplete');
 
