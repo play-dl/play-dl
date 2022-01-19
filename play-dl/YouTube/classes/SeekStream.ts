@@ -148,7 +148,7 @@ export class SeekStream {
             this.timer.reuse();
             return this.seek();
         }
-        const bytes = this.stream.seek();
+        const bytes = this.stream.seek(this.content_length);
         if (bytes instanceof Error) {
             this.stream.emit('error', bytes);
             this.bytes_count = 0;

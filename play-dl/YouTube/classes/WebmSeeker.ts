@@ -75,7 +75,7 @@ export class WebmSeeker extends Duplex {
 
     _read() {}
 
-    seek(): Error | number {
+    seek(content_length: number): Error | number {
         let clusterlength = 0,
             position = 0;
         let time_left = (this.sec - this.time) * 1000 || 0;
@@ -86,8 +86,7 @@ export class WebmSeeker extends Duplex {
             const data = this.header.segment.cues[i];
             if (Math.floor((data.time as number) / 1000) === this.time) {
                 position = data.position as number;
-                if (this.header.segment.cues.length > 1)
-                    clusterlength = this.header.segment.cues[i + 1].position! - position - 1;
+                clusterlength = (this.header.segment.cues[i + 1]?.position || content_length) - position - 1;
                 break;
             } else continue;
         }
@@ -145,6 +144,7 @@ export class WebmSeeker extends Duplex {
             // stop parsing the header once we have found the correct cue
             if (
                 ebmlID.name === 'cueClusterPosition' &&
+                this.header.segment.cues!.length > 2 &&
                 this.time === (this.header.segment.cues!.at(-2)!.time as number) / 1000
             )
                 this.emit('headComplete');
