@@ -50,6 +50,17 @@ import play from 'play-dl'; // Everything
 import { video_basic_info, stream } from 'play-dl'; // Individual functions
 ```
 
+## **Compatibility issues** - discord-player
+    
+Because discord-player doesn't work with raw opus packets you need to enable the compatibility mode in `play-dl`, if you want to use both frameworks together.
+
+- To fix the playback of YouTube videos with `discord-player`, you can disable some of play-dl's optimisations and fixes by setting the `discordPlayerCompatibility` option for `stream` and `stream_from_info` to true
+
+- The `discordPlayerCompatiblity` option might break the playback of long YouTube videos.
+
+- Even with the `discordPlayerCompatibility` option set you will not be able to use the seek option for `stream` and `stream_from_info`.
+    
+
 ### [Documentation](https://play-dl.github.io/modules.html)
 ### [Examples](./examples)
 ### [Instructions](./instructions)

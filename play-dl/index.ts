@@ -100,6 +100,7 @@ async function stream(url: string, options?: StreamOptions): Promise<YouTubeStre
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `boolean` htmldata : given data is html data or not
  *  - `number` precache : No of segments of data to store before looping [YouTube Live Stream only]. [ Defaults to 3 ]
+ *  - `boolean` discordPlayerCompatibility : Conversion of Webm to Opus [ Defaults to false ]
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
 async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
@@ -239,6 +240,7 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  *  - `number` quality : Quality number. [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  *  - `boolean` htmldata : given data is html data or not
  *  - `number` precache : No of segments of data to store before looping [YouTube Live Stream only]. [ Defaults to 3 ]
+ *  - `boolean` discordPlayerCompatibility : Conversion of Webm to Opus[ Defaults to false ]
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
 async function stream_from_info(
