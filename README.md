@@ -56,7 +56,7 @@ Because discord-player doesn't work with raw opus packets you need to enable the
 
 - To fix the playback of YouTube videos with `discord-player`, you can disable some of play-dl's optimisations and fixes by setting the `discordPlayerCompatibility` option for `stream` and `stream_from_info` to true
 
-- The `discordPlayerCompatiblity` option breaks the playback of long YouTube videos.
+- The `discordPlayerCompatiblity` option might breaks the playback of long YouTube videos.
 
 - Even with the `discordPlayerCompatibility` option set you will not be able to use the seek option for `stream` and `stream_from_info`.
     
