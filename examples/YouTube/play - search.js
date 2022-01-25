@@ -1,35 +1,46 @@
-const discord = require('discord.js')
-const { Intents } = require('discord.js')
+const { Intents, Client } = require('discord.js')
 const { createAudioPlayer, createAudioResource , StreamType, demuxProbe, joinVoiceChannel, NoSubscriberBehavior, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection } = require('@discordjs/voice')
 const play = require('play-dl')
-const client = new discord.Client({ intents : [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES] , partials : ['CHANNEL', 'MESSAGE']})
+const client = new Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES],
+    partials: ['CHANNEL', 'MESSAGE']
+})
 const token = '< YOUR BOT TOKEN >'
 
-
 client.on('messageCreate', async message => {
-	if(message.content.startsWith('!play')){
-		if(!message.member.voice?.channel) return message.channel.send('Connect to a Voice Channel')
+    
+    if (message.content.startsWith('!play')) {
+        
+        if (!message.member.voice?.channel) return message.channel.send('Connect to a Voice Channel')
+        
         const connection = joinVoiceChannel({
-            channelId : message.member.voice.channel.id,
-            guildId : message.guild.id,
+            channelId: message.member.voice.channel.id,
+            guildId: message.guild.id,
             adapterCreator: message.guild.voiceAdapterCreator
         })
-		
-		let args = message.content.split('play')[1]
-        let yt_info = await play.search(args, { limit : 1 })
-		let stream = await play.stream(yt_info[0].url)
-        let resource = createAudioResource(stream.stream, {
-            inputType : stream.type
+
+        
+        let args = message.content.split('play')[1]
+        let yt_info = await play.search(args, {
+            limit: 1
         })
+        
+        let stream = await play.stream(yt_info[0].url)
+        
+        let resource = createAudioResource(stream.stream, {
+            inputType: stream.type
+        })
+
         let player = createAudioPlayer({
             behaviors: {
                 noSubscriber: NoSubscriberBehavior.Play
             }
         })
+
         player.play(resource)
 
         connection.subscribe(player)
-	}
+    }
 })
 
 client.on('ready', () => {
@@ -37,4 +48,3 @@ client.on('ready', () => {
 })
 
 client.login(token);
-
