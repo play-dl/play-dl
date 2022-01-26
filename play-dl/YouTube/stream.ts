@@ -19,7 +19,7 @@ export interface StreamOptions {
     language?: string;
     htmldata?: boolean;
     precache?: number;
-    discordPlayerCompatibility?: boolean
+    discordPlayerCompatibility?: boolean;
 }
 
 /**
@@ -63,6 +63,9 @@ export async function stream_from_info(
     info: InfoData | StreamInfoData,
     options: StreamOptions = {}
 ): Promise<YouTubeStream> {
+    if (!info.format || info.format.length === 0)
+        throw new Error('Upcoming and premiere videos that are not currently live cannot be streamed.');
+
     const final: any[] = [];
     if (
         info.LiveStreamData.isLive === true &&
@@ -87,8 +90,8 @@ export async function stream_from_info(
         final[0].codec === 'opus' && final[0].container === 'webm' ? StreamType.WebmOpus : StreamType.Arbitrary;
     await request_stream(`https://${new URL(final[0].url).host}/generate_204`);
     if (type === StreamType.WebmOpus) {
-        if(!options.discordPlayerCompatibility){
-            options.seek ??= 0
+        if (!options.discordPlayerCompatibility) {
+            options.seek ??= 0;
             if (options.seek >= info.video_details.durationInSec || options.seek < 0)
                 throw new Error(`Seeking beyond limit. [ 0 - ${info.video_details.durationInSec - 1}]`);
             return new SeekStream(
@@ -99,7 +102,7 @@ export async function stream_from_info(
                 info.video_details.url,
                 options
             );
-        } else if(options.seek) throw new Error("Can not seek with discordPlayerCompatibility set to true.")
+        } else if (options.seek) throw new Error('Can not seek with discordPlayerCompatibility set to true.');
     }
     return new Stream(
         final[0].url,

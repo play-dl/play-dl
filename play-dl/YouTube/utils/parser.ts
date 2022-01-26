@@ -146,6 +146,9 @@ export function parseVideo(data?: any): YouTubeVideo {
             artist: Boolean(badge?.includes('artist'))
         },
         uploadedAt: data.videoRenderer.publishedTimeText?.simpleText ?? null,
+        upcoming: data.videoRenderer.upcomingEventData?.startTime
+            ? new Date(parseInt(data.videoRenderer.upcomingEventData.startTime) * 1000)
+            : undefined,
         views: data.videoRenderer.viewCountText?.simpleText?.replace(/\D/g, '') ?? 0,
         live: durationText ? false : true
     });

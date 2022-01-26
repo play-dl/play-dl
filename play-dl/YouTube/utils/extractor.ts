@@ -159,6 +159,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     const vid = player_response.videoDetails;
 
     let discretionAdvised = false;
+    let upcoming = false;
     if (player_response.playabilityStatus.status !== 'OK') {
         if (player_response.playabilityStatus.status === 'CONTENT_CHECK_REQUIRED') {
             if (options.htmldata)
@@ -179,7 +180,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
             const updatedValues = await acceptViewerDiscretion(vid.videoId, cookieJar, body, true);
             player_response.streamingData = updatedValues.streamingData;
             initial_response.contents.twoColumnWatchNextResults.secondaryResults = updatedValues.relatedVideos;
-        } else
+        } else if (player_response.playabilityStatus.status === 'LIVE_STREAM_OFFLINE') upcoming = true;
+        else
             throw new Error(
                 `While getting info from url\n${
                     player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
@@ -223,6 +225,17 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
         });
     }
+    let upcomingDate;
+    if (upcoming) {
+        if (microformat.liveBroadcastDetails.startTimestamp)
+            upcomingDate = new Date(microformat.liveBroadcastDetails.startTimestamp);
+        else {
+            const timestamp =
+                player_response.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate
+                    .liveStreamOfflineSlateRenderer.scheduledStartTime;
+            upcomingDate = new Date(parseInt(timestamp) * 1000);
+        }
+    }
     const video_details = new YouTubeVideo({
         id: vid.videoId,
         title: vid.title,
@@ -230,6 +243,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         duration: Number(vid.lengthSeconds),
         duration_raw: parseSeconds(vid.lengthSeconds),
         uploadedAt: microformat.publishDate,
+        upcoming: upcomingDate,
         thumbnails: vid.thumbnail.thumbnails,
         channel: {
             name: vid.author,
@@ -254,8 +268,11 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         discretionAdvised,
         music
     });
-    const format = player_response.streamingData.formats ?? [];
-    format.push(...(player_response.streamingData.adaptiveFormats ?? []));
+    let format = [];
+    if (!upcoming) {
+        format.push(...(player_response.streamingData.formats ?? []));
+        format.push(...(player_response.streamingData.adaptiveFormats ?? []));
+    }
     const LiveStreamData = {
         isLive: video_details.live,
         dashManifestUrl: player_response.streamingData?.dashManifestUrl ?? null,
@@ -304,6 +321,7 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         .split(/;\s*(var|const|let)\s/)[0];
     if (!player_data) throw new Error('Initial Player Response Data is undefined.');
     const player_response = JSON.parse(player_data);
+    let upcoming = false;
     if (player_response.playabilityStatus.status !== 'OK') {
         if (player_response.playabilityStatus.status === 'CONTENT_CHECK_REQUIRED') {
             if (options.htmldata)
@@ -334,7 +352,8 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
                 false
             );
             player_response.streamingData = updatedValues.streamingData;
-        } else
+        } else if (player_response.playabilityStatus.status === 'LIVE_STREAM_OFFLINE') upcoming = true;
+        else
             throw new Error(
                 `While getting info from url\n${
                     player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
@@ -348,8 +367,11 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         url: `https://www.youtube.com/watch?v=${player_response.videoDetails.videoId}`,
         durationInSec: (duration < 0 ? 0 : duration) || 0
     };
-    const format = player_response.streamingData.formats ?? [];
-    format.push(...(player_response.streamingData.adaptiveFormats ?? []));
+    let format = [];
+    if (!upcoming) {
+        format.push(...(player_response.streamingData.formats ?? []));
+        format.push(...(player_response.streamingData.adaptiveFormats ?? []));
+    }
 
     const LiveStreamData = {
         isLive: player_response.videoDetails.isLiveContent,
@@ -414,7 +436,7 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(data: T
         data.video_details.durationInSec === 0
     ) {
         return data;
-    } else if (data.format[0].signatureCipher || data.format[0].cipher) {
+    } else if (data.format.length > 0 && (data.format[0].signatureCipher || data.format[0].cipher)) {
         data.format = await format_decipher(data.format, data.html5player);
         return data;
     } else {
@@ -495,6 +517,9 @@ export function getPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
                 duration_raw: info.lengthText?.simpleText ?? '0:00',
                 thumbnails: info.thumbnail.thumbnails,
                 title: info.title.runs[0].text,
+                upcoming: info.upcomingEventData?.startTime
+                    ? new Date(parseInt(info.upcomingEventData.startTime) * 1000)
+                    : undefined,
                 channel: {
                     id: info.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId || undefined,
                     name: info.shortBylineText.runs[0].text || undefined,
@@ -723,6 +748,8 @@ function getWatchPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
                 duration_raw: info.lengthText?.simpleText ?? '0:00',
                 thumbnails: info.thumbnail.thumbnails,
                 title: info.title.simpleText,
+                upcoming:
+                    info.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.style === 'UPCOMING' || undefined,
                 channel: {
                     id: channel_info.navigationEndpoint.browseEndpoint.browseId || undefined,
                     name: channel_info.text || undefined,
