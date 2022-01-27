@@ -4,6 +4,7 @@ import { YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 import { InfoData, StreamInfoData } from './constants';
 import { URL, URLSearchParams } from 'node:url';
+import { parseAudioFormats } from '../stream';
 
 interface InfoOptions {
     htmldata?: boolean;
@@ -378,12 +379,15 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
         dashManifestUrl: player_response.streamingData?.dashManifestUrl ?? null,
         hlsManifestUrl: player_response.streamingData?.hlsManifestUrl ?? null
     };
-    return await decipher_info({
-        LiveStreamData,
-        html5player,
-        format,
-        video_details
-    });
+    return await decipher_info(
+        {
+            LiveStreamData,
+            html5player,
+            format,
+            video_details
+        },
+        true
+    );
 }
 /**
  * Function to convert seconds to [hour : minutes : seconds] format
@@ -427,9 +431,13 @@ export async function video_info(url: string, options: InfoOptions = {}): Promis
 /**
  * Function uses data from video_basic_info and deciphers it if it contains signatures.
  * @param data Data - {@link InfoData}
+ * @param audio_only `boolean` - To decipher only audio formats only.
  * @returns Deciphered Video Info {@link InfoData}
  */
-export async function decipher_info<T extends InfoData | StreamInfoData>(data: T): Promise<T> {
+export async function decipher_info<T extends InfoData | StreamInfoData>(
+    data: T,
+    audio_only: boolean = false
+): Promise<T> {
     if (
         data.LiveStreamData.isLive === true &&
         data.LiveStreamData.dashManifestUrl !== null &&
@@ -437,11 +445,10 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(data: T
     ) {
         return data;
     } else if (data.format.length > 0 && (data.format[0].signatureCipher || data.format[0].cipher)) {
+        if (audio_only) data.format = parseAudioFormats(data.format);
         data.format = await format_decipher(data.format, data.html5player);
         return data;
-    } else {
-        return data;
-    }
+    } else return data;
 }
 /**
  * Gets YouTube playlist info from a playlist url.
