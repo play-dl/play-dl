@@ -63,7 +63,7 @@ export async function stream_from_info(
     info: InfoData | StreamInfoData,
     options: StreamOptions = {}
 ): Promise<YouTubeStream> {
-    if (!info.format || info.format.length === 0)
+    if (info.format.length === 0)
         throw new Error('Upcoming and premiere videos that are not currently live cannot be streamed.');
 
     const final: any[] = [];
