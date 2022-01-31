@@ -461,7 +461,10 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(
  * ```
  * @param url Playlist URL
  * @param options Playlist Info Options
- * - `boolean` incomplete : If set to true, parses playlist with hidden videos.
+ * - `boolean` incomplete : When this is set to `false` (default) this function will throw an error
+ *                          if the playlist contains hidden videos.
+ *                          If it is set to `true`, it parses the playlist skipping the hidden videos,
+ *                          only visible videos are included in the resulting {@link YouTubePlaylist}.
  *
  * @returns YouTube Playlist
  */
