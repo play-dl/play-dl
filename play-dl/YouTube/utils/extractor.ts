@@ -723,10 +723,10 @@ function getNormalPlaylist(response: any, body: any): YouTubePlayList {
                       author.videoOwnerRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url ||
                       author.videoOwnerRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl
                   }`,
-                  icon: author.videoOwnerRenderer.thumbnail.thumbnails.length
+                  icons: author.videoOwnerRenderer.thumbnail.thumbnails.length
                       ? author.videoOwnerRenderer.thumbnail.thumbnails[
                             author.videoOwnerRenderer.thumbnail.thumbnails.length - 1
-                        ].url
+                        ]
                       : null
               }
             : {},
