@@ -30,6 +30,7 @@ export class WebmSeeker extends Duplex {
     headerparsed: boolean;
     seekfound: boolean;
     private data_size: number;
+    private offset: number;
     private data_length: number;
     private sec: number;
     private time: number;
@@ -44,6 +45,7 @@ export class WebmSeeker extends Duplex {
         this.seekfound = false;
         this.data_length = 0;
         this.data_size = 0;
+        this.offset = 0;
         this.sec = sec;
         this.time = Math.floor(sec / 10) * 10;
     }
@@ -91,7 +93,7 @@ export class WebmSeeker extends Duplex {
             } else continue;
         }
         if (clusterlength === 0) return position;
-        return Math.round(position + (time_left / 20) * (clusterlength / 500));
+        return this.offset + Math.round(position + (time_left / 20) * (clusterlength / 500));
     }
 
     _write(chunk: Buffer, _: BufferEncoding, callback: (error?: Error | null) => void): void {
@@ -142,6 +144,9 @@ export class WebmSeeker extends Duplex {
             if (parse instanceof Error) return parse;
 
             // stop parsing the header once we have found the correct cue
+
+            if (ebmlID.name === 'seekHead') this.offset = oldCursor;
+
             if (
                 ebmlID.name === 'cueClusterPosition' &&
                 this.header.segment.cues!.length > 2 &&
@@ -211,6 +216,10 @@ export class WebmSeeker extends Duplex {
     }
 
     private getClosestBlock(): Error | undefined {
+        if (this.sec === 0) {
+            this.seekfound = true;
+            return this.readTag();
+        }
         if (!this.chunk) return new Error('Chunk is missing');
         this.cursor = 0;
         let positionFound = false;
