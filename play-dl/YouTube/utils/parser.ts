@@ -3,7 +3,6 @@ import { YouTubePlayList } from '../classes/Playlist';
 import { YouTubeChannel } from '../classes/Channel';
 import { YouTube } from '..';
 import { YouTubeThumbnail } from '../classes/Thumbnail';
-import { writeFileSync } from 'fs';
 
 const BLURRED_THUMBNAILS = [
     '-oaymwEpCOADEI4CSFryq4qpAxsIARUAAAAAGAElAADIQj0AgKJDeAHtAZmZGUI=',
@@ -48,7 +47,6 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     const details =
         json_data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0]
             .itemSectionRenderer.contents;
-    writeFileSync('results.json', JSON.stringify(details));
     for (const detail of details) {
         if (hasLimit && results.length === options.limit) break;
         if (!detail.videoRenderer && !detail.channelRenderer && !detail.playlistRenderer) continue;
