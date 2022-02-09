@@ -1,0 +1,48 @@
+name: 'Update user agents'
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    name: Update user agents
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 17
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Create and checkout automated/update-user-agents branch
+        run: |
+          git branch 'automated/update-user-agents' main
+          git checkout 'automated/update-user-agents'
+
+      - name: Install dependencies
+        run: npm install user-agents
+
+      - name: Run update script
+        run: node .github/updateUserAgents.js
+
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add play-dl/Request/useragents.json
+          git commit --message '[Automated] Update user agents'
+
+      - name: Push and create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push --set-upstream origin automated/update-user-agents
+          useragents=$(cat play-dl/Request/useragents.json | jq -r '"New user agents:\n- " + join("\n- ")')
+          gh pr create --title '[Automated] Update user agents' --body "$useragents" --head 'automated/update-user-agents'
