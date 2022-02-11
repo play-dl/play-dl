@@ -244,6 +244,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         duration: Number(vid.lengthSeconds),
         duration_raw: parseSeconds(vid.lengthSeconds),
         uploadedAt: microformat.publishDate,
+        liveAt: microformat.liveBroadcastDetails?.startTimestamp,
         upcoming: upcomingDate,
         thumbnails: vid.thumbnail.thumbnails,
         channel: {
