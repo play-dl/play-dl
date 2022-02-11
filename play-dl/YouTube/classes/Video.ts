@@ -120,6 +120,10 @@ export class YouTubeVideo {
      */
     uploadedAt?: string;
     /**
+     * YouTube Live Date
+     */
+    liveAt?: string;
+    /**
      * If the video is upcoming or a premiere that isn't currently live, this will contain the premiere date, for watch page playlists this will be true, it defaults to undefined
      */
     upcoming?: Date | true;
@@ -174,6 +178,7 @@ export class YouTubeVideo {
         this.durationRaw = data.duration_raw || '0:00';
         this.durationInSec = (data.duration < 0 ? 0 : data.duration) || 0;
         this.uploadedAt = data.uploadedAt || undefined;
+        this.liveAt = data.liveAt || undefined;
         this.upcoming = data.upcoming;
         this.views = parseInt(data.views) || 0;
         const thumbnails = [];
