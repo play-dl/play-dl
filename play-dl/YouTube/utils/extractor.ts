@@ -60,7 +60,7 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
             else return 'search';
         }
     } else {
-        if (!url.match(playlist_pattern)) return false;
+        if (!url.match(playlist_pattern)) return yt_validate(url.replace(/(\?|\&)list=[a-zA-Z\d_-]+/, ''));
         else return 'playlist';
     }
 }
