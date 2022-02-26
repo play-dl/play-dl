@@ -45,11 +45,12 @@ export function ParseSearchResult(html: string, options?: ParseSearchInterface):
     const json_data = JSON.parse(data);
     const results = [];
     const details =
-        json_data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0]
-            .itemSectionRenderer.contents;
+        json_data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.flatMap(
+            (s: any) => s.itemSectionRenderer?.contents
+        );
     for (const detail of details) {
         if (hasLimit && results.length === options.limit) break;
-        if (!detail.videoRenderer && !detail.channelRenderer && !detail.playlistRenderer) continue;
+        if (!detail || (!detail.videoRenderer && !detail.channelRenderer && !detail.playlistRenderer)) continue;
         switch (options.type) {
             case 'video': {
                 const parsed = parseVideo(detail);
