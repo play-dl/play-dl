@@ -136,15 +136,46 @@ export function request_resolve_redirect(url: string): Promise<string> {
             resolve(url);
         } else if (statusCode < 400) {
             const resolved = await request_resolve_redirect(res.headers.location as string).catch((err) => err);
-
-            if (res instanceof Error) {
-                reject(res);
+            if (resolved instanceof Error) {
+                reject(resolved);
                 return;
             }
 
             resolve(resolved);
         } else {
             reject(new Error(`${res.statusCode}: ${res.statusMessage}, ${url}`));
+        }
+    });
+}
+
+export function request_content_length(url: string): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+        let res = await https_getter(url, { method: 'HEAD' }).catch((err: Error) => err);
+        if (res instanceof Error) {
+            reject(res);
+            return;
+        }
+        const statusCode = Number(res.statusCode);
+        if (statusCode < 300) {
+            resolve(Number(res.headers['content-length']));
+        } else if (statusCode < 400) {
+            const newURL = await request_resolve_redirect(res.headers.location as string).catch((err) => err);
+            if (newURL instanceof Error) {
+                reject(newURL);
+                return;
+            }
+
+            const res2 = await request_content_length(newURL).catch((err) => err);
+            if (res2 instanceof Error) {
+                reject(res2);
+                return;
+            }
+
+            resolve(res2);
+        } else {
+            reject(
+                new Error(`Failed to get content length with error: ${res.statusCode}, ${res.statusMessage}, ${url}`)
+            );
         }
     });
 }
