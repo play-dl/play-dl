@@ -14,6 +14,10 @@ export interface SoundTrackJSON {
      */
     url: string;
     /**
+     * User friendly SoundCloud track URL
+     */
+    permalink: string;
+    /**
      * SoundCloud Track fetched status
      */
     fetched: boolean;
