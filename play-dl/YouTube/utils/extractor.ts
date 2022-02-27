@@ -22,7 +22,7 @@ const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern =
-    /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?(youtube\.com)\/(?:(playlist|watch))(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(.*)?$/;
+    /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?((?:youtube\.com|youtu.be))\/(?:(playlist|watch))?(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(.*)?$/;
 /**
  * Validate YouTube URL or ID.
  *
@@ -60,7 +60,7 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
             else return 'search';
         }
     } else {
-        if (!url.match(playlist_pattern)) return false;
+        if (!url.match(playlist_pattern)) return yt_validate(url.replace(/(\?|\&)list=[a-zA-Z\d_-]+/, ''));
         else return 'playlist';
     }
 }
@@ -274,6 +274,13 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     if (!upcoming) {
         format.push(...(player_response.streamingData.formats ?? []));
         format.push(...(player_response.streamingData.adaptiveFormats ?? []));
+
+        // get the formats for the android player for legacy videos
+        // fixes the stream being closed because not enough data
+        // arrived in time for ffmpeg to be able to extract audio data
+        if (parseAudioFormats(format).length === 0 && !options.htmldata) {
+            format = await getAndroidFormats(vid.videoId, cookieJar, body);
+        }
     }
     const LiveStreamData = {
         isLive: video_details.live,
@@ -373,6 +380,13 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
     if (!upcoming) {
         format.push(...(player_response.streamingData.formats ?? []));
         format.push(...(player_response.streamingData.adaptiveFormats ?? []));
+
+        // get the formats for the android player for legacy videos
+        // fixes the stream being closed because not enough data
+        // arrived in time for ffmpeg to be able to extract audio data
+        if (parseAudioFormats(format).length === 0 && !options.htmldata) {
+            format = await getAndroidFormats(player_response.videoDetails.videoId, cookieJar, body);
+        }
     }
 
     const LiveStreamData = {
@@ -637,6 +651,36 @@ async function acceptViewerDiscretion(
         };
 
     return { streamingData };
+}
+
+async function getAndroidFormats(videoId: string, cookieJar: { [key: string]: string }, body: string): Promise<any[]> {
+    const apiKey =
+        body.split('INNERTUBE_API_KEY":"')[1]?.split('"')[0] ??
+        body.split('innertubeApiKey":"')[1]?.split('"')[0] ??
+        DEFAULT_API_KEY;
+
+    const response = await request(`https://www.youtube.com/youtubei/v1/player?key=${apiKey}`, {
+        method: 'POST',
+        body: JSON.stringify({
+            context: {
+                client: {
+                    clientName: 'ANDROID',
+                    clientVersion: '16.49',
+                    hl: 'en',
+                    timeZone: 'UTC',
+                    utcOffsetMinutes: 0
+                }
+            },
+            videoId: videoId,
+            playbackContext: { contentPlaybackContext: { html5Preference: 'HTML5_PREF_WANTS' } },
+            contentCheckOk: true,
+            racyCheckOk: true
+        }),
+        cookies: true,
+        cookieJar
+    });
+
+    return JSON.parse(response).streamingData.formats;
 }
 
 function getWatchPlaylist(response: any, body: any, url: string): YouTubePlayList {

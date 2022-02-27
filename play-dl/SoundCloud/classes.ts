@@ -105,6 +105,10 @@ export class SoundCloudTrack {
      */
     url: string;
     /**
+     * User friendly SoundCloud track URL
+     */
+    permalink: string;
+    /**
      * SoundCloud Track fetched status
      */
     fetched: boolean;
@@ -150,6 +154,7 @@ export class SoundCloudTrack {
         this.name = data.title;
         this.id = data.id;
         this.url = data.uri;
+        this.permalink = data.permalink_url;
         this.fetched = true;
         this.type = 'track';
         this.durationInSec = Math.round(Number(data.duration) / 1000);
@@ -187,6 +192,7 @@ export class SoundCloudTrack {
             name: this.name,
             id: this.id,
             url: this.url,
+            permalink: this.permalink,
             fetched: this.fetched,
             durationInMs: this.durationInMs,
             durationInSec: this.durationInSec,

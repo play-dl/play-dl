@@ -1,4 +1,4 @@
-import { request_stream } from '../Request';
+import { request_content_length, request_stream } from '../Request';
 import { LiveStream, Stream } from './classes/LiveStream';
 import { SeekStream } from './classes/SeekStream';
 import { InfoData, StreamInfoData } from './utils/constants';
@@ -104,11 +104,19 @@ export async function stream_from_info(
             );
         } else if (options.seek) throw new Error('Can not seek with discordPlayerCompatibility set to true.');
     }
+
+    let contentLength;
+    if (final[0].contentLength) {
+        contentLength = Number(final[0].contentLength);
+    } else {
+        contentLength = await request_content_length(final[0].url);
+    }
+
     return new Stream(
         final[0].url,
         type,
         info.video_details.durationInSec,
-        Number(final[0].contentLength),
+        contentLength,
         info.video_details.url,
         options
     );
