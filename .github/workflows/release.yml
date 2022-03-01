@@ -1,0 +1,40 @@
+name: Publish NPM package + Docs
+on:
+  release:
+    types: [created]
+jobs:
+  publish_npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 17
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Publish NPM package
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish_discord:
+    runs-on: ubuntu-latest
+    needs: publish_npm
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 17
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Publish on discord
+        run: node .github/discord.js
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHANNEL: "888999793458835466"
+          BODY: ${{ github.event.release.body }}
+          TAG: ${{ github.event.release.tag_name }}
+          URL: "https://github.com/play-dl/play-dl/releases/tag/"
