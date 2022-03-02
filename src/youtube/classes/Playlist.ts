@@ -2,7 +2,7 @@ import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
 import { YouTubeVideo } from './Video';
 
-const BASE_API = 'https://www.youtube.com/youtubei/v1/browse?key=';
+//const BASE_API = 'https://www.youtube.com/youtubei/v1/browse?key=';
 
 interface continuationToken {
     api?: string;
@@ -22,7 +22,7 @@ export class YouTubePlayList {
     thumbnails: YouTubeThumbnail[];
     private fetched_videos: Map<number, YouTubeVideo[]>;
     private continuation: continuationToken;
-    constructor(data: any) {
+    constructor(data: Omit<playlistOptions, 'type'>) {
         this.id = data.id;
         this.title = data.title;
         this.url = data.url;
@@ -32,6 +32,7 @@ export class YouTubePlayList {
         this.views = data.views;
         this.channel = data.channel ? new YouTubeChannel(data.channel) : null;
         const thumbnails: YouTubeThumbnail[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.thumbnails?.forEach((x: any) => thumbnails.push(new YouTubeThumbnail(x)));
         this.thumbnails = thumbnails;
         this.fetched_videos = new Map();
@@ -39,6 +40,19 @@ export class YouTubePlayList {
     }
 
     private next(limit = Infinity) {
-        return 0;
+        return limit;
     }
+}
+
+interface playlistOptions {
+    id: string;
+    title: string;
+    url: string;
+    type: 'playlist';
+    videoCount: number;
+    lastUpdate: Date | null;
+    views: number;
+    channel: YouTubeChannel | null;
+    thumbnails: YouTubeThumbnail[];
+    continuation: continuationToken;
 }

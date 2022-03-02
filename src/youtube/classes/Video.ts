@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
 
@@ -22,22 +21,23 @@ export class YouTubeVideo {
     tags: string[];
     discretionAdvised: boolean;
     constructor(data: Omit<YouTubeVideoOptions, 'type'>) {
-        this.id = data!.id;
-        this.url = data!.url;
+        this.id = data.id;
+        this.url = data.url;
         this.type = 'video';
-        this.title = data!.title;
-        this.description = data!.description;
-        this.durationRaw = data!.durationRaw;
-        this.durationInSec = data!.durationInSec;
+        this.title = data.title;
+        this.description = data.description;
+        this.durationRaw = data.durationRaw;
+        this.durationInSec = data.durationInSec;
         this.uploadedAt = data.uploadedAt ? new Date(data.uploadedAt) : null;
         this.liveAt = data.liveAt ? new Date(data.liveAt) : null;
         this.upcoming = data.upcoming ? new Date(data.upcoming) : null;
-        this.views = data!.views;
+        this.views = data.views;
         const thumbnails: YouTubeThumbnail[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.thumbnails.forEach((x: any) => thumbnails.push(new YouTubeThumbnail(x)));
         this.thumbnails = thumbnails;
         this.channel = data.channel ? new YouTubeChannel(data.channel) : null;
-        this.likes = data!.likes;
+        this.likes = data.likes;
         this.live = !!data.live;
         this.private = !!data.private;
         this.tags = data.tags;
