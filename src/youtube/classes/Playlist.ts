@@ -32,7 +32,6 @@ export class YouTubePlayList {
         this.views = data.views;
         this.channel = data.channel ? new YouTubeChannel(data.channel) : null;
         const thumbnails: YouTubeThumbnail[] = [];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.thumbnails?.forEach((x: any) => thumbnails.push(new YouTubeThumbnail(x)));
         this.thumbnails = thumbnails;
         this.fetched_videos = new Map();
