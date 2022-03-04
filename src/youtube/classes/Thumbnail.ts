@@ -18,6 +18,7 @@ export class YouTubeThumbnail {
                 this.width = 480;
                 this.height = 360;
                 break;
+            case 'maxresdefault':
             case 'hq720':
                 this.width = 1280;
                 this.height = 720;

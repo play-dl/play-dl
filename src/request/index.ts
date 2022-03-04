@@ -69,9 +69,8 @@ export async function request_stream(req_url: string, options: RequestOpts = { m
 
 async function redirect(req_url: string, options: RequestOpts = {}): Promise<https_return> {
     const res = await https_getter(req_url, options);
-    if (res.data && res.data.headers.location) {
-        return redirect(res.data.headers.location, options);
-    } else return res;
+    if (res.data && res.data.headers.location) return redirect(res.data.headers.location, options);
+    else return res;
 }
 
 function https_getter(req_url: string, options: RequestOpts = {}): Promise<https_return> {
