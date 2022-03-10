@@ -82,7 +82,33 @@ interface VideoOptions {
      * Gives info about music content in that video.
      */
     music?: VideoMusic[];
+    /**
+     * The chapters for this video
+     *
+     * If the video doesn't have any chapters or if the video object wasn't created by {@link video_basic_info} or {@link video_info} this will be an empty array.
+     */
+    chapters: VideoChapter[];
 }
+
+export interface VideoChapter {
+    /**
+     * The title of the chapter
+     */
+    title: string;
+    /**
+     * The timestamp of the start of the chapter
+     */
+    timestamp: string;
+    /**
+     * The start of the chapter in seconds
+     */
+    seconds: number;
+    /**
+     * Thumbnails of the frame at the start of this chapter
+     */
+    thumbnails: YouTubeThumbnail[];
+}
+
 /**
  * Class for YouTube Video url
  */
@@ -164,6 +190,12 @@ export class YouTubeVideo {
      */
     music?: VideoMusic[];
     /**
+     * The chapters for this video
+     *
+     * If the video doesn't have any chapters or if the video object wasn't created by {@link video_basic_info} or {@link video_info} this will be an empty array.
+     */
+    chapters: VideoChapter[];
+    /**
      * Constructor for YouTube Video Class
      * @param data JSON parsed data.
      */
@@ -193,6 +225,7 @@ export class YouTubeVideo {
         this.tags = data.tags || [];
         this.discretionAdvised = data.discretionAdvised ?? undefined;
         this.music = data.music || [];
+        this.chapters = data.chapters || [];
     }
     /**
      * Converts class to title name of video.
@@ -222,7 +255,8 @@ export class YouTubeVideo {
             live: this.live,
             private: this.private,
             discretionAdvised: this.discretionAdvised,
-            music: this.music
+            music: this.music,
+            chapters: this.chapters
         };
     }
 }

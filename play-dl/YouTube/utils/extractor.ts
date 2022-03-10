@@ -1,6 +1,6 @@
 import { request } from './../../Request/index';
 import { format_decipher } from './cipher';
-import { YouTubeVideo } from '../classes/Video';
+import { VideoChapter, YouTubeVideo } from '../classes/Video';
 import { YouTubePlayList } from '../classes/Playlist';
 import { InfoData, StreamInfoData } from './constants';
 import { URL, URLSearchParams } from 'node:url';
@@ -229,6 +229,21 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
                     x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
         });
     }
+    const rawChapters =
+        initial_response.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer.decoratedPlayerBarRenderer.playerBar?.multiMarkersPlayerBarRenderer.markersMap.find(
+            (m: any) => m.key === 'DESCRIPTION_CHAPTERS'
+        ).value.chapters;
+    const chapters: VideoChapter[] = [];
+    if (rawChapters) {
+        for (const { chapterRenderer } of rawChapters) {
+            chapters.push({
+                title: chapterRenderer.title.simpleText,
+                timestamp: parseSeconds(chapterRenderer.timeRangeStartMillis / 1000),
+                seconds: chapterRenderer.timeRangeStartMillis / 1000,
+                thumbnails: chapterRenderer.thumbnail.thumbnails
+            });
+        }
+    }
     let upcomingDate;
     if (upcoming) {
         if (microformat.liveBroadcastDetails.startTimestamp)
@@ -271,7 +286,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         live: vid.isLiveContent,
         private: vid.isPrivate,
         discretionAdvised,
-        music
+        music,
+        chapters
     });
     let format = [];
     if (!upcoming) {
