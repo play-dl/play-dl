@@ -43,9 +43,10 @@ const pattern = /^((https:)?\/\/)?open.spotify.com\/(track|album|playlist)\//;
  */
 export async function spotify(url: string): Promise<Spotify> {
     if (!spotifyData) throw new Error('Spotify Data is missing\nDid you forgot to do authorization ?');
-    if (!url.match(pattern)) throw new Error('This is not a Spotify URL');
-    if (url.indexOf('track/') !== -1) {
-        const trackID = url.split('track/')[1].split('&')[0].split('?')[0];
+    const url_ = url.trim();
+    if (!url_.match(pattern)) throw new Error('This is not a Spotify URL');
+    if (url_.indexOf('track/') !== -1) {
+        const trackID = url_.split('track/')[1].split('&')[0].split('?')[0];
         const response = await request(`https://api.spotify.com/v1/tracks/${trackID}?market=${spotifyData.market}`, {
             headers: {
                 Authorization: `${spotifyData.token_type} ${spotifyData.access_token}`
@@ -55,7 +56,7 @@ export async function spotify(url: string): Promise<Spotify> {
         });
         if (response instanceof Error) throw response;
         return new SpotifyTrack(JSON.parse(response));
-    } else if (url.indexOf('album/') !== -1) {
+    } else if (url_.indexOf('album/') !== -1) {
         const albumID = url.split('album/')[1].split('&')[0].split('?')[0];
         const response = await request(`https://api.spotify.com/v1/albums/${albumID}?market=${spotifyData.market}`, {
             headers: {
@@ -66,7 +67,7 @@ export async function spotify(url: string): Promise<Spotify> {
         });
         if (response instanceof Error) throw response;
         return new SpotifyAlbum(JSON.parse(response), spotifyData, false);
-    } else if (url.indexOf('playlist/') !== -1) {
+    } else if (url_.indexOf('playlist/') !== -1) {
         const playlistID = url.split('playlist/')[1].split('&')[0].split('?')[0];
         const response = await request(
             `https://api.spotify.com/v1/playlists/${playlistID}?market=${spotifyData.market}`,
@@ -91,13 +92,14 @@ export async function spotify(url: string): Promise<Spotify> {
  * ```
  */
 export function sp_validate(url: string): 'track' | 'playlist' | 'album' | 'search' | false {
-    if (!url.startsWith('https')) return 'search';
-    if (!url.match(pattern)) return false;
-    if (url.indexOf('track/') !== -1) {
+    const url_ = url.trim();
+    if (!url_.startsWith('https')) return 'search';
+    if (!url_.match(pattern)) return false;
+    if (url_.indexOf('track/') !== -1) {
         return 'track';
-    } else if (url.indexOf('album/') !== -1) {
+    } else if (url_.indexOf('album/') !== -1) {
         return 'album';
-    } else if (url.indexOf('playlist/') !== -1) {
+    } else if (url_.indexOf('playlist/') !== -1) {
         return 'playlist';
     } else return false;
 }

@@ -41,26 +41,27 @@ const playlist_pattern =
  * ```
  */
 export function yt_validate(url: string): 'playlist' | 'video' | 'search' | false {
-    if (url.indexOf('list=') === -1) {
-        if (url.startsWith('https')) {
-            if (url.match(video_pattern)) {
+    const url_ = url.trim();
+    if (url_.indexOf('list=') === -1) {
+        if (url_.startsWith('https')) {
+            if (url_.match(video_pattern)) {
                 let id: string;
-                if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
-                else if (url.includes('youtube.com/embed/'))
-                    id = url.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
-                else if (url.includes('youtube.com/shorts/'))
-                    id = url.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
-                else id = url.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
+                if (url_.includes('youtu.be/')) id = url_.split('youtu.be/')[1].split(/(\?|\/|&)/)[0];
+                else if (url_.includes('youtube.com/embed/'))
+                    id = url_.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
+                else if (url_.includes('youtube.com/shorts/'))
+                    id = url_.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
+                else id = url_.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
                 if (id.match(video_id_pattern)) return 'video';
                 else return false;
             } else return false;
         } else {
-            if (url.match(video_id_pattern)) return 'video';
-            else if (url.match(playlist_id_pattern)) return 'playlist';
+            if (url_.match(video_id_pattern)) return 'video';
+            else if (url_.match(playlist_id_pattern)) return 'playlist';
             else return 'search';
         }
     } else {
-        if (!url.match(playlist_pattern)) return yt_validate(url.replace(/(\?|\&)list=[^&]+/, ''));
+        if (!url_.match(playlist_pattern)) return yt_validate(url_.replace(/(\?|\&)list=[^&]+/, ''));
         else return 'playlist';
     }
 }
@@ -99,15 +100,16 @@ function extractVideoId(urlOrId: string): string | false {
 export function extractID(url: string): string {
     const check = yt_validate(url);
     if (!check || check === 'search') throw new Error('This is not a YouTube url or videoId or PlaylistID');
-    if (url.startsWith('https')) {
-        if (url.indexOf('list=') === -1) {
-            const video_id = extractVideoId(url);
+    const url_ = url.trim();
+    if (url_.startsWith('https')) {
+        if (url_.indexOf('list=') === -1) {
+            const video_id = extractVideoId(url_);
             if (!video_id) throw new Error('This is not a YouTube url or videoId or PlaylistID');
             return video_id;
         } else {
-            return url.split('list=')[1].split('&')[0];
+            return url_.split('list=')[1].split('&')[0];
         }
-    } else return url;
+    } else return url_;
 }
 /**
  * Basic function to get data from a YouTube url or ID.
@@ -127,12 +129,13 @@ export function extractID(url: string): string {
  */
 export async function video_basic_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
     if (typeof url !== 'string') throw new Error('url parameter is not a URL string or a string of HTML');
+    const url_ = url.trim();
     let body: string;
     const cookieJar = {};
     if (options.htmldata) {
-        body = url;
+        body = url_;
     } else {
-        const video_id = extractVideoId(url);
+        const video_id = extractVideoId(url_);
         if (!video_id) throw new Error('This is not a YouTube Watch URL');
         const new_url = `https://www.youtube.com/watch?v=${video_id}&has_verified=1`;
         body = await request(new_url, {
@@ -440,7 +443,7 @@ function parseSeconds(seconds: number): string {
  * @returns Deciphered Video Info {@link InfoData}.
  */
 export async function video_info(url: string, options: InfoOptions = {}): Promise<InfoData> {
-    const data = await video_basic_info(url, options);
+    const data = await video_basic_info(url.trim(), options);
     return await decipher_info(data);
 }
 /**
@@ -485,16 +488,17 @@ export async function decipher_info<T extends InfoData | StreamInfoData>(
  */
 export async function playlist_info(url: string, options: PlaylistOptions = {}): Promise<YouTubePlayList> {
     if (!url || typeof url !== 'string') throw new Error(`Expected playlist url, received ${typeof url}!`);
-    if (!url.startsWith('https')) url = `https://www.youtube.com/playlist?list=${url}`;
-    if (url.indexOf('list=') === -1) throw new Error('This is not a Playlist URL');
+    let url_ = url.trim();
+    if (!url_.startsWith('https')) url_ = `https://www.youtube.com/playlist?list=${url_}`;
+    if (url_.indexOf('list=') === -1) throw new Error('This is not a Playlist URL');
 
-    if (url.includes('music.youtube.com')) {
-        const urlObj = new URL(url);
+    if (url_.includes('music.youtube.com')) {
+        const urlObj = new URL(url_);
         urlObj.hostname = 'www.youtube.com';
-        url = urlObj.toString();
+        url_ = urlObj.toString();
     }
 
-    const body = await request(url, {
+    const body = await request(url_, {
         headers: {
             'accept-language': options.language || 'en-US;q=0.9'
         }
@@ -517,8 +521,8 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
             throw new Error(`While parsing playlist url\n${response.alerts[0].alertRenderer.text.runs[0].text}`);
         else throw new Error('While parsing playlist url\nUnknown Playlist Error');
     }
-    if (url.indexOf('watch?v=') !== -1) {
-        return getWatchPlaylist(response, body, url);
+    if (url_.indexOf('watch?v=') !== -1) {
+        return getWatchPlaylist(response, body, url_);
     } else return getNormalPlaylist(response, body);
 }
 /**

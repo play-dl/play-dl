@@ -145,7 +145,7 @@ export type Deezer = DeezerTrack | DeezerPlaylist | DeezerAlbum;
  * object depending on the provided URL.
  */
 export async function deezer(url: string): Promise<Deezer> {
-    const typeData = await internalValidate(url);
+    const typeData = await internalValidate(url.trim());
 
     if (typeData.error) {
         throw new Error(`This is not a Deezer track, playlist or album URL:\n${typeData.error}`);
@@ -179,7 +179,7 @@ export async function deezer(url: string): Promise<Deezer> {
  * `false` means that the provided URL was a wrongly formatted or an unsupported Deezer URL.
  */
 export async function dz_validate(url: string): Promise<'track' | 'playlist' | 'album' | 'search' | false> {
-    const typeData = await internalValidate(url);
+    const typeData = await internalValidate(url.trim());
     return typeData.type;
 }
 
@@ -257,13 +257,13 @@ export async function dz_advanced_track_search(options: DeezerAdvancedSearchOpti
     if (limit < 1) throw new Error('The minimum search limit for Deezer is 1');
 
     const metadata: string[] = [];
-    if (options.artist) metadata.push(`artist:"${encodeURIComponent(options.artist)}"`);
+    if (options.artist) metadata.push(`artist:"${encodeURIComponent(options.artist.trim())}"`);
 
-    if (options.album) metadata.push(`album:"${encodeURIComponent(options.album)}"`);
+    if (options.album) metadata.push(`album:"${encodeURIComponent(options.album.trim())}"`);
 
-    if (options.title) metadata.push(`track:"${encodeURIComponent(options.title)}"`);
+    if (options.title) metadata.push(`track:"${encodeURIComponent(options.title.trim())}"`);
 
-    if (options.label) metadata.push(`label:"${encodeURIComponent(options.label)}"`);
+    if (options.label) metadata.push(`label:"${encodeURIComponent(options.label.trim())}"`);
 
     if (!isNaN(Number(options.minDurationInSec))) metadata.push(`dur_min:${options.minDurationInSec}`);
 

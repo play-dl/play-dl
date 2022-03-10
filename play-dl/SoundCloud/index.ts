@@ -30,10 +30,11 @@ const pattern = /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(api\.soundcloud\.com|soundc
  */
 export async function soundcloud(url: string): Promise<SoundCloud> {
     if (!soundData) throw new Error('SoundCloud Data is missing\nDid you forget to do authorization ?');
-    if (!url.match(pattern)) throw new Error('This is not a SoundCloud URL');
+    const url_ = url.trim();
+    if (!url_.match(pattern)) throw new Error('This is not a SoundCloud URL');
 
     const data = await request(
-        `https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${soundData.client_id}`
+        `https://api-v2.soundcloud.com/resolve?url=${url_}&client_id=${soundData.client_id}`
     ).catch((err: Error) => err);
 
     if (data instanceof Error) throw data;
@@ -162,10 +163,11 @@ export async function check_id(id: string): Promise<boolean> {
  * ```
  */
 export async function so_validate(url: string): Promise<false | 'track' | 'playlist' | 'search'> {
-    if (!url.startsWith('https')) return 'search';
-    if (!url.match(pattern)) return false;
+    const url_ = url.trim();
+    if (!url_.startsWith('https')) return 'search';
+    if (!url_.match(pattern)) return false;
     const data = await request(
-        `https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${soundData.client_id}`
+        `https://api-v2.soundcloud.com/resolve?url=${url_}&client_id=${soundData.client_id}`
     ).catch((err: Error) => err);
 
     if (data instanceof Error) return false;

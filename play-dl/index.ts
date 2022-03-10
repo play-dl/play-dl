@@ -109,20 +109,21 @@ async function stream(url: string, options?: StreamOptions): Promise<YouTubeStre
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
 async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
-    if (url.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
-    if (options.htmldata) return await yt_stream(url, options);
-    if (url.indexOf('spotify') !== -1) {
+    const url_ = url.trim();
+    if (url_.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
+    if (options.htmldata) return await yt_stream(url_, options);
+    if (url_.indexOf('spotify') !== -1) {
         throw new Error(
             'Streaming from Spotify is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
         );
     }
-    if (url.indexOf('deezer') !== -1) {
+    if (url_.indexOf('deezer') !== -1) {
         throw new Error(
             'Streaming from Deezer is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
         );
     }
-    if (url.indexOf('soundcloud') !== -1) return await so_stream(url, options.quality);
-    else return await yt_stream(url, options);
+    if (url_.indexOf('soundcloud') !== -1) return await so_stream(url_, options.quality);
+    else return await yt_stream(url_, options);
 }
 
 async function search(query: string, options: { source: { deezer: 'album' } } & SearchOptions): Promise<DeezerAlbum[]>;
@@ -207,18 +208,18 @@ async function search(
     options: SearchOptions = {}
 ): Promise<YouTube[] | Spotify[] | SoundCloud[] | Deezer[]> {
     if (!options.source) options.source = { youtube: 'video' };
-    query = encodeURIComponent(query);
+    const query_ = encodeURIComponent(query.trim());
     if (options.source.youtube)
-        return await yt_search(query, {
+        return await yt_search(query_, {
             limit: options.limit,
             type: options.source.youtube,
             language: options.language,
             unblurNSFWThumbnails: options.unblurNSFWThumbnails
         });
-    else if (options.source.spotify) return await sp_search(query, options.source.spotify, options.limit);
-    else if (options.source.soundcloud) return await so_search(query, options.source.soundcloud, options.limit);
+    else if (options.source.spotify) return await sp_search(query_, options.source.spotify, options.limit);
+    else if (options.source.soundcloud) return await so_search(query_, options.source.soundcloud, options.limit);
     else if (options.source.deezer)
-        return await dz_search(query, { limit: options.limit, type: options.source.deezer, fuzzy: options.fuzzy });
+        return await dz_search(query_, { limit: options.limit, type: options.source.deezer, fuzzy: options.fuzzy });
     else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
 }
 
@@ -289,18 +290,19 @@ async function validate(
     | false
 > {
     let check;
-    if (!url.startsWith('https')) return 'search';
-    if (url.indexOf('spotify') !== -1) {
-        check = sp_validate(url);
+    const url_ = url.trim();
+    if (!url_.startsWith('https')) return 'search';
+    if (url_.indexOf('spotify') !== -1) {
+        check = sp_validate(url_);
         return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
-    } else if (url.indexOf('soundcloud') !== -1) {
-        check = await so_validate(url);
+    } else if (url_.indexOf('soundcloud') !== -1) {
+        check = await so_validate(url_);
         return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
-    } else if (url.indexOf('deezer') !== -1) {
-        check = await dz_validate(url);
+    } else if (url_.indexOf('deezer') !== -1) {
+        check = await dz_validate(url_);
         return check !== false ? (('dz_' + check) as 'dz_track' | 'dz_playlist' | 'dz_album') : false;
     } else {
-        check = yt_validate(url);
+        check = yt_validate(url_);
         return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
     }
 }
