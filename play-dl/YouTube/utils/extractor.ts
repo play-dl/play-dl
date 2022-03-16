@@ -51,8 +51,8 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
                     id = url_.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
                 else if (url_.includes('youtube.com/shorts/'))
                     id = url_.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
-                else id = url_.split('watch?v=')[1].split(/(\?|\/|&)/)[0];
-                if (id.match(video_id_pattern)) return 'video';
+                else id = url_.split('watch?v=')[1]?.split(/(\?|\/|&)/)[0];
+                if (id?.match(video_id_pattern)) return 'video';
                 else return false;
             } else return false;
         } else {
