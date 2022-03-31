@@ -94,6 +94,10 @@ export class SpotifyTrack {
      */
     explicit: boolean;
     /**
+     * Spotify Track playability info.
+     */
+    playable: boolean;
+    /**
      * Spotify Track Duration in seconds
      */
     durationInSec: number;
@@ -123,6 +127,7 @@ export class SpotifyTrack {
         this.type = 'track';
         this.url = data.external_urls.spotify;
         this.explicit = data.explicit;
+        this.playable = data.is_playable;
         this.durationInMs = data.duration_ms;
         this.durationInSec = Math.round(this.durationInMs / 1000);
         const artists: SpotifyArtists[] = [];
