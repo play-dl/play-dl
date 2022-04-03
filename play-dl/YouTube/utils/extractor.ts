@@ -219,15 +219,13 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         musicInfo.forEach((x: any) => {
             if (!x.metadataRowRenderer) return;
             const title = x.metadataRowRenderer.title.simpleText ?? x.metadataRowRenderer.title.runs[0].text;
+            let text = x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
+            let url = x.metadataRowRenderer.contents[0]?.runs?.[0]?.navigationEndpoint?.commandMetadata?.webCommandMetadata.url;
             if (title.toLowerCase() === 'song') {
                 music.push({});
-                let text = x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
-                let url = x.metadataRowRenderer.contents[0]?.runs?.[0]?.navigationEndpoint?.commandMetadata?.webCommandMetadata.url;
                 music[music.length - 1].song = url ? {text, url: `https://www.youtube.com${url}`} : text;
             } else if (music.length === 0) return;
             else {
-                let text = x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
-                let url = x.metadataRowRenderer.contents[0]?.runs?.[0]?.navigationEndpoint?.commandMetadata?.webCommandMetadata.url;
                 music[music.length - 1][title.toLowerCase()] = url ? {text, url: `https://www.youtube.com${url}`} : text;
             }
         });
