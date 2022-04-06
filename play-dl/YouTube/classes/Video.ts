@@ -2,11 +2,16 @@ import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
 
 interface VideoMusic {
-    song?: string;
-    artist?: string;
+    song?: MusicEntry;
+    artist?: string | MusicEntry;
     album?: string;
     writers?: string;
     license?: string;
+}
+
+interface MusicEntry {
+    text?: string;
+    url?: string | undefined;
 }
 
 interface VideoOptions {

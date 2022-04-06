@@ -223,7 +223,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
             let url = x.metadataRowRenderer.contents[0]?.runs?.[0]?.navigationEndpoint?.commandMetadata?.webCommandMetadata.url;
             if (title.toLowerCase() === 'song') {
                 music.push({});
-                music[music.length - 1].song = url ? {text, url: `https://www.youtube.com${url}`} : text;
+                music[music.length - 1].song = {text, url: url ? `https://www.youtube.com${url}` : undefined};
             } else if (music.length === 0) return;
             else {
                 music[music.length - 1][title.toLowerCase()] = url ? {text, url: `https://www.youtube.com${url}`} : text;
