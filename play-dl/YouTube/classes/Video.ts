@@ -2,7 +2,7 @@ import { YouTubeChannel } from './Channel';
 import { YouTubeThumbnail } from './Thumbnail';
 
 interface VideoMusic {
-    song?: MusicEntry;
+    song?: string | MusicEntry;
     artist?: string | MusicEntry;
     album?: string;
     writers?: string;
@@ -11,7 +11,7 @@ interface VideoMusic {
 
 interface MusicEntry {
     text?: string;
-    url?: string | undefined;
+    url?: string;
 }
 
 interface VideoOptions {
