@@ -218,15 +218,16 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
     if (musicInfo) {
         musicInfo.forEach((x: any) => {
             if (!x.metadataRowRenderer) return;
-            const title = x.metadataRowRenderer.title.simpleText ?? x.metadataRowRenderer.title.runs[0].text;
-            if (title.toLowerCase() === 'song') {
-                music.push({});
-                music[music.length - 1].song =
-                    x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
-            } else if (music.length === 0) return;
-            else
-                music[music.length - 1][title.toLowerCase()] =
-                    x.metadataRowRenderer.contents[0].simpleText ?? x.metadataRowRenderer.contents[0]?.runs?.[0]?.text;
+            const row = x.metadataRowRenderer;
+
+            const title = row.title.simpleText ?? row.title.runs[0].text;
+            const contents = row.contents[0].simpleText ?? row.contents[0]?.runs?.[0]?.text;
+
+            if (music.length === 0) music.push({});
+
+            music[music.length - 1][title.toLowerCase()] = contents;
+
+            if (row.hasDividerLine) music.push({});
         });
     }
     const rawChapters =
