@@ -9,7 +9,8 @@ for (let i = 0; i < 10; i++) {
 
 	// only use Windows and Linux user agents and exclude Internet Explorer ones
 	while (!(userAgent.data.platform.startsWith('Win') || userAgent.data.platform.startsWith('Linux'))
-		|| userAgent.data.userAgent.includes('; MSIE') || userAgent.data.userAgent.includes('Trident/')) {
+		|| userAgent.data.userAgent.includes('; MSIE') || userAgent.data.userAgent.includes('Trident/')
+		|| userAgents.includes(userAgent.toString())) {
 		userAgent = generator.random();
 	}
 
