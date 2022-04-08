@@ -387,7 +387,8 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
             throw new Error(
                 `While getting info from url\n${
                     player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ??
-                    player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText
+                    player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText ??
+                    player_response.playabilityStatus.reason
                 }`
             );
     }
