@@ -230,7 +230,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         });
     }
     const rawChapters =
-        initial_response.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer.decoratedPlayerBarRenderer.playerBar?.multiMarkersPlayerBarRenderer.markersMap.find(
+        initial_response.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer?.decoratedPlayerBarRenderer.playerBar?.multiMarkersPlayerBarRenderer.markersMap.find(
             (m: any) => m.key === 'DESCRIPTION_CHAPTERS'
         )?.value?.chapters;
     const chapters: VideoChapter[] = [];
