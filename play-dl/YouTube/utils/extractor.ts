@@ -223,10 +223,11 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
 
             const title = row.title.simpleText ?? row.title.runs[0].text;
             const contents = row.contents[0].simpleText ?? row.contents[0]?.runs?.[0]?.text;
+            const url = row.contents[0]?.runs?.[0]?.navigationEndpoint?.commandMetadata?.webCommandMetadata.url;
 
             if (music.length === 0) music.push({});
 
-            music[music.length - 1][title.toLowerCase()] = contents;
+            music[music.length - 1][title.toLowerCase()] = url ? {text: contents, url: `https://www.youtube.com${url}`} : contents;
 
             if (row.hasDividerLine) music.push({});
         });
