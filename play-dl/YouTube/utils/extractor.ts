@@ -521,7 +521,8 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
     const body = await request(url_, {
         headers: {
             'accept-language': options.language || 'en-US;q=0.9'
-        }
+        },
+        cookie: true,
     });
     if (body.indexOf('Our systems have detected unusual traffic from your computer network.') !== -1)
         throw new Error('Captcha page: YouTube has detected that you are a bot!');
