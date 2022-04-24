@@ -609,7 +609,7 @@ async function acceptViewerDiscretion(
     if (!sessionToken)
         throw new Error(`Unable to extract XSRF_TOKEN to accept the viewer discretion popup for video: ${videoId}.`);
 
-    const verificationResponse = await request(`https://www.youtube.com/youtubei/v1/verify_age?key=${apiKey}`, {
+    const verificationResponse = await request(`https://www.youtube.com/youtubei/v1/verify_age?key=${apiKey}&prettyPrint=false`, {
         method: 'POST',
         body: JSON.stringify({
             context: {
@@ -683,7 +683,7 @@ async function getAndroidFormats(videoId: string, cookieJar: { [key: string]: st
         body.split('innertubeApiKey":"')[1]?.split('"')[0] ??
         DEFAULT_API_KEY;
 
-    const response = await request(`https://www.youtube.com/youtubei/v1/player?key=${apiKey}`, {
+    const response = await request(`https://www.youtube.com/youtubei/v1/player?key=${apiKey}&prettyPrint=false`, {
         method: 'POST',
         body: JSON.stringify({
             context: {
