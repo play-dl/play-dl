@@ -128,7 +128,7 @@ export class YouTubePlayList {
     async next(limit = Infinity): Promise<YouTubeVideo[]> {
         if (!this._continuation || !this._continuation.token) return [];
 
-        const nextPage = await request(`${BASE_API}${this._continuation.api}`, {
+        const nextPage = await request(`${BASE_API}${this._continuation.api}&prettyPrint=false`, {
             method: 'POST',
             body: JSON.stringify({
                 continuation: this._continuation.token,
