@@ -63,6 +63,7 @@ export class SeekStream {
      * @param duration Duration of audio playback [ in seconds ]
      * @param headerLength Length of the header in bytes.
      * @param contentLength Total length of Audio file in bytes.
+     * @param bitrate Bitrate provided by YouTube.
      * @param video_url YouTube video url.
      * @param options Options provided to stream function.
      */
@@ -71,6 +72,7 @@ export class SeekStream {
         duration: number,
         headerLength: number,
         contentLength: number,
+        bitrate: number,
         video_url: string,
         options: StreamOptions
     ) {
@@ -83,7 +85,7 @@ export class SeekStream {
         this.type = StreamType.Opus;
         this.bytes_count = 0;
         this.video_url = video_url;
-        this.per_sec_bytes = Math.ceil(contentLength / duration);
+        this.per_sec_bytes = bitrate ? Math.ceil(bitrate / 8) : Math.ceil(contentLength / duration);
         this.header_length = headerLength;
         this.content_length = contentLength;
         this.request = null;
