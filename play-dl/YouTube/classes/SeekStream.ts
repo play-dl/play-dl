@@ -63,6 +63,7 @@ export class SeekStream {
      * @param duration Duration of audio playback [ in seconds ]
      * @param headerLength Length of the header in bytes.
      * @param contentLength Total length of Audio file in bytes.
+     * @param bitrate Bitrate provided by YouTube.
      * @param video_url YouTube video url.
      * @param options Options provided to stream function.
      */

@@ -1,8 +1,5 @@
 # Play-dl
 
-
-# ⚠️ Play-dl is no longer being maintained. ⚠️
-
 A **light-weight** YouTube, SoundCloud, Spotify and Deezer streaming and searching library.
 
 -   Search by video, playlist/album, channel/artist
