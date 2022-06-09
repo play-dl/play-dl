@@ -61,7 +61,7 @@ export function yt_validate(url: string): 'playlist' | 'video' | 'search' | fals
             else return 'search';
         }
     } else {
-        if (!url_.match(playlist_pattern)) return yt_validate(url_.replace(/(\?|\&)list=[^&]+/, ''));
+        if (!url_.match(playlist_pattern)) return yt_validate(url_.replace(/(\?|\&)list=[^&]*/, ''));
         else return 'playlist';
     }
 }
