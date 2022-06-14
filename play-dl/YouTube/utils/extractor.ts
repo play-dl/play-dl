@@ -708,7 +708,9 @@ async function getAndroidFormats(videoId: string, cookieJar: { [key: string]: st
 }
 
 function getWatchPlaylist(response: any, body: any, url: string): YouTubePlayList {
-    const playlist_details = response.contents.twoColumnWatchNextResults.playlist.playlist;
+    const playlist_details = response.contents.twoColumnWatchNextResults.playlist?.playlist;
+    if (!playlist_details)
+        throw new Error("Watch playlist unavailable due to YouTube layout changes.")
 
     const videos = getWatchPlaylistVideos(playlist_details.contents);
     const API_KEY =
@@ -824,7 +826,7 @@ function getWatchPlaylistVideos(data: any, limit = Infinity): YouTubeVideo[] {
                 thumbnails: info.thumbnail.thumbnails,
                 title: info.title.simpleText,
                 upcoming:
-                    info.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.style === 'UPCOMING' || undefined,
+                    info.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer?.style === 'UPCOMING' || undefined,
                 channel: {
                     id: channel_info.navigationEndpoint.browseEndpoint.browseId || undefined,
                     name: channel_info.text || undefined,
