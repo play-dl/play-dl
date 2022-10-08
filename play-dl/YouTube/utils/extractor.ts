@@ -282,7 +282,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
             initial_response.contents.twoColumnWatchNextResults.results.results.contents
                 .find((content: any) => content.videoPrimaryInfoRenderer)
                 ?.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons?.find(
-                    (button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE'
+                    (button: any) => button.toggleButtonRenderer?.defaultIcon?.iconType === 'LIKE'
                 )
                 ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
         ),
