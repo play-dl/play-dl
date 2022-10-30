@@ -212,24 +212,22 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         }
     );
     const microformat = player_response.microformat.playerMicroformatRenderer;
-    const musicInfo =
-        initial_response.contents.twoColumnWatchNextResults.results.results.contents?.[1]?.videoSecondaryInfoRenderer
-            ?.metadataRowContainer?.metadataRowContainerRenderer?.rows;
+    const musicInfo = initial_response.engagementPanels.find((item: any) => item?.engagementPanelSectionListRenderer?.panelIdentifier == 'engagement-panel-structured-description')?.engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items
+        .find((el: any) => el.videoDescriptionMusicSectionRenderer)?.videoDescriptionMusicSectionRenderer.carouselLockups;
+
     const music: any[] = [];
     if (musicInfo) {
         musicInfo.forEach((x: any) => {
-            if (!x.metadataRowRenderer) return;
-            const row = x.metadataRowRenderer;
+            if (!x.carouselLockupRenderer) return;
+            const row = x.carouselLockupRenderer;
 
-            const title = row.title.simpleText ?? row.title.runs[0].text;
-            const contents = row.contents[0].simpleText ?? row.contents[0]?.runs?.[0]?.text;
-            const url = row.contents[0]?.runs?.[0]?.navigationEndpoint?.commandMetadata?.webCommandMetadata.url;
+            const song = row.videoLockup?.compactVideoRenderer.title.simpleText ?? row.videoLockup?.compactVideoRenderer.title.runs?.find((x:any) => x.text)?.text;
+            const metadata = row.infoRows?.map((info: any) => [info.infoRowRenderer.title.simpleText.toLowerCase(), ((info.infoRowRenderer.expandedMetadata ?? info.infoRowRenderer.defaultMetadata)?.runs?.map((i:any) => i.text).join("")) ?? info.infoRowRenderer.defaultMetadata?.simpleText ?? info.infoRowRenderer.expandedMetadata?.simpleText ?? ""]);
+            const contents = Object.fromEntries(metadata ?? {});
+            const id = row.videoLockup?.compactVideoRenderer.navigationEndpoint?.watchEndpoint.videoId
+                ?? row.infoRows?.find((x: any) => x.infoRowRenderer.title.simpleText.toLowerCase() == "song")?.infoRowRenderer.defaultMetadata.runs?.find((x: any) => x.navigationEndpoint)?.navigationEndpoint.watchEndpoint?.videoId;
 
-            if (music.length === 0) music.push({});
-
-            music[music.length - 1][title.toLowerCase()] = url ? {text: contents, url: `https://www.youtube.com${url}`} : contents;
-
-            if (row.hasDividerLine) music.push({});
+            music.push({song, url: id ? `https://www.youtube.com/watch?v=${id}` : null, ...contents})
         });
     }
     const rawChapters =
@@ -258,6 +256,13 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
             upcomingDate = new Date(parseInt(timestamp) * 1000);
         }
     }
+
+    const likeRenderer = initial_response.contents.twoColumnWatchNextResults.results.results.contents
+        .find((content: any) => content.videoPrimaryInfoRenderer)
+        ?.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons?.find(
+            (button: any) => button.toggleButtonRenderer?.defaultIcon.iconType === 'LIKE' || button.segmentedLikeDislikeButtonRenderer?.likeButton.toggleButtonRenderer?.defaultIcon.iconType === 'LIKE'
+        )
+
     const video_details = new YouTubeVideo({
         id: vid.videoId,
         title: vid.title,
@@ -279,12 +284,8 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         views: vid.viewCount,
         tags: vid.keywords,
         likes: parseInt(
-            initial_response.contents.twoColumnWatchNextResults.results.results.contents
-                .find((content: any) => content.videoPrimaryInfoRenderer)
-                ?.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons?.find(
-                    (button: any) => button.toggleButtonRenderer.defaultIcon.iconType === 'LIKE'
-                )
-                ?.toggleButtonRenderer.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
+            likeRenderer?.toggleButtonRenderer?.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 
+            likeRenderer?.segmentedLikeDislikeButtonRenderer?.likeButton.toggleButtonRenderer?.defaultText.accessibility?.accessibilityData.label.replace(/\D+/g, '') ?? 0
         ),
         live: vid.isLiveContent,
         private: vid.isPrivate,
