@@ -7,16 +7,12 @@ import { YouTubeThumbnail } from './Thumbnail';
  * The property names change depending on your region's language.
  */
 interface VideoMusic {
-    song?: string | MusicEntry;
-    artist?: string | MusicEntry;
+    song?: string;
+    url?: string | null;
+    artist?: string;
     album?: string;
     writers?: string;
-    license?: string;
-}
-
-interface MusicEntry {
-    text?: string;
-    url?: string;
+    licenses?: string;
 }
 
 interface VideoOptions {
