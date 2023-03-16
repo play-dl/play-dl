@@ -542,7 +542,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
             throw new Error(`While parsing playlist url\n${response.alerts[0].alertRenderer.text.runs[0].text}`);
         else throw new Error('While parsing playlist url\nUnknown Playlist Error');
     }
-    if (url_.indexOf('watch?v=') !== -1) {
+    if (url_.indexOf('watch?v=') !== -1 || url_.indexOf('youtu.be/') !== -1) {
         return getWatchPlaylist(response, body, url_);
     } else return getNormalPlaylist(response, body);
 }
