@@ -85,16 +85,7 @@ export async function stream(url: string, quality?: number): Promise<SoundCloudS
 
     if (data instanceof SoundCloudPlaylist) throw new Error("Streams can't be created from playlist urls");
 
-    const HLSformats = parseHlsFormats(data.formats);
-    if (typeof quality !== 'number') quality = HLSformats.length - 1;
-    else if (quality <= 0) quality = 0;
-    else if (quality >= HLSformats.length) quality = HLSformats.length - 1;
-    const req_url = HLSformats[quality].url + '?client_id=' + soundData.client_id;
-    const s_data = JSON.parse(await request(req_url));
-    const type = HLSformats[quality].format.mime_type.startsWith('audio/ogg')
-        ? StreamType.OggOpus
-        : StreamType.Arbitrary;
-    return new SoundCloudStream(s_data.url, type);
+    return await stream_from_info(data, quality);
 }
 /**
  * Gets Free SoundCloud Client ID.
