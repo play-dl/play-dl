@@ -128,7 +128,7 @@ export class SpotifyTrack {
     constructor(data: any) {
         this.name = data.name;
         this.id = data.id;
-        this.isrc = data.external_ids.isrc || '';
+        this.isrc = data.external_ids?.isrc || '';
         this.type = 'track';
         this.url = data.external_urls.spotify;
         this.explicit = data.explicit;
