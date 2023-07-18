@@ -3,7 +3,7 @@ import { YouTubeThumbnail } from './Thumbnail';
 
 /**
  * Licensed music in the video
- * 
+ *
  * The property names change depending on your region's language.
  */
 interface VideoMusic {
@@ -86,7 +86,7 @@ interface VideoOptions {
     discretionAdvised?: boolean;
     /**
      * Gives info about music content in that video.
-     * 
+     *
      * The property names of VideoMusic change depending on your region's language.
      */
     music?: VideoMusic[];
