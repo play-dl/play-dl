@@ -1,5 +1,4 @@
 node_modules/
-dist/
 .npmrc
 examples/node_modules
 examples/package-lock.json
