@@ -335,44 +335,57 @@ function authorization(): void {
         }
         ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify)  / yo (for YouTube): ', (msg) => {
             if (msg.toLowerCase().startsWith('sp')) {
-                let client_id: string, client_secret: string, redirect_url: string, market: string;
-                ask.question('Start by entering your Client ID : ', (id) => {
-                    client_id = id;
-                    ask.question('Now enter your Client Secret : ', (secret) => {
-                        client_secret = secret;
-                        ask.question('Enter your Redirect URL now : ', (url) => {
-                            redirect_url = url;
-                            console.log(
-                                '\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
-                            );
-                            ask.question('Enter your region code (2-letter country code) : ', (mar) => {
-                                if (mar.length === 2) market = mar;
-                                else {
+                let client_id: string,
+                    client_secret: string,
+                    redirect_url: string,
+                    market: string,
+                    needUserData: boolean;
+                ask.question('Do you require user specific information ? (Yes / No): ', (needUser) => {
+                    if (needUser.toLowerCase() === 'yes') needUserData = true;
+                    else if (needUser.toLowerCase() === 'no') needUserData = false;
+                    else {
+                        console.log('That option does not exist. Try again...');
+                        ask.close();
+                        return;
+                    }
+                    ask.question('Start by entering your Client ID : ', (id) => {
+                        client_id = id;
+                        ask.question('Now enter your Client Secret : ', (secret) => {
+                            client_secret = secret;
+                            ask.question('Enter your Redirect URL now : ', (url) => {
+                                redirect_url = url;
+                                console.log(
+                                    '\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
+                                );
+                                ask.question('Enter your region code (2-letter country code) : ', (mar) => {
+                                    if (mar.length === 2) market = mar;
+                                    else {
+                                        console.log(
+                                            "That doesn't look like a valid region code, IN will be selected as default."
+                                        );
+                                        market = 'IN';
+                                    }
                                     console.log(
-                                        "That doesn't look like a valid region code, IN will be selected as default."
+                                        '\nNow open your browser and paste the below url, then authorize it and copy the redirected url. \n'
                                     );
-                                    market = 'IN';
-                                }
-                                console.log(
-                                    '\nNow open your browser and paste the below url, then authorize it and copy the redirected url. \n'
-                                );
-                                console.log(
-                                    `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(
-                                        redirect_url
-                                    )} \n`
-                                );
-                                ask.question('Paste the url which you just copied : ', async (url) => {
-                                    if (!existsSync('.data')) mkdirSync('.data');
-                                    const spotifyData = {
-                                        client_id,
-                                        client_secret,
-                                        redirect_url,
-                                        authorization_code: url.split('code=')[1],
-                                        market
-                                    };
-                                    const check = await SpotifyAuthorize(spotifyData, file);
-                                    if (check === false) throw new Error('Failed to get access token.');
-                                    ask.close();
+                                    console.log(
+                                        `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(
+                                            redirect_url
+                                        )} \n`
+                                    );
+                                    ask.question('Paste the url which you just copied : ', async (url) => {
+                                        if (!existsSync('.data')) mkdirSync('.data');
+                                        const spotifyData = {
+                                            client_id,
+                                            client_secret,
+                                            redirect_url,
+                                            authorization_code: url.split('code=')[1],
+                                            market
+                                        };
+                                        const check = await SpotifyAuthorize(spotifyData, file, needUserData);
+                                        if (check === false) throw new Error('Failed to get access token.');
+                                        ask.close();
+                                    });
                                 });
                             });
                         });
