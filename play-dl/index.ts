@@ -340,11 +340,11 @@ function authorization(): void {
                     redirect_url: string,
                     market: string,
                     needUserData: boolean;
-                ask.question('Do you require user specific information ? (Yes / No)', (needUser) => {
+                ask.question('Do you require user specific information ? (Yes / No): ', (needUser) => {
                     if (needUser.toLowerCase() === 'yes') needUserData = true;
                     else if (needUser.toLowerCase() === 'no') needUserData = false;
                     else {
-                        console.log('That optio does not exist. Try again...');
+                        console.log('That option does not exist. Try again...');
                         ask.close();
                         return;
                     }
