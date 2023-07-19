@@ -352,12 +352,45 @@ function authorization(): void {
                         client_id = id;
                         ask.question('Now enter your Client Secret : ', (secret) => {
                             client_secret = secret;
-                            ask.question('Enter your Redirect URL now : ', (url) => {
-                                redirect_url = url;
-                                console.log(
-                                    '\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
-                                );
-                                ask.question('Enter your region code (2-letter country code) : ', (mar) => {
+                            if (needUserData) {
+                                ask.question('Enter your Redirect URL now : ', (url) => {
+                                    redirect_url = url;
+                                    console.log(
+                                        '\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
+                                    );
+                                    ask.question('Enter your region code (2-letter country code) : ', async (mar) => {
+                                        if (mar.length === 2) market = mar;
+                                        else {
+                                            console.log(
+                                                "That doesn't look like a valid region code, IN will be selected as default."
+                                            );
+                                            market = 'IN';
+                                        }
+                                        console.log(
+                                            '\nNow open your browser and paste the below url, then authorize it and copy the redirected url. \n'
+                                        );
+                                        console.log(
+                                            `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(
+                                                redirect_url
+                                            )} \n`
+                                        );
+                                        ask.question('Paste the url which you just copied : ', async (url) => {
+                                            if (!existsSync('.data')) mkdirSync('.data');
+                                            const spotifyData = {
+                                                client_id,
+                                                client_secret,
+                                                redirect_url,
+                                                authorization_code: url.split('code=')[1],
+                                                market
+                                            };
+                                            const check = await SpotifyAuthorize(spotifyData, file, needUserData);
+                                            if (check === false) throw new Error('Failed to get access token.');
+                                            ask.close();
+                                        });
+                                    });
+                                });
+                            } else {
+                                ask.question('Enter your region code (2-letter country code) : ', async (mar) => {
                                     if (mar.length === 2) market = mar;
                                     else {
                                         console.log(
@@ -365,29 +398,20 @@ function authorization(): void {
                                         );
                                         market = 'IN';
                                     }
-                                    console.log(
-                                        '\nNow open your browser and paste the below url, then authorize it and copy the redirected url. \n'
-                                    );
-                                    console.log(
-                                        `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(
-                                            redirect_url
-                                        )} \n`
-                                    );
-                                    ask.question('Paste the url which you just copied : ', async (url) => {
-                                        if (!existsSync('.data')) mkdirSync('.data');
-                                        const spotifyData = {
-                                            client_id,
-                                            client_secret,
-                                            redirect_url,
-                                            authorization_code: url.split('code=')[1],
-                                            market
-                                        };
-                                        const check = await SpotifyAuthorize(spotifyData, file, needUserData);
-                                        if (check === false) throw new Error('Failed to get access token.');
-                                        ask.close();
-                                    });
+
+                                    if (!existsSync('.data')) mkdirSync('.data');
+                                    const spotifyData = {
+                                        client_id,
+                                        client_secret,
+                                        redirect_url,
+                                        authorization_code: '',
+                                        market
+                                    };
+                                    const check = await SpotifyAuthorize(spotifyData, file, needUserData);
+                                    if (check === false) throw new Error('Failed to get access token.');
+                                    ask.close();
                                 });
-                            });
+                            }
                         });
                     });
                 });
