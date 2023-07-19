@@ -1,77 +1,77 @@
 import {
-        playlist_info,
-        video_basic_info,
-        video_info,
-        decipher_info,
-        yt_validate,
-        extractID,
-        YouTube,
-        YouTubeStream,
-        YouTubeChannel,
-        YouTubePlayList,
-        YouTubeVideo,
-        InfoData
+    playlist_info,
+    video_basic_info,
+    video_info,
+    decipher_info,
+    yt_validate,
+    extractID,
+    YouTube,
+    YouTubeStream,
+    YouTubeChannel,
+    YouTubePlayList,
+    YouTubeVideo,
+    InfoData
 } from './YouTube';
 import {
-        spotify,
-        sp_validate,
-        refreshToken,
-        is_expired,
-        SpotifyAlbum,
-        SpotifyPlaylist,
-        SpotifyTrack,
-        Spotify,
-        SpotifyAuthorize,
-        sp_search
+    spotify,
+    sp_validate,
+    refreshToken,
+    is_expired,
+    SpotifyAlbum,
+    SpotifyPlaylist,
+    SpotifyTrack,
+    Spotify,
+    SpotifyAuthorize,
+    sp_search
 } from './Spotify';
 import {
-        soundcloud,
-        so_validate,
-        SoundCloud,
-        SoundCloudStream,
-        getFreeClientID,
-        SoundCloudPlaylist,
-        SoundCloudTrack,
-        check_id,
-        so_search,
-        stream as so_stream,
-        stream_from_info as so_stream_info
+    soundcloud,
+    so_validate,
+    SoundCloud,
+    SoundCloudStream,
+    getFreeClientID,
+    SoundCloudPlaylist,
+    SoundCloudTrack,
+    check_id,
+    so_search,
+    stream as so_stream,
+    stream_from_info as so_stream_info
 } from './SoundCloud';
 import {
-        deezer,
-        dz_validate,
-        dz_advanced_track_search,
-        Deezer,
-        DeezerTrack,
-        DeezerPlaylist,
-        DeezerAlbum,
-        dz_search
+    deezer,
+    dz_validate,
+    dz_advanced_track_search,
+    Deezer,
+    DeezerTrack,
+    DeezerPlaylist,
+    DeezerAlbum,
+    dz_search
 } from './Deezer';
 import { setToken } from './token';
 
 enum AudioPlayerStatus {
-        Idle = 'idle',
-        Buffering = 'buffering',
-        Paused = 'paused',
-        Playing = 'playing',
-        AutoPaused = 'autopaused'
+    Idle = 'idle',
+    Buffering = 'buffering',
+    Paused = 'paused',
+    Playing = 'playing',
+    AutoPaused = 'autopaused'
 }
 
 interface SearchOptions {
-        limit?: number;
-        source?: {
-                youtube?: 'video' | 'playlist' | 'channel';
-                spotify?: 'album' | 'playlist' | 'track';
-                soundcloud?: 'tracks' | 'playlists' | 'albums';
-                deezer?: 'track' | 'playlist' | 'album';
-        };
-        fuzzy?: boolean;
-        language?: string;
-        /**
-         * !!! Before enabling this for public servers, please consider using Discord features like NSFW channels as not everyone in your server wants to see NSFW images. !!!
-         * Unblurred images will likely have different dimensions than specified in the {@link YouTubeThumbnail} objects.
-         */
-        unblurNSFWThumbnails?: boolean;
+    limit?: number;
+    source?: {
+        youtube?: 'video' | 'playlist' | 'channel';
+        spotify?: 'album' | 'playlist' | 'track';
+        soundcloud?: 'tracks' | 'playlists' | 'albums';
+        deezer?: 'track' | 'playlist' | 'album';
+    };
+    fuzzy?: boolean;
+    language?: string;
+    /**
+     * !!! Before enabling this for public servers, please consider using Discord features like NSFW channels as not everyone in your server wants to see NSFW images. !!!
+     * Unblurred images will likely have different dimensions than specified in the {@link YouTubeThumbnail} objects.
+     */
+    unblurNSFWThumbnails?: boolean;
 }
 
 import { createInterface } from 'node:readline';
@@ -109,64 +109,64 @@ async function stream(url: string, options?: StreamOptions): Promise<YouTubeStre
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
 async function stream(url: string, options: StreamOptions = {}): Promise<YouTubeStream | SoundCloudStream> {
-        const url_ = url.trim();
-        if (url_.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
-        if (options.htmldata) return await yt_stream(url_, options);
-        if (url_.indexOf('spotify') !== -1) {
-                throw new Error(
-                        'Streaming from Spotify is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
-                );
-        }
-        if (url_.indexOf('deezer') !== -1) {
-                throw new Error(
-                        'Streaming from Deezer is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
-                );
-        }
-        if (url_.indexOf('soundcloud') !== -1) return await so_stream(url_, options.quality);
-        else return await yt_stream(url_, options);
+    const url_ = url.trim();
+    if (url_.length === 0) throw new Error('Stream URL has a length of 0. Check your url again.');
+    if (options.htmldata) return await yt_stream(url_, options);
+    if (url_.indexOf('spotify') !== -1) {
+        throw new Error(
+            'Streaming from Spotify is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
+        );
+    }
+    if (url_.indexOf('deezer') !== -1) {
+        throw new Error(
+            'Streaming from Deezer is not supported. Please use search() to find a similar track on YouTube or SoundCloud instead.'
+        );
+    }
+    if (url_.indexOf('soundcloud') !== -1) return await so_stream(url_, options.quality);
+    else return await yt_stream(url_, options);
 }
 
 async function search(query: string, options: { source: { deezer: 'album' } } & SearchOptions): Promise<DeezerAlbum[]>;
 async function search(
-        query: string,
-        options: { source: { deezer: 'playlist' } } & SearchOptions
+    query: string,
+    options: { source: { deezer: 'playlist' } } & SearchOptions
 ): Promise<DeezerPlaylist[]>;
 async function search(query: string, options: { source: { deezer: 'track' } } & SearchOptions): Promise<DeezerTrack[]>;
 async function search(
-        query: string,
-        options: { source: { soundcloud: 'albums' } } & SearchOptions
+    query: string,
+    options: { source: { soundcloud: 'albums' } } & SearchOptions
 ): Promise<SoundCloudPlaylist[]>;
 async function search(
-        query: string,
-        options: { source: { soundcloud: 'playlists' } } & SearchOptions
+    query: string,
+    options: { source: { soundcloud: 'playlists' } } & SearchOptions
 ): Promise<SoundCloudPlaylist[]>;
 async function search(
-        query: string,
-        options: { source: { soundcloud: 'tracks' } } & SearchOptions
+    query: string,
+    options: { source: { soundcloud: 'tracks' } } & SearchOptions
 ): Promise<SoundCloudTrack[]>;
 async function search(
-        query: string,
-        options: { source: { spotify: 'album' } } & SearchOptions
+    query: string,
+    options: { source: { spotify: 'album' } } & SearchOptions
 ): Promise<SpotifyAlbum[]>;
 async function search(
-        query: string,
-        options: { source: { spotify: 'playlist' } } & SearchOptions
+    query: string,
+    options: { source: { spotify: 'playlist' } } & SearchOptions
 ): Promise<SpotifyPlaylist[]>;
 async function search(
-        query: string,
-        options: { source: { spotify: 'track' } } & SearchOptions
+    query: string,
+    options: { source: { spotify: 'track' } } & SearchOptions
 ): Promise<SpotifyTrack[]>;
 async function search(
-        query: string,
-        options: { source: { youtube: 'channel' } } & SearchOptions
+    query: string,
+    options: { source: { youtube: 'channel' } } & SearchOptions
 ): Promise<YouTubeChannel[]>;
 async function search(
-        query: string,
-        options: { source: { youtube: 'playlist' } } & SearchOptions
+    query: string,
+    options: { source: { youtube: 'playlist' } } & SearchOptions
 ): Promise<YouTubePlayList[]>;
 async function search(
-        query: string,
-        options: { source: { youtube: 'video' } } & SearchOptions
+    query: string,
+    options: { source: { youtube: 'video' } } & SearchOptions
 ): Promise<YouTubeVideo[]>;
 async function search(query: string, options: { limit: number } & SearchOptions): Promise<YouTubeVideo[]>;
 async function search(query: string, options?: SearchOptions): Promise<YouTubeVideo[]>;
@@ -204,23 +204,23 @@ async function search(query: string, options?: SearchOptions): Promise<YouTubeVi
  * @returns Array of {@link YouTube} or {@link Spotify} or {@link SoundCloud} or {@link Deezer} type
  */
 async function search(
-        query: string,
-        options: SearchOptions = {}
+    query: string,
+    options: SearchOptions = {}
 ): Promise<YouTube[] | Spotify[] | SoundCloud[] | Deezer[]> {
-        if (!options.source) options.source = { youtube: 'video' };
-        const query_ = encodeURIComponent(query.trim());
-        if (options.source.youtube)
-                return await yt_search(query_, {
-                        limit: options.limit,
-                        type: options.source.youtube,
-                        language: options.language,
-                        unblurNSFWThumbnails: options.unblurNSFWThumbnails
-                });
-        else if (options.source.spotify) return await sp_search(query_, options.source.spotify, options.limit);
-        else if (options.source.soundcloud) return await so_search(query_, options.source.soundcloud, options.limit);
-        else if (options.source.deezer)
-                return await dz_search(query_, { limit: options.limit, type: options.source.deezer, fuzzy: options.fuzzy });
-        else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
+    if (!options.source) options.source = { youtube: 'video' };
+    const query_ = encodeURIComponent(query.trim());
+    if (options.source.youtube)
+        return await yt_search(query_, {
+            limit: options.limit,
+            type: options.source.youtube,
+            language: options.language,
+            unblurNSFWThumbnails: options.unblurNSFWThumbnails
+        });
+    else if (options.source.spotify) return await sp_search(query_, options.source.spotify, options.limit);
+    else if (options.source.soundcloud) return await so_search(query_, options.source.soundcloud, options.limit);
+    else if (options.source.deezer)
+        return await dz_search(query_, { limit: options.limit, type: options.source.deezer, fuzzy: options.fuzzy });
+    else throw new Error('Not possible to reach Here LOL. Easter Egg of play-dl if someone get this.');
 }
 
 async function stream_from_info(info: SoundCloudTrack, options?: StreamOptions): Promise<SoundCloudStream>;
@@ -254,11 +254,11 @@ async function stream_from_info(info: InfoData, options?: StreamOptions): Promis
  * @returns A {@link YouTubeStream} or {@link SoundCloudStream} Stream to play
  */
 async function stream_from_info(
-        info: InfoData | SoundCloudTrack,
-        options: StreamOptions = {}
+    info: InfoData | SoundCloudTrack,
+    options: StreamOptions = {}
 ): Promise<YouTubeStream | SoundCloudStream> {
-        if (info instanceof SoundCloudTrack) return await so_stream_info(info, options.quality);
-        else return await yt_stream_info(info, options);
+    if (info instanceof SoundCloudTrack) return await so_stream_info(info, options.quality);
+    else return await yt_stream_info(info, options);
 }
 /**
  * Validates url that play-dl supports.
@@ -274,37 +274,37 @@ async function stream_from_info(
  * ```
  */
 async function validate(
-        url: string
+    url: string
 ): Promise<
-        | 'so_playlist'
-        | 'so_track'
-        | 'sp_track'
-        | 'sp_album'
-        | 'sp_playlist'
-        | 'dz_track'
-        | 'dz_playlist'
-        | 'dz_album'
-        | 'yt_video'
-        | 'yt_playlist'
-        | 'search'
-        | false
+    | 'so_playlist'
+    | 'so_track'
+    | 'sp_track'
+    | 'sp_album'
+    | 'sp_playlist'
+    | 'dz_track'
+    | 'dz_playlist'
+    | 'dz_album'
+    | 'yt_video'
+    | 'yt_playlist'
+    | 'search'
+    | false
 > {
-        let check;
-        const url_ = url.trim();
-        if (!url_.startsWith('https')) return 'search';
-        if (url_.indexOf('spotify') !== -1) {
-                check = sp_validate(url_);
-                return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
-        } else if (url_.indexOf('soundcloud') !== -1) {
-                check = await so_validate(url_);
-                return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
-        } else if (url_.indexOf('deezer') !== -1) {
-                check = await dz_validate(url_);
-                return check !== false ? (('dz_' + check) as 'dz_track' | 'dz_playlist' | 'dz_album') : false;
-        } else {
-                check = yt_validate(url_);
-                return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
-        }
+    let check;
+    const url_ = url.trim();
+    if (!url_.startsWith('https')) return 'search';
+    if (url_.indexOf('spotify') !== -1) {
+        check = sp_validate(url_);
+        return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
+    } else if (url_.indexOf('soundcloud') !== -1) {
+        check = await so_validate(url_);
+        return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
+    } else if (url_.indexOf('deezer') !== -1) {
+        check = await dz_validate(url_);
+        return check !== false ? (('dz_' + check) as 'dz_track' | 'dz_playlist' | 'dz_album') : false;
+    } else {
+        check = yt_validate(url_);
+        return check !== false ? (('yt_' + check) as 'yt_video' | 'yt_playlist') : false;
+    }
 }
 /**
  * Authorization interface for Spotify, SoundCloud and YouTube.
@@ -320,125 +320,129 @@ async function validate(
  * Just run the above command and you will get a interface asking some questions.
  */
 function authorization(): void {
-        const ask = createInterface({
-                input: process.stdin,
-                output: process.stdout
-        });
-        ask.question('Do you want to save data in a file ? (Yes / No): ', (msg) => {
-                let file: boolean;
-                if (msg.toLowerCase() === 'yes') file = true;
-                else if (msg.toLowerCase() === 'no') file = false;
-                else {
-                        console.log("That option doesn't exist. Try again...");
+    const ask = createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    ask.question('Do you want to save data in a file ? (Yes / No): ', (msg) => {
+        let file: boolean;
+        if (msg.toLowerCase() === 'yes') file = true;
+        else if (msg.toLowerCase() === 'no') file = false;
+        else {
+            console.log("That option doesn't exist. Try again...");
+            ask.close();
+            return;
+        }
+        ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify)  / yo (for YouTube): ', (msg) => {
+            if (msg.toLowerCase().startsWith('sp')) {
+                let client_id: string,
+                    client_secret: string,
+                    redirect_url: string,
+                    market: string,
+                    needUserData: boolean;
+                ask.question('Do you require user specific information ? (Yes / No): ', (needUser) => {
+                    if (needUser.toLowerCase() === 'yes') needUserData = true;
+                    else if (needUser.toLowerCase() === 'no') needUserData = false;
+                    else {
+                        console.log('That option does not exist. Try again...');
                         ask.close();
                         return;
-                }
-                ask.question('Choose your service - sc (for SoundCloud) / sp (for Spotify)  / yo (for YouTube): ', (msg) => {
-                        if (msg.toLowerCase().startsWith('sp')) {
-                                let client_id: string, client_secret: string, redirect_url: string, market: string, needUserData: boolean;
-                                ask.question('Do you require user specific information ? (Yes / No)', (needUser) => {
-                                        if (needUser.toLowerCase() === 'yes') needUserData = true;
-                                        else if (needUser.toLowerCase() === 'no') needUserData = false;
-                                        else {
-                                                console.log("That optio does not exist. Try again...");
-                                                ask.close();
-                                                return;
-                                        }
-                                        ask.question('Start by entering your Client ID : ', (id) => {
-                                                client_id = id;
-                                                ask.question('Now enter your Client Secret : ', (secret) => {
-                                                        client_secret = secret;
-                                                        ask.question('Enter your Redirect URL now : ', (url) => {
-                                                                redirect_url = url;
-                                                                console.log(
-                                                                        '\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
-                                                                );
-                                                                ask.question('Enter your region code (2-letter country code) : ', (mar) => {
-                                                                        if (mar.length === 2) market = mar;
-                                                                        else {
-                                                                                console.log(
-                                                                                        "That doesn't look like a valid region code, IN will be selected as default."
-                                                                                );
-                                                                                market = 'IN';
-                                                                        }
-                                                                        console.log(
-                                                                                '\nNow open your browser and paste the below url, then authorize it and copy the redirected url. \n'
-                                                                        );
-                                                                        console.log(
-                                                                                `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(
-                                                                                        redirect_url
-                                                                                )} \n`
-                                                                        );
-                                                                        ask.question('Paste the url which you just copied : ', async (url) => {
-                                                                                if (!existsSync('.data')) mkdirSync('.data');
-                                                                                const spotifyData = {
-                                                                                        client_id,
-                                                                                        client_secret,
-                                                                                        redirect_url,
-                                                                                        authorization_code: url.split('code=')[1],
-                                                                                        market
-                                                                                };
-                                                                                const check = await SpotifyAuthorize(spotifyData, file, needUserData);
-                                                                                if (check === false) throw new Error('Failed to get access token.');
-                                                                                ask.close();
-                                                                        });
-                                                                });
-                                                        });
-                                                });
-                                        });
-                                });
-                        } else if (msg.toLowerCase().startsWith('sc')) {
-                                if (!file) {
-                                        console.log('You already had a client ID, just paste that in setToken function.');
-                                        ask.close();
-                                        return;
-                                }
-                                ask.question('Client ID : ', async (id) => {
-                                        let client_id = id;
-                                        if (!client_id) {
-                                                console.log("You didn't provide a client ID. Try again...");
-                                                ask.close();
-                                                return;
-                                        }
+                    }
+                    ask.question('Start by entering your Client ID : ', (id) => {
+                        client_id = id;
+                        ask.question('Now enter your Client Secret : ', (secret) => {
+                            client_secret = secret;
+                            ask.question('Enter your Redirect URL now : ', (url) => {
+                                redirect_url = url;
+                                console.log(
+                                    '\nIf you would like to know your region code visit : \nhttps://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements \n'
+                                );
+                                ask.question('Enter your region code (2-letter country code) : ', (mar) => {
+                                    if (mar.length === 2) market = mar;
+                                    else {
+                                        console.log(
+                                            "That doesn't look like a valid region code, IN will be selected as default."
+                                        );
+                                        market = 'IN';
+                                    }
+                                    console.log(
+                                        '\nNow open your browser and paste the below url, then authorize it and copy the redirected url. \n'
+                                    );
+                                    console.log(
+                                        `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURI(
+                                            redirect_url
+                                        )} \n`
+                                    );
+                                    ask.question('Paste the url which you just copied : ', async (url) => {
                                         if (!existsSync('.data')) mkdirSync('.data');
-                                        console.log('Validating your client ID, hold on...');
-                                        if (await check_id(client_id)) {
-                                                console.log('Client ID has been validated successfully.');
-                                                writeFileSync('.data/soundcloud.data', JSON.stringify({ client_id }, undefined, 4));
-                                        } else console.log("That doesn't look like a valid client ID. Retry with a correct client ID.");
+                                        const spotifyData = {
+                                            client_id,
+                                            client_secret,
+                                            redirect_url,
+                                            authorization_code: url.split('code=')[1],
+                                            market
+                                        };
+                                        const check = await SpotifyAuthorize(spotifyData, file, needUserData);
+                                        if (check === false) throw new Error('Failed to get access token.');
                                         ask.close();
+                                    });
                                 });
-                        } else if (msg.toLowerCase().startsWith('yo')) {
-                                if (!file) {
-                                        console.log('You already had cookie, just paste that in setToken function.');
-                                        ask.close();
-                                        return;
-                                }
-                                ask.question('Cookies : ', (cook: string) => {
-                                        if (!cook || cook.length === 0) {
-                                                console.log("You didn't provide a cookie. Try again...");
-                                                ask.close();
-                                                return;
-                                        }
-                                        if (!existsSync('.data')) mkdirSync('.data');
-                                        console.log('Cookies has been added successfully.');
-                                        let cookie: Object = {};
-                                        cook.split(';').forEach((x) => {
-                                                const arr = x.split('=');
-                                                if (arr.length <= 1) return;
-                                                const key = arr.shift()?.trim() as string;
-                                                const value = arr.join('=').trim();
-                                                Object.assign(cookie, { [key]: value });
-                                        });
-                                        writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
-                                        ask.close();
-                                });
-                        } else {
-                                console.log("That option doesn't exist. Try again...");
-                                ask.close();
-                        }
+                            });
+                        });
+                    });
                 });
+            } else if (msg.toLowerCase().startsWith('sc')) {
+                if (!file) {
+                    console.log('You already had a client ID, just paste that in setToken function.');
+                    ask.close();
+                    return;
+                }
+                ask.question('Client ID : ', async (id) => {
+                    let client_id = id;
+                    if (!client_id) {
+                        console.log("You didn't provide a client ID. Try again...");
+                        ask.close();
+                        return;
+                    }
+                    if (!existsSync('.data')) mkdirSync('.data');
+                    console.log('Validating your client ID, hold on...');
+                    if (await check_id(client_id)) {
+                        console.log('Client ID has been validated successfully.');
+                        writeFileSync('.data/soundcloud.data', JSON.stringify({ client_id }, undefined, 4));
+                    } else console.log("That doesn't look like a valid client ID. Retry with a correct client ID.");
+                    ask.close();
+                });
+            } else if (msg.toLowerCase().startsWith('yo')) {
+                if (!file) {
+                    console.log('You already had cookie, just paste that in setToken function.');
+                    ask.close();
+                    return;
+                }
+                ask.question('Cookies : ', (cook: string) => {
+                    if (!cook || cook.length === 0) {
+                        console.log("You didn't provide a cookie. Try again...");
+                        ask.close();
+                        return;
+                    }
+                    if (!existsSync('.data')) mkdirSync('.data');
+                    console.log('Cookies has been added successfully.');
+                    let cookie: Object = {};
+                    cook.split(';').forEach((x) => {
+                        const arr = x.split('=');
+                        if (arr.length <= 1) return;
+                        const key = arr.shift()?.trim() as string;
+                        const value = arr.join('=').trim();
+                        Object.assign(cookie, { [key]: value });
+                    });
+                    writeFileSync('.data/youtube.data', JSON.stringify({ cookie }, undefined, 4));
+                    ask.close();
+                });
+            } else {
+                console.log("That option doesn't exist. Try again...");
+                ask.close();
+            }
         });
+    });
 }
 /**
  * Attaches paused, playing, autoPaused Listeners to discordjs voice AudioPlayer.
@@ -448,71 +452,71 @@ function authorization(): void {
  * @param resource A {@link YouTubeStream} or {@link SoundCloudStream}
  */
 function attachListeners(player: EventEmitter, resource: YouTubeStream | SoundCloudStream) {
-        // cleanup existing listeners if they are still registered
-        type listenerType = (...args: any[]) => void;
+    // cleanup existing listeners if they are still registered
+    type listenerType = (...args: any[]) => void;
 
-        const listeners = player.listeners(AudioPlayerStatus.Idle);
-        for (const cleanup of listeners) {
-                if ((cleanup as any).__playDlAttachedListener) {
-                        cleanup();
-                        player.removeListener(AudioPlayerStatus.Idle, cleanup as listenerType);
-                }
+    const listeners = player.listeners(AudioPlayerStatus.Idle);
+    for (const cleanup of listeners) {
+        if ((cleanup as any).__playDlAttachedListener) {
+            cleanup();
+            player.removeListener(AudioPlayerStatus.Idle, cleanup as listenerType);
         }
+    }
 
-        const pauseListener = () => resource.pause();
-        const resumeListener = () => resource.resume();
-        const idleListener = () => {
-                player.removeListener(AudioPlayerStatus.Paused, pauseListener);
-                player.removeListener(AudioPlayerStatus.AutoPaused, pauseListener);
-                player.removeListener(AudioPlayerStatus.Playing, resumeListener);
-        };
-        pauseListener.__playDlAttachedListener = true;
-        resumeListener.__playDlAttachedListener = true;
-        idleListener.__playDlAttachedListener = true;
-        player.on(AudioPlayerStatus.Paused, pauseListener);
-        player.on(AudioPlayerStatus.AutoPaused, pauseListener);
-        player.on(AudioPlayerStatus.Playing, resumeListener);
-        player.once(AudioPlayerStatus.Idle, idleListener);
+    const pauseListener = () => resource.pause();
+    const resumeListener = () => resource.resume();
+    const idleListener = () => {
+        player.removeListener(AudioPlayerStatus.Paused, pauseListener);
+        player.removeListener(AudioPlayerStatus.AutoPaused, pauseListener);
+        player.removeListener(AudioPlayerStatus.Playing, resumeListener);
+    };
+    pauseListener.__playDlAttachedListener = true;
+    resumeListener.__playDlAttachedListener = true;
+    idleListener.__playDlAttachedListener = true;
+    player.on(AudioPlayerStatus.Paused, pauseListener);
+    player.on(AudioPlayerStatus.AutoPaused, pauseListener);
+    player.on(AudioPlayerStatus.Playing, resumeListener);
+    player.once(AudioPlayerStatus.Idle, idleListener);
 }
 
 // Export Main Commands
 export {
-        DeezerAlbum,
-        DeezerPlaylist,
-        DeezerTrack,
-        SoundCloudPlaylist,
-        SoundCloudStream,
-        SoundCloudTrack,
-        SpotifyAlbum,
-        SpotifyPlaylist,
-        SpotifyTrack,
-        YouTubeChannel,
-        YouTubePlayList,
-        YouTubeVideo,
-        attachListeners,
-        authorization,
-        decipher_info,
-        deezer,
-        dz_advanced_track_search,
-        dz_validate,
-        extractID,
-        getFreeClientID,
-        is_expired,
-        playlist_info,
-        refreshToken,
-        search,
-        setToken,
-        so_validate,
-        soundcloud,
-        spotify,
-        sp_validate,
-        stream,
-        stream_from_info,
-        validate,
-        video_basic_info,
-        video_info,
-        yt_validate,
-        InfoData
+    DeezerAlbum,
+    DeezerPlaylist,
+    DeezerTrack,
+    SoundCloudPlaylist,
+    SoundCloudStream,
+    SoundCloudTrack,
+    SpotifyAlbum,
+    SpotifyPlaylist,
+    SpotifyTrack,
+    YouTubeChannel,
+    YouTubePlayList,
+    YouTubeVideo,
+    attachListeners,
+    authorization,
+    decipher_info,
+    deezer,
+    dz_advanced_track_search,
+    dz_validate,
+    extractID,
+    getFreeClientID,
+    is_expired,
+    playlist_info,
+    refreshToken,
+    search,
+    setToken,
+    so_validate,
+    soundcloud,
+    spotify,
+    sp_validate,
+    stream,
+    stream_from_info,
+    validate,
+    video_basic_info,
+    video_info,
+    yt_validate,
+    InfoData
 };
 
 // Export Types
@@ -520,39 +524,39 @@ export { Deezer, YouTube, SoundCloud, Spotify, YouTubeStream };
 
 // Export Default
 export default {
-        DeezerAlbum,
-        DeezerPlaylist,
-        DeezerTrack,
-        SoundCloudPlaylist,
-        SoundCloudStream,
-        SoundCloudTrack,
-        SpotifyAlbum,
-        SpotifyPlaylist,
-        SpotifyTrack,
-        YouTubeChannel,
-        YouTubePlayList,
-        YouTubeVideo,
-        attachListeners,
-        authorization,
-        decipher_info,
-        deezer,
-        dz_advanced_track_search,
-        dz_validate,
-        extractID,
-        getFreeClientID,
-        is_expired,
-        playlist_info,
-        refreshToken,
-        search,
-        setToken,
-        so_validate,
-        soundcloud,
-        spotify,
-        sp_validate,
-        stream,
-        stream_from_info,
-        validate,
-        video_basic_info,
-        video_info,
-        yt_validate
+    DeezerAlbum,
+    DeezerPlaylist,
+    DeezerTrack,
+    SoundCloudPlaylist,
+    SoundCloudStream,
+    SoundCloudTrack,
+    SpotifyAlbum,
+    SpotifyPlaylist,
+    SpotifyTrack,
+    YouTubeChannel,
+    YouTubePlayList,
+    YouTubeVideo,
+    attachListeners,
+    authorization,
+    decipher_info,
+    deezer,
+    dz_advanced_track_search,
+    dz_validate,
+    extractID,
+    getFreeClientID,
+    is_expired,
+    playlist_info,
+    refreshToken,
+    search,
+    setToken,
+    so_validate,
+    soundcloud,
+    spotify,
+    sp_validate,
+    stream,
+    stream_from_info,
+    validate,
+    video_basic_info,
+    video_info,
+    yt_validate
 };

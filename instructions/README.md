@@ -49,10 +49,11 @@ First Request :-
     and run it `node authorize.js`
 
 6. You will be asked :-
+     - If you require user specific information or not [ Will use the client credentials flow instead of authorization code ]
      - Saving INFO in file or not. [ If selected no, you will have to use `setToken` function after you get refresh-Token ]
      - Client ID
      - Client Secret
-     - Redirect URI or Redirect URL
+     - Redirect URI or Redirect URL [ Only applicable when client user specific information is not required ]
      - Market [ Choose 2 letter code on left side of your country name from [url](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements) ]
      - You will be given a link for authorizing. Just paste it in your browser and click on authorize and copy the link that you are redirected to. [ Redirected Link should start with Redirect URI / Redirect URL that you have provided ]
      - Paste the url in Redirected URL
