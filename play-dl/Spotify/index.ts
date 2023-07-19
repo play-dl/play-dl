@@ -166,7 +166,7 @@ export async function SpotifyAuthorize(
     else {
         console.log(`Client ID : ${spotifyData.client_id}`);
         console.log(`Client Secret : ${spotifyData.client_secret}`);
-        client_flow && console.log(`Refresh Token : ${spotifyData.refresh_token}`);
+        console.log(`Refresh Token : ${spotifyData.refresh_token}`);
         console.log(`Market : ${spotifyData.market}`);
         console.log(`\nPaste above info in setToken function.`);
     }
