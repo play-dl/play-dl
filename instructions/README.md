@@ -76,3 +76,28 @@ play.getFreeClientID().then((clientID) => {
     })
 })
 ```
+
+## CLI
+
+play-dl provide a CLI for authorization! Simply install play-dl as a Dev Dependency and create a script called `auth` with the value `playdl-auth`
+
+Run `npm run auth` or `yarn auth` in your shell
+
+##### Installing playdl as a Dev Dependency
+
+```bash
+npm install -D play-dl
+# or yarn
+yarn add -D play-dl
+```
+##### Creating a script in package.json
+
+Simply add this to package.json
+
+```json
+{
+    "scripts": {
+        "auth": "playdl-auth"
+    }
+}
+```

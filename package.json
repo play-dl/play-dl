@@ -52,5 +52,8 @@
   },
   "dependencies": {
     "play-audio": "^0.5.2"
+  },
+  "bin": {
+    "playdl-auth": "bin/cli.js"
   }
 }
