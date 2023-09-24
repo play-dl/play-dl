@@ -24,7 +24,7 @@ export interface SpotifyDataOptions {
     file?: boolean;
 }
 
-const pattern = /^((https:)?\/\/)?open.spotify.com\/(track|album|playlist)\//;
+const pattern = /^((https:)?\/\/)?open\.spotify\.com\/(?:intl\-.{2}\/)?(track|album|playlist)\//;
 /**
  * Gets Spotify url details.
  *
@@ -55,7 +55,9 @@ export async function spotify(url: string): Promise<Spotify> {
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyTrack(JSON.parse(response));
+        const resObj = JSON.parse(response);
+        if (resObj.error) throw new Error(`Got ${resObj.error.status} from the spotify request: ${resObj.error.message}`);
+        return new SpotifyTrack(resObj);
     } else if (url_.indexOf('album/') !== -1) {
         const albumID = url.split('album/')[1].split('&')[0].split('?')[0];
         const response = await request(`https://api.spotify.com/v1/albums/${albumID}?market=${spotifyData.market}`, {
@@ -66,7 +68,9 @@ export async function spotify(url: string): Promise<Spotify> {
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyAlbum(JSON.parse(response), spotifyData, false);
+        const resObj = JSON.parse(response);
+        if (resObj.error) throw new Error(`Got ${resObj.error.status} from the spotify request: ${resObj.error.message}`);
+        return new SpotifyAlbum(resObj, spotifyData, false);
     } else if (url_.indexOf('playlist/') !== -1) {
         const playlistID = url.split('playlist/')[1].split('&')[0].split('?')[0];
         const response = await request(
@@ -80,7 +84,9 @@ export async function spotify(url: string): Promise<Spotify> {
             return err;
         });
         if (response instanceof Error) throw response;
-        return new SpotifyPlaylist(JSON.parse(response), spotifyData, false);
+        const resObj = JSON.parse(response);
+        if (resObj.error) throw new Error(`Got ${resObj.error.status} from the spotify request: ${resObj.error.message}`);
+        return new SpotifyPlaylist(resObj, spotifyData, false);
     } else throw new Error('URL is out of scope for play-dl.');
 }
 /**

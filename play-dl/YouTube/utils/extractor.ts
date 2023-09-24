@@ -20,7 +20,7 @@ const video_id_pattern = /^[a-zA-Z\d_-]{11,12}$/;
 const playlist_id_pattern = /^(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}$/;
 const DEFAULT_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const video_pattern =
-    /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+    /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|shorts\/|embed\/|live\/|v\/)?)([\w\-]+)(\S+)?$/;
 const playlist_pattern =
     /^((?:https?:)?\/\/)?(?:(?:www|m|music)\.)?((?:youtube\.com|youtu.be))\/(?:(playlist|watch))?(.*)?((\?|\&)list=)(PL|UU|LL|RD|OL)[a-zA-Z\d_-]{10,}(&.*)?$/;
 /**
@@ -81,6 +81,8 @@ function extractVideoId(urlOrId: string): string | false {
             id = urlOrId.split('youtube.com/embed/')[1].split(/(\?|\/|&)/)[0];
         } else if (urlOrId.includes('youtube.com/shorts/')) {
             id = urlOrId.split('youtube.com/shorts/')[1].split(/(\?|\/|&)/)[0];
+        } else if (urlOrId.includes('youtube.com/live/')) {
+            id = urlOrId.split('youtube.com/live/')[1].split(/(\?|\/|&)/)[0];
         } else {
             id = (urlOrId.split('watch?v=')[1] ?? urlOrId.split('&v=')[1]).split(/(\?|\/|&)/)[0];
         }
@@ -231,7 +233,7 @@ export async function video_basic_info(url: string, options: InfoOptions = {}): 
         });
     }
     const rawChapters =
-        initial_response.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer?.decoratedPlayerBarRenderer.playerBar?.multiMarkersPlayerBarRenderer.markersMap.find(
+        initial_response.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer?.decoratedPlayerBarRenderer.playerBar?.multiMarkersPlayerBarRenderer.markersMap?.find(
             (m: any) => m.key === 'DESCRIPTION_CHAPTERS'
         )?.value?.chapters;
     const chapters: VideoChapter[] = [];
@@ -542,7 +544,7 @@ export async function playlist_info(url: string, options: PlaylistOptions = {}):
             throw new Error(`While parsing playlist url\n${response.alerts[0].alertRenderer.text.runs[0].text}`);
         else throw new Error('While parsing playlist url\nUnknown Playlist Error');
     }
-    if (url_.indexOf('watch?v=') !== -1) {
+    if (response.currentVideoEndpoint) {
         return getWatchPlaylist(response, body, url_);
     } else return getNormalPlaylist(response, body);
 }
@@ -629,7 +631,7 @@ async function acceptViewerDiscretion(
             },
             nextEndpoint: {
                 urlEndpoint: {
-                    url: `watch?v=${videoId}`
+                    url: `/watch?v=${videoId}&has_verified=1`
                 }
             },
             setControvercy: true
