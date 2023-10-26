@@ -399,6 +399,7 @@ export async function video_stream_info(url: string, options: InfoOptions = {}):
     const html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     const duration = Number(player_response.videoDetails.lengthSeconds);
     const video_details = {
+        title: player_response.videoDetails.title,
         url: `https://www.youtube.com/watch?v=${player_response.videoDetails.videoId}`,
         durationInSec: (duration < 0 ? 0 : duration) || 0
     };
