@@ -293,8 +293,14 @@ async function validate(
     const url_ = url.trim();
     if (!url_.startsWith('https')) return 'search';
     if (url_.indexOf('spotify') !== -1) {
-        check = sp_validate(url_);
-        return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
+        try {
+            check = sp_validate(url_);
+            return check !== false ? (('sp_' + check) as 'sp_track' | 'sp_album' | 'sp_playlist') : false;
+        } catch(e)
+        {
+            return false;
+        }
+       
     } else if (url_.indexOf('soundcloud') !== -1) {
         check = await so_validate(url_);
         return check !== false ? (('so_' + check) as 'so_playlist' | 'so_track') : false;
